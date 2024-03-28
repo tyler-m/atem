@@ -42,7 +42,6 @@ namespace Atem
 
         public static bool WillHalfCarry(this byte b, int value)
         {
-            
             return (((b & 0xF) + (value & 0xF)) & 0x10) == 0x10;
         }
 
