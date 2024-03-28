@@ -3,16 +3,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Atem
 {
-    public class View : Game
+    internal class View : Game
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Atem _atem;
 
-        public View()
+        public View(Atem atem)
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _atem = atem;
         }
 
         protected override void Initialize()
@@ -27,6 +29,7 @@ namespace Atem
 
         protected override void Update(GameTime gameTime)
         {
+            _atem.Update();
             base.Update(gameTime);
         }
 

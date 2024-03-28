@@ -2,11 +2,12 @@
 
 namespace Atem
 {
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            using var view = new View();
+            Atem atem = new Atem();
+            using View view = new View(atem);
             view.Run();
         }
     }
