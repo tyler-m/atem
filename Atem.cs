@@ -18,14 +18,14 @@ namespace Atem
             _bus.LoadBootROM("BOOT.bin");
         }
 
-        internal void Update()
+        public void Update()
         {
             for (int i = 0; i < _numberOfClocksPerFrame; i += _clockCost) {
                 Clock();
             }
         }
 
-        internal void Clock()
+        public void Clock()
         {
             _cpu.Clock();
         }
