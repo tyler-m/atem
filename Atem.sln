@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem", "Atem.csproj", "{E7A7EE12-9597-471E-84C4-D286F63EAD12}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2BB2D034-FC19-4E41-B378-96AC2C67AC81}
+	EndGlobalSection
+EndGlobal
