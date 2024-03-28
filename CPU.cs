@@ -2,12 +2,42 @@
 
 namespace Atem
 {
+    internal struct CPUFlags
+    {
+        public byte F;
+
+        public bool Z
+        {
+            get { return F.GetBit(7); }
+            set { F = F.SetBit(7, value); }
+        }
+
+        public bool N
+        {
+            get { return F.GetBit(6); }
+            set { F = F.SetBit(6, value); }
+        }
+
+        public bool H
+        {
+            get { return F.GetBit(5); }
+            set { F = F.SetBit(5, value); }
+        }
+
+        public bool C
+        {
+            get { return F.GetBit(4); }
+            set { F = F.SetBit(4, value); }
+        }
+    }
+
     internal struct CPURegisters
     {
         public byte IR;
         public byte A, B, C, D, E, H, L;
         public ushort PC, SP;
         public byte W, Z;
+        public CPUFlags Flags;
 
         public ushort BC
         {
