@@ -8,9 +8,9 @@ namespace Atem
 
         public bool Enabled;
 
-        public byte this[ushort address]
+        public byte Read(ushort address)
         {
-            get { return _rom[address]; }
+            return _rom[address & 0xFF];
         }
 
         public BootROM(string filepath = "", bool enabled = true)

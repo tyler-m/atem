@@ -19,7 +19,7 @@ namespace Atem
 
             if (block <= 0x00 && _bootROM.Enabled) // boot ROM
             {
-
+                return _bootROM.Read(address);
             }
             else if (block <= 0x7F) // cartridge ROM
             {
