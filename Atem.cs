@@ -27,6 +27,11 @@ namespace Atem
             }
         }
 
+        public void ClockCPUOneOp()
+        {
+            while (!_cpu.Clock()) ;
+        }
+
         public void Clock()
         {
             _cpu.Clock();
