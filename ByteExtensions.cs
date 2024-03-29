@@ -67,7 +67,7 @@ namespace Atem
 
         public static byte GetLowByte(this ushort us)
         {
-            return (byte)(us & 0xFF);
+            return (byte)us;
         }
     }
 }
