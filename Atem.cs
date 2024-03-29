@@ -8,11 +8,13 @@ namespace Atem
         private int _clockCost = 4;
 
         private CPU _cpu;
+        private PPU _ppu;
         private Bus _bus;
 
         public Atem()
         {
-            _bus = new Bus();
+            _ppu = new PPU();
+            _bus = new Bus(_ppu);
             _cpu = new CPU(_bus);
 
             _bus.LoadBootROM("BOOT.bin");

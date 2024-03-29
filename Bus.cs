@@ -1,11 +1,16 @@
-﻿using System;
-
+﻿
 namespace Atem
 {
     internal class Bus
     {
+        private PPU _ppu;
         private BootROM _bootROM;
         private byte[] _hram = new byte[0x7F];
+
+        public Bus(PPU ppu)
+        {
+            _ppu = ppu;
+        }
 
         public void LoadBootROM(string filepath, bool enabled = true)
         {
@@ -27,7 +32,7 @@ namespace Atem
             }
             else if (block <= 0x9F) // VRAM
             {
-
+                return _ppu.ReadVRAM(address);
             }
             else if (block <= 0xBF) // cartridge RAM
             {
@@ -82,7 +87,7 @@ namespace Atem
             }
             else if (block <= 0x9F) // VRAM
             {
-
+                _ppu.WriteVRAM(address, value);
             }
             else if (block <= 0xBF) // cartridge RAM
             {
