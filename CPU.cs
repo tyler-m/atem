@@ -88,6 +88,14 @@ namespace Atem
         private int _opCycle;
         private int _opLength;
 
+        public CPURegisters Registers
+        {
+            get
+            {
+                return _registers;
+            }
+        }
+
         public CPU(Bus bus)
         {
             _bus = bus;
@@ -103,7 +111,7 @@ namespace Atem
             _bus.Write(address, value);
         }
 
-        public void Clock()
+        public bool Clock()
         {
             byte opcode = _registers.IR;
 
@@ -204,6 +212,8 @@ namespace Atem
                 _registers.IR = Read(_registers.PC++);
                 _opCycle = 0;
             }
+
+            return _opCycle == 0;
         }
     }
 }
