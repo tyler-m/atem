@@ -85,6 +85,9 @@ namespace Atem
         private CPURegisters _registers;
         private Bus _bus;
 
+        private int _opCycle;
+        private int _opLength;
+
         public CPU(Bus bus)
         {
             _bus = bus;
@@ -102,7 +105,19 @@ namespace Atem
 
         public void Clock()
         {
+            byte opCode = _registers.IR;
 
+            if (opCode == 0x00) // NOP
+            {
+                _opLength = 1;
+            }
+
+            _opCycle++;
+            if (_opCycle == _opLength)
+            {
+                _registers.IR = Read(_registers.PC++);
+                _opCycle = 0;
+            }
         }
     }
 }
