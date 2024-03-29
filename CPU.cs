@@ -105,11 +105,97 @@ namespace Atem
 
         public void Clock()
         {
-            byte opCode = _registers.IR;
+            byte opcode = _registers.IR;
 
-            if (opCode == 0x00) // NOP
+            if (opcode == 0x00) // NOP
             {
-                _opLength = 1;
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                }
+            }
+            else if (opcode == 0x21) // LD HL,u16
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.PC++);
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.HL = _registers.WZ;
+                }
+            }
+            else if (opcode == 0x31) // LD SP,u16
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.PC++);
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.SP = _registers.WZ;
+                }
+            }
+            else if (opcode == 0x32) // LD (HL-),A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    Write(_registers.HL--, _registers.A);
+                }
+            }
+            else if (opcode == 0xAF) // XOR A,A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A &= _registers.A;
+                    _registers.Flags.C = false;
+                    _registers.Flags.N = false;
+                    _registers.Flags.H = false;
+                    _registers.Flags.Z = _registers.A == 0;
+                }
+            }
+            else if (opcode == 0xCB) // CB
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else // handle CB prefixed opcode
+                {
+                    opcode = _registers.Z;
+
+                    if (opcode == 0x7C) // BIT 7,H
+                    {
+                        if (_opCycle == 1)
+                        {
+                            _opLength = 2;
+                            _registers.Flags.H = true;
+                            _registers.Flags.N = false;
+                            _registers.Flags.Z = !_registers.H.GetBit(7);
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception($"Unhandled CB prefixed opcode 0x{opcode:X2}.");
+                    }
+                }
+            }
+            else
+            {
+                throw new Exception($"Unhandled opcode 0x{opcode:X2}.");
             }
 
             _opCycle++;
