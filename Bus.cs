@@ -5,6 +5,7 @@ namespace Atem
     {
         private PPU _ppu;
         private BootROM _bootROM;
+        private Cartridge _cartridge;
         private byte[] _hram = new byte[0x7F];
 
         public Bus(PPU ppu)
@@ -15,6 +16,11 @@ namespace Atem
         public void LoadBootROM(string filepath, bool enabled = true)
         {
             _bootROM = new BootROM(filepath, enabled);
+        }
+
+        public void LoadCartridge(string filepath)
+        {
+            _cartridge = new Cartridge(filepath);
         }
 
         public byte Read(ushort address)
@@ -28,7 +34,7 @@ namespace Atem
             }
             else if (block <= 0x7F) // cartridge ROM
             {
-
+                return _cartridge.ReadROM(address);
             }
             else if (block <= 0x9F) // VRAM
             {
@@ -36,7 +42,7 @@ namespace Atem
             }
             else if (block <= 0xBF) // cartridge RAM
             {
-
+                return _cartridge.ReadRAM(address);
             }
             else if (block <= 0xDF) // WRAM
             {
@@ -91,7 +97,7 @@ namespace Atem
             }
             else if (block <= 0xBF) // cartridge RAM
             {
-
+                _cartridge.WriteRAM(address, value);
             }
             else if (block <= 0xDF) // WRAM
             {
