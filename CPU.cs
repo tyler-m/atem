@@ -37,6 +37,7 @@ namespace Atem
         public byte A, B, C, D, E, H, L;
         public ushort PC, SP;
         public byte W, Z;
+        public bool IME;
         public CPUFlags Flags;
 
         public ushort BC
@@ -123,6 +124,22 @@ namespace Atem
                     _opLength = 1;
                 }
             }
+            else if (opcode == 0x01) // LD BC,u16
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.PC++);
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.BC = _registers.WZ;
+                }
+            }
             else if (opcode == 0x04) // INC B
             {
                 if (_opCycle == 0)
@@ -155,6 +172,14 @@ namespace Atem
                 else if (_opCycle == 1)
                 {
                     _registers.B = _registers.Z;
+                }
+            }
+            else if (opcode == 0x0B) // DEC BC
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.BC--;
                 }
             }
             else if (opcode == 0x0C) // INC C
@@ -383,6 +408,18 @@ namespace Atem
                     }
                 }
             }
+            else if (opcode == 0x2A) // LD A,(HL+)
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.HL++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.A = _registers.Z;
+                }
+            }
             else if (opcode == 0x2E) // LD L,u8
             {
                 if (_opCycle == 0)
@@ -417,6 +454,18 @@ namespace Atem
                 {
                     _opLength = 2;
                     Write(_registers.HL--, _registers.A);
+                }
+            }
+            else if (opcode == 0x36) // LD (HL),u8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                if (_opCycle == 1)
+                {
+                    Write(_registers.HL, _registers.Z);
                 }
             }
             else if (opcode == 0x3D) // DEC A
@@ -543,6 +592,18 @@ namespace Atem
                     _registers.Flags.C = false;
                     _registers.Flags.N = false;
                     _registers.Flags.H = false;
+                    _registers.Flags.Z = _registers.A == 0;
+                }
+            }
+            else if (opcode == 0xB1) // OR A,C
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A &= _registers.C;
+                    _registers.Flags.C = false;
+                    _registers.Flags.H = false;
+                    _registers.Flags.N = false;
                     _registers.Flags.Z = _registers.A == 0;
                 }
             }
@@ -745,6 +806,14 @@ namespace Atem
                     _registers.A = _registers.Z;
                 }
             }
+            else if (opcode == 0xF3) // DI
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.IME = false;
+                }
+            }
             else if (opcode == 0xFE) // CP A,u8
             {
                 if (_opCycle == 0)
@@ -758,6 +827,24 @@ namespace Atem
                     _registers.Flags.H = _registers.A.WillHalfBorrow(_registers.Z);
                     _registers.Flags.N = true;
                     _registers.Flags.Z = _registers.A == _registers.Z;
+                }
+            }
+            else if (opcode == 0xFF) // RST 38h
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 4;
+                    _registers.SP--;
+                }
+                else if (_opCycle == 1)
+                {
+                    Write(_registers.SP, _registers.PC.GetHighByte());
+                    _registers.SP--;
+                }
+                else if (_opCycle == 2)
+                {
+                    Write(_registers.SP, _registers.PC.GetLowByte());
+                    _registers.PC = 0x0038;
                 }
             }
             else
