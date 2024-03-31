@@ -123,6 +123,28 @@ namespace Atem
                     _opLength = 1;
                 }
             }
+            else if (opcode == 0x04) // INC B
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.B.WillCarry(1);
+                    _registers.Flags.N = false;
+                    _registers.B++;
+                    _registers.Flags.Z = _registers.B == 0;
+                }
+            }
+            else if (opcode == 0x05) // DEC B
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.B.WillHalfBorrow(1);
+                    _registers.Flags.N = true;
+                    _registers.B--;
+                    _registers.Flags.Z = _registers.B == 0;
+                }
+            }
             else if (opcode == 0x06) // LD B,u8
             {
                 if (_opCycle == 0)
@@ -143,6 +165,17 @@ namespace Atem
                     _registers.Flags.H = _registers.C.WillCarry(1);
                     _registers.Flags.N = false;
                     _registers.C++;
+                    _registers.Flags.Z = _registers.C == 0;
+                }
+            }
+            else if (opcode == 0x0D) // DEC C
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.C.WillHalfBorrow(1);
+                    _registers.Flags.N = true;
+                    _registers.C--;
                     _registers.Flags.Z = _registers.C == 0;
                 }
             }
@@ -174,6 +207,37 @@ namespace Atem
                     _registers.DE = _registers.WZ;
                 }
             }
+            else if (opcode == 0x13) // INC DE
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.DE++;
+                }
+            }
+            else if (opcode == 0x15) // DEC D
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.D.WillHalfBorrow(1);
+                    _registers.Flags.N = true;
+                    _registers.D--;
+                    _registers.Flags.Z = _registers.D == 0;
+                }
+            }
+            else if (opcode == 0x16) // LD D,u8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.D = _registers.Z;
+                }
+            }
             else if (opcode == 0x17) // RLA
             {
                 if (_opCycle == 0)
@@ -188,6 +252,23 @@ namespace Atem
                     _registers.Flags.Z = false; // ?
                 }
             }
+            else if (opcode == 0x18) // JR s8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+
+                }
+                else if (_opCycle == 2)
+                {
+                    int offset = (sbyte)_registers.Z;
+                    _registers.PC = (ushort)(_registers.PC + offset);
+                }
+            }
             else if (opcode == 0x1A) // LD A,(DE)
             {
                 if (_opCycle == 0)
@@ -198,6 +279,29 @@ namespace Atem
                 else if (_opCycle == 1)
                 {
                     _registers.A = _registers.Z;
+                }
+            }
+            else if (opcode == 0x1D) // DEC E
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.E.WillHalfBorrow(1);
+                    _registers.Flags.N = true;
+                    _registers.E--;
+                    _registers.Flags.Z = _registers.E == 0;
+                }
+            }
+            else if (opcode == 0x1E) // LD E,u8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.E = _registers.Z;
                 }
             }
             else if (opcode == 0x20) // JR NZ,s8
@@ -234,6 +338,63 @@ namespace Atem
                     _registers.HL = _registers.WZ;
                 }
             }
+            else if (opcode == 0x22) // LD (HL+),A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    Write(_registers.HL++, _registers.A);
+                }
+            }
+            else if (opcode == 0x23) // INC HL
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.HL++;
+                }
+            }
+            else if (opcode == 0x24) // INC H
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.H.WillCarry(1);
+                    _registers.Flags.N = false;
+                    _registers.H++;
+                    _registers.Flags.Z = _registers.H == 0;
+                }
+            }
+            else if (opcode == 0x28) // JR Z,s8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                    _opCondition = _registers.Flags.Z;
+                }
+                else if (_opCycle == 1)
+                {
+                    if (_opCondition)
+                    {
+                        _opLength = 3;
+                        int offset = (sbyte)_registers.Z;
+                        _registers.PC = (ushort)(_registers.PC + offset);
+                    }
+                }
+            }
+            else if (opcode == 0x2E) // LD L,u8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.L = _registers.Z;
+                }
+            }
             else if (opcode == 0x31) // LD SP,u16
             {
                 if (_opCycle == 0)
@@ -258,6 +419,17 @@ namespace Atem
                     Write(_registers.HL--, _registers.A);
                 }
             }
+            else if (opcode == 0x3D) // DEC A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.H = _registers.A.WillHalfBorrow(1);
+                    _registers.Flags.N = true;
+                    _registers.A--;
+                    _registers.Flags.Z = _registers.A == 0;
+                }
+            }
             else if (opcode == 0x3E) // LD A,u8
             {
                 if (_opCycle == 0)
@@ -278,12 +450,88 @@ namespace Atem
                     _registers.C = _registers.A;
                 }
             }
+            else if (opcode == 0x57) // LD D,A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.D = _registers.A;
+                }
+            }
+            else if (opcode == 0x67) // LD H,A
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.H = _registers.A;
+                }
+            }
             else if (opcode == 0x77) // LD (HL),A
             {
                 if (_opCycle == 0)
                 {
                     _opLength = 2;
                     Write(_registers.HL, _registers.A);
+                }
+            }
+            else if (opcode == 0x78) // LD A,B
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A = _registers.B;
+                }
+            }
+            else if (opcode == 0x7B) // LD A,E
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A = _registers.E;
+                }
+            }
+            else if (opcode == 0x7C) // LD A,H
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A = _registers.H;
+                }
+            }
+            else if (opcode == 0x7D) // LD A,L
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.A = _registers.L;
+                }
+            }
+            else if (opcode == 0x86) // Add A,(HL)
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.HL);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.Flags.C = _registers.A.WillCarry(_registers.Z);
+                    _registers.Flags.H = _registers.A.WillHalfCarry(_registers.Z);
+                    _registers.Flags.N = false;
+                    _registers.A += _registers.Z;
+                    _registers.Flags.Z = _registers.A == 0;
+                }
+            }
+            else if (opcode == 0x90) // SUB A,B
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 1;
+                    _registers.Flags.C = _registers.A.WillBorrow(_registers.B);
+                    _registers.Flags.H = _registers.A.WillHalfBorrow(_registers.B);
+                    _registers.Flags.N = true;
+                    _registers.A -= _registers.B;
+                    _registers.Flags.Z = _registers.A == 0;
                 }
             }
             else if (opcode == 0xAF) // XOR A,A
@@ -296,6 +544,21 @@ namespace Atem
                     _registers.Flags.N = false;
                     _registers.Flags.H = false;
                     _registers.Flags.Z = _registers.A == 0;
+                }
+            }
+            else if (opcode == 0xBE) // CP A,(HL)
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.HL);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.Flags.C = _registers.A.WillBorrow(_registers.Z);
+                    _registers.Flags.H = _registers.A.WillHalfBorrow(_registers.Z);
+                    _registers.Flags.N = true;
+                    _registers.Flags.Z = _registers.A == _registers.Z;
                 }
             }
             else if (opcode == 0xC1) // POP BC
@@ -312,6 +575,22 @@ namespace Atem
                 else if (_opCycle == 2)
                 {
                     _registers.BC = _registers.WZ;
+                }
+            }
+            else if (opcode == 0xC3) // JP u16
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 4;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.PC++);
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.PC = _registers.WZ;
                 }
             }
             else if (opcode == 0xC5) // PUSH BC
@@ -398,6 +677,22 @@ namespace Atem
                     _registers.PC = _registers.WZ;
                 }
             }
+            else if (opcode == 0xC9) // RET
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 4;
+                    _registers.Z = Read(_registers.SP++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.SP++);
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.PC = _registers.WZ;
+                }
+            }
             else if (opcode == 0xE0) // LD (FF00+u8),A
             {
                 if (_opCycle == 0)
@@ -416,6 +711,53 @@ namespace Atem
                 {
                     _opLength = 2;
                     Write((ushort)(0xFF00 | _registers.C), _registers.A);
+                }
+            }
+            else if (opcode == 0xEA) // LD (u16),A
+            {
+                if(_opCycle == 0)
+                {
+                    _opLength = 4;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.W = Read(_registers.PC++);
+                }
+                else if (_opCycle == 2)
+                {
+                    Write(_registers.WZ, _registers.A);
+                }
+            }
+            else if (opcode == 0xF0) // LD A,(FF00+u8)
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 3;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.Z = Read((ushort)(0xFF00 | _registers.Z));
+                }
+                else if (_opCycle == 2)
+                {
+                    _registers.A = _registers.Z;
+                }
+            }
+            else if (opcode == 0xFE) // CP A,u8
+            {
+                if (_opCycle == 0)
+                {
+                    _opLength = 2;
+                    _registers.Z = Read(_registers.PC++);
+                }
+                else if (_opCycle == 1)
+                {
+                    _registers.Flags.C = _registers.A.WillBorrow(_registers.Z);
+                    _registers.Flags.H = _registers.A.WillHalfBorrow(_registers.Z);
+                    _registers.Flags.N = true;
+                    _registers.Flags.Z = _registers.A == _registers.Z;
                 }
             }
             else
