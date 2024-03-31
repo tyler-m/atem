@@ -63,7 +63,7 @@ namespace Atem
             {
                 if (offset <= 0x7F) // I/O registers
                 {
-
+                    return ReadIO(offset);
                 }
                 else if (offset <= 0xFE) // HRAM
                 {
@@ -76,6 +76,76 @@ namespace Atem
             }
 
             return 0xFF;
+        }
+
+        private byte ReadIO(byte offset)
+        {
+            if (offset == 0x00)
+            {
+
+            }
+            else if (offset == 0x42)
+            {
+                return _ppu.SCY;
+            }
+            else if (offset == 0x44)
+            {
+                return _ppu.LY;
+            }
+            else
+            {
+                throw new System.Exception($"ReadIO undefined at offset {offset:X2}.");
+            }
+
+            return 0xFF;
+        }
+
+        private void WriteIO(byte offset, byte value)
+        {
+            if (offset == 0x00)
+            {
+
+            }
+            else if (offset <= 0x26)
+            {
+
+            }
+            else if (offset == 0x40)
+            {
+                _ppu.LCDC = value;
+            }
+            else if (offset == 0x41)
+            {
+                _ppu.STAT = value;
+            }
+            else if (offset == 0x42)
+            {
+                _ppu.SCY = value;
+            }
+            else if (offset == 0x43)
+            {
+                _ppu.SCX = value;
+            }
+            else if (offset == 0x47)
+            {
+                _ppu.BGP = value;
+            }
+            else if (offset == 0x48)
+            {
+                _ppu.OBP0 = value;
+            }
+            else if (offset == 0x49)
+            {
+                _ppu.OBP1 = value;
+            }
+            else if (offset == 0x50)
+            {
+                _bootROM.Enabled = false;
+            }
+            else
+            {
+                throw new System.Exception($"WriteIO undefined at offset {offset:X2}.");
+            }
         }
 
         public void Write(ushort address, byte value)
@@ -118,7 +188,7 @@ namespace Atem
             {
                 if (offset <= 0x7F) // I/O registers
                 {
-
+                    WriteIO(offset, value);
                 } 
                 else if (offset <= 0xFE) // HRAM
                 {
