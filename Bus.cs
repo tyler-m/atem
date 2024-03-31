@@ -4,13 +4,15 @@ namespace Atem
     internal class Bus
     {
         private PPU _ppu;
+        private Timer _timer;
         private BootROM _bootROM;
         private Cartridge _cartridge;
         private byte[] _hram = new byte[0x7F];
 
-        public Bus(PPU ppu)
+        public Bus(PPU ppu, Timer timer)
         {
             _ppu = ppu;
+            _timer = timer;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
@@ -84,6 +86,22 @@ namespace Atem
             {
 
             }
+            else if (offset == 0x04)
+            {
+                return _timer.DIV;
+            }
+            else if (offset == 0x05)
+            {
+                return _timer.TIMA;
+            }
+            else if (offset == 0x06)
+            {
+                return _timer.TMA;
+            }
+            else if (offset == 0x07)
+            {
+                return _timer.TAC;
+            }
             else if (offset == 0x42)
             {
                 return _ppu.SCY;
@@ -105,6 +123,22 @@ namespace Atem
             if (offset == 0x00)
             {
 
+            }
+            else if (offset == 0x04)
+            {
+                _timer.DIV = value;
+            }
+            else if (offset == 0x05)
+            {
+                _timer.TIMA = value;
+            }
+            else if (offset == 0x06)
+            {
+                _timer.TMA = value;
+            }
+            else if (offset == 0x07)
+            {
+                _timer.TAC = value;
             }
             else if (offset <= 0x26)
             {

@@ -10,6 +10,7 @@ namespace Atem
         private CPU _cpu;
         private PPU _ppu;
         private Bus _bus;
+        private Timer _timer;
 
         public event VerticalBlankEvent OnVerticalBlank
         {
@@ -26,7 +27,8 @@ namespace Atem
         public Atem()
         {
             _ppu = new PPU();
-            _bus = new Bus(_ppu);
+            _timer = new Timer();
+            _bus = new Bus(_ppu, _timer);
             _cpu = new CPU(_bus);
 
             _bus.LoadBootROM("BOOT.bin");
@@ -49,6 +51,7 @@ namespace Atem
         {
             _cpu.Clock();
             _ppu.Clock();
+            _timer.Clock();
         }
     }
 }
