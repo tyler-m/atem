@@ -4,7 +4,11 @@ namespace Atem
 {
     internal class Atem
     {
-        private const int NumberOfClocksPerFrame = 70224;
+        private const int ClockFrequency = 4194304;
+        private const float FrameFrequency = 59.73f;
+        private const float ClocksPerFrame = ClockFrequency / FrameFrequency;
+
+        private float _leftoverClocks = 0.0f;
         private int _clockCost = 4;
 
         private CPU _cpu;
@@ -37,9 +41,14 @@ namespace Atem
 
         public void Update()
         {
-            for (int i = 0; i < NumberOfClocksPerFrame; i += _clockCost) {
+            int additionalClocks = (int)(_leftoverClocks / _clockCost);
+            float clocksForCurrentFrame = ClocksPerFrame + additionalClocks;
+
+            for (int i = 0; i < clocksForCurrentFrame; i += _clockCost) {
                 Clock();
             }
+
+            _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost*additionalClocks;
         }
 
         public void ClockCPUOneOp()
