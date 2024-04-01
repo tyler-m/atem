@@ -27,6 +27,8 @@ namespace Atem
         public byte BGP;
         public byte OBP0;
         public byte OBP1;
+        public byte WY;
+        public byte WX;
 
         public bool LCDEnabled
         {
