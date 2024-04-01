@@ -16,6 +16,8 @@ namespace Atem
         private Bus _bus;
         private Timer _timer;
 
+        public ViewHelper ViewHelper { get; private set; }
+
         public event VerticalBlankEvent OnVerticalBlank
         {
             add
@@ -37,6 +39,8 @@ namespace Atem
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
+
+            ViewHelper = new ViewHelper(_cpu, _bus);
         }
 
         public void Update()
