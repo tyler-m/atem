@@ -51,16 +51,18 @@ namespace Atem
             _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost*additionalClocks;
         }
 
-        public void ClockCPUOneOp()
+
+        public void ClockOneCPUOp()
         {
-            while (!_cpu.Clock()) ;
+            while (!Clock()) ;
         }
 
-        public void Clock()
+        public bool Clock()
         {
-            _cpu.Clock();
+            bool opFinished = _cpu.Clock();
             _ppu.Clock();
             _timer.Clock();
+            return opFinished;
         }
     }
 }

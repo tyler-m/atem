@@ -34,7 +34,7 @@ namespace Atem
 
             _atem = atem;
             _atem.OnVerticalBlank += OnVerticalBlank;
-            _atem.ClockCPUOneOp();
+            _atem.ClockOneCPUOp();
         }
 
         protected override void Initialize()
@@ -56,11 +56,15 @@ namespace Atem
 
             if (_currentKeyboardState.IsKeyDown(Keys.Right) && !_previousKeyboardState.IsKeyDown(Keys.Right))
             {
-                _atem.Clock();
+                _atem.ClockOneCPUOp();
             }
             else if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
             {
                 _pauseAtem = !_pauseAtem;
+            }
+            else if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
+            {
+                _atem.Update();
             }
 
             if (!_pauseAtem)
@@ -73,11 +77,11 @@ namespace Atem
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(new Color(33, 36, 39));
 
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
             _spriteBatch.Draw(_screenTexture,
-                new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight),
+                new Rectangle(0, 0, (int)(ScreenWidth * ScreenSizeFactor), (int)(ScreenHeight * ScreenSizeFactor)),
                 new Rectangle(0, 0, ScreenWidth, ScreenHeight), Color.White);
             _spriteBatch.End();
 
