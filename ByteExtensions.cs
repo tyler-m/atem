@@ -69,5 +69,10 @@ namespace Atem
         {
             return (byte)us;
         }
+
+        public static byte SwapNibbles(this byte b)
+        {
+            return (byte)((b >> 4) | (b << 4));
+        }
     }
 }
