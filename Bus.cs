@@ -8,6 +8,7 @@ namespace Atem
         private BootROM _bootROM;
         private Cartridge _cartridge;
         private byte[] _hram = new byte[0x7F];
+        private byte[] _wram = new byte[0x2000];
 
         public Bus(PPU ppu, Timer timer)
         {
@@ -48,7 +49,7 @@ namespace Atem
             }
             else if (block <= 0xDF) // WRAM
             {
-
+                return _wram[address & 0x1FFF];
             }
             else if (block <= 0xFD) // echo RAM
             {
@@ -102,6 +103,10 @@ namespace Atem
             {
                 return _timer.TAC;
             }
+            else if (offset == 0x40)
+            {
+                return _ppu.LCDC;
+            }
             else if (offset == 0x42)
             {
                 return _ppu.SCY;
@@ -120,7 +125,11 @@ namespace Atem
 
         private void WriteIO(byte offset, byte value)
         {
-            if (offset == 0x00)
+            if (offset == 0x00) // joypad
+            {
+
+            }
+            else if (offset <= 0x02) // serial
             {
 
             }
@@ -140,7 +149,7 @@ namespace Atem
             {
                 _timer.TAC = value;
             }
-            else if (offset <= 0x26)
+            else if (offset <= 0x3F) // audio
             {
 
             }
@@ -172,9 +181,21 @@ namespace Atem
             {
                 _ppu.OBP1 = value;
             }
+            else if (offset == 0x4A)
+            {
+                _ppu.WY = value;
+            }
+            else if (offset == 0x4B)
+            {
+                _ppu.WX = value;
+            }
             else if (offset == 0x50)
             {
                 _bootROM.Enabled = false;
+            }
+            else if (offset >= 0x78) // unused?
+            {
+
             }
             else
             {
@@ -205,7 +226,7 @@ namespace Atem
             }
             else if (block <= 0xDF) // WRAM
             {
-
+                _wram[address & 0x1FFF] = value;
             }
             else if (block <= 0xFD) // echo RAM
             {
