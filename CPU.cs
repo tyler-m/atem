@@ -90,7 +90,7 @@ namespace Atem
         private int _opLength;
         private bool _opCondition;
 
-        public ushort AddressOfOperationBeingExecuted { get; set; }
+        public ushort AddressOfNextOperation { get; set; }
 
         public CPURegisters Registers
         {
@@ -118,7 +118,6 @@ namespace Atem
         public bool Clock()
         {
             byte opcode = _registers.IR;
-            ushort pc = _registers.PC;
 
             if (opcode == 0x00) // NOP
             {
@@ -1185,14 +1184,10 @@ namespace Atem
                 throw new Exception($"Unhandled opcode 0x{opcode:X2}.");
             }
 
-            if (_opCycle == 0)
-            {
-                AddressOfOperationBeingExecuted = pc;
-            }
-
             _opCycle++;
             if (_opCycle == _opLength)
             {
+                AddressOfNextOperation = _registers.PC;
                 _registers.IR = Read(_registers.PC++);
                 _opCycle = 0;
             }
