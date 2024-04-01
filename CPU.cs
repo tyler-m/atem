@@ -588,7 +588,7 @@ namespace Atem
                 if (_opCycle == 0)
                 {
                     _opLength = 1;
-                    _registers.A &= _registers.A;
+                    _registers.A ^= _registers.A;
                     _registers.Flags.C = false;
                     _registers.Flags.N = false;
                     _registers.Flags.H = false;
