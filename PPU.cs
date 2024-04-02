@@ -11,9 +11,12 @@ namespace Atem
             Draw
         }
 
+        private Bus _bus;
+
         private int _lineDotCount;
         private byte _linePixel;
         private byte[] _vram = new byte[0x2000];
+        private byte[] _oam = new byte[160];
         private byte[] _screen = new byte[160*144];
 
         public delegate void VerticalBlankEvent(byte[] screen);
@@ -29,6 +32,24 @@ namespace Atem
         public byte OBP1;
         public byte WY;
         public byte WX;
+
+        private byte _dma;
+
+        public byte DMA
+        {
+            get
+            {
+                return _dma;
+            }
+            set
+            {
+                for (int i = 0; i < 160; i++)
+                {
+                    _oam[i] = _bus.Read((ushort)((value << 8) + i));
+                }
+                _dma = value;
+            }
+        }
 
         public bool LCDEnabled
         {
@@ -68,8 +89,9 @@ namespace Atem
             }
         }
 
-        public PPU()
+        public PPU(Bus bus)
         {
+            _bus = bus;
             Mode = PPUMode.OAM;
         }
 
@@ -163,6 +185,7 @@ namespace Atem
                     {
                         Mode = PPUMode.VerticalBlank;
                         OnVerticalBlank?.Invoke(_screen);
+                        _bus.RequestInterrupt(InterruptType.VerticalBlank);
                     }
                     else
                     {

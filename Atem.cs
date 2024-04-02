@@ -15,6 +15,7 @@ namespace Atem
         private PPU _ppu;
         private Bus _bus;
         private Timer _timer;
+        private Interrupt _interrupt;
 
         public ViewHelper ViewHelper { get; private set; }
 
@@ -32,10 +33,12 @@ namespace Atem
 
         public Atem()
         {
-            _ppu = new PPU();
-            _timer = new Timer();
-            _bus = new Bus(_ppu, _timer);
+            _bus = new Bus();
             _cpu = new CPU(_bus);
+            _ppu = new PPU(_bus);
+            _timer = new Timer();
+            _interrupt = new Interrupt();
+            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");

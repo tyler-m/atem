@@ -3,17 +3,21 @@ namespace Atem
 {
     internal class Bus
     {
+        private CPU _cpu;
         private PPU _ppu;
         private Timer _timer;
+        private Interrupt _interrupt;
         private BootROM _bootROM;
         private Cartridge _cartridge;
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-        public Bus(PPU ppu, Timer timer)
+        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt)
         {
+            _cpu = cpu;
             _ppu = ppu;
             _timer = timer;
+            _interrupt = interrupt;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
@@ -64,18 +68,7 @@ namespace Atem
             }
             else if (block <= 0xFF)
             {
-                if (offset <= 0x7F) // I/O registers
-                {
-                    return ReadIO(offset);
-                }
-                else if (offset <= 0xFE) // HRAM
-                {
-                    return _hram[offset & 0x7F];
-                }
-                else if (offset <= 0xFF) // IE register
-                {
-
-                }
+                return ReadIO(offset);
             }
 
             return 0xFF;
@@ -103,6 +96,10 @@ namespace Atem
             {
                 return _timer.TAC;
             }
+            else if (offset == 0x0F)
+            {
+                return _interrupt.IF;
+            }
             else if (offset == 0x40)
             {
                 return _ppu.LCDC;
@@ -114,6 +111,22 @@ namespace Atem
             else if (offset == 0x44)
             {
                 return _ppu.LY;
+            }
+            else if (offset == 0x46)
+            {
+                return _ppu.DMA;
+            }
+            else if (offset >= 0x78 && offset <= 0x7F) // unused?
+            {
+
+            }
+            else if (offset <= 0xFE)
+            {
+                return _hram[offset & 0x7F];
+            }
+            else if (offset == 0xFF)
+            {
+                return _interrupt.IE;
             }
             else
             {
@@ -149,6 +162,10 @@ namespace Atem
             {
                 _timer.TAC = value;
             }
+            else if (offset == 0x0F)
+            {
+                _interrupt.IF = value;
+            }
             else if (offset <= 0x3F) // audio
             {
 
@@ -168,6 +185,10 @@ namespace Atem
             else if (offset == 0x43)
             {
                 _ppu.SCX = value;
+            }
+            else if (offset == 0x46)
+            {
+                _ppu.DMA = value;
             }
             else if (offset == 0x47)
             {
@@ -193,9 +214,17 @@ namespace Atem
             {
                 _bootROM.Enabled = false;
             }
-            else if (offset >= 0x78) // unused?
+            else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
 
+            }
+            else if (offset <= 0xFE)
+            {
+                _hram[offset & 0x7F] = value;
+            }
+            else if (offset == 0xFF)
+            {
+                _interrupt.IE = value;
             }
             else
             {
@@ -241,19 +270,13 @@ namespace Atem
             }
             else if (block <= 0xFF)
             {
-                if (offset <= 0x7F) // I/O registers
-                {
-                    WriteIO(offset, value);
-                } 
-                else if (offset <= 0xFE) // HRAM
-                {
-                    _hram[offset & 0x7F] = value;
-                }
-                else if (offset <= 0xFF) // IE register
-                {
-
-                }
+                WriteIO(offset, value);
             }
+        }
+
+        internal void RequestInterrupt(InterruptType interruptType)
+        {
+            _interrupt.SetInterrupt(interruptType);
         }
     }
 }
