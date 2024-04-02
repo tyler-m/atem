@@ -70,6 +70,16 @@ namespace Atem
             return (byte)us;
         }
 
+        public static byte GetLowNibble(this byte b)
+        {
+            return (byte)(b & 0b00001111);
+        }
+
+        public static byte GetHighNibble(this byte b)
+        {
+            return (byte)((b & 0b11110000) >> 4);
+        }
+
         public static byte SwapNibbles(this byte b)
         {
             return (byte)((b >> 4) | (b << 4));
