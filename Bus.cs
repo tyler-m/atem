@@ -7,17 +7,22 @@ namespace Atem
         private PPU _ppu;
         private Timer _timer;
         private Interrupt _interrupt;
+        private Joypad _joypad;
+        private Serial _serial;
         private BootROM _bootROM;
         private Cartridge _cartridge;
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt)
+
+        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial)
         {
             _cpu = cpu;
             _ppu = ppu;
             _timer = timer;
             _interrupt = interrupt;
+            _joypad = joypad;
+            _serial = serial;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
@@ -63,7 +68,7 @@ namespace Atem
             {
                 if (offset <= 0x9F) // OAM
                 {
-
+                    return _ppu.ReadOAM(address);
                 }
             }
             else if (block <= 0xFF)
@@ -78,7 +83,15 @@ namespace Atem
         {
             if (offset == 0x00)
             {
-
+                return _joypad.JOYP;
+            }
+            else if (offset == 0x01)
+            {
+                return _serial.SC;
+            }
+            else if (offset == 0x02)
+            {
+                return _serial.SB;
             }
             else if (offset == 0x04)
             {
@@ -138,13 +151,17 @@ namespace Atem
 
         private void WriteIO(byte offset, byte value)
         {
-            if (offset == 0x00) // joypad
+            if (offset == 0x00)
             {
-
+                _joypad.JOYP = value;
             }
-            else if (offset <= 0x02) // serial
+            else if (offset == 0x01)
             {
-
+                _serial.SC = value;
+            }
+            else if (offset == 0x02)
+            {
+                _serial.SB = value;
             }
             else if (offset == 0x04)
             {

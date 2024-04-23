@@ -16,6 +16,8 @@ namespace Atem
         private Bus _bus;
         private Timer _timer;
         private Interrupt _interrupt;
+        private Joypad _joypad;
+        private Serial _serial;
 
         public ViewHelper ViewHelper { get; private set; }
 
@@ -38,7 +40,9 @@ namespace Atem
             _ppu = new PPU(_bus);
             _timer = new Timer();
             _interrupt = new Interrupt();
-            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt);
+            _joypad = new Joypad();
+            _serial = new Serial();
+            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt, _joypad, _serial);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
@@ -70,6 +74,11 @@ namespace Atem
             _ppu.Clock();
             _timer.Clock();
             return opFinished;
+        }
+
+        internal void OnJoypadChange(JoypadButton button, bool down)
+        {
+            _joypad.OnJoypadChange(button, down);
         }
     }
 }
