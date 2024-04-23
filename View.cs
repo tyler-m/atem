@@ -34,7 +34,6 @@ namespace Atem
 
             _atem = atem;
             _atem.OnVerticalBlank += OnVerticalBlank;
-            _atem.ClockOneCPUOp();
         }
 
         protected override void Initialize()
@@ -54,17 +53,79 @@ namespace Atem
             _previousKeyboardState = _currentKeyboardState;
             _currentKeyboardState = Keyboard.GetState();
 
-            if (_currentKeyboardState.IsKeyDown(Keys.Right) && !_previousKeyboardState.IsKeyDown(Keys.Right))
+            if (_currentKeyboardState.IsKeyDown(Keys.PageUp) && _previousKeyboardState.IsKeyUp(Keys.PageUp))
             {
                 _atem.ClockOneCPUOp();
+                _pauseAtem = true;
             }
-            else if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+            if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
             {
                 _pauseAtem = !_pauseAtem;
             }
-            else if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
+
+            if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
             {
-                _atem.Update();
+                _atem.OnJoypadChange(JoypadButton.Up, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Up) && _previousKeyboardState.IsKeyDown(Keys.Up))
+            {
+                _atem.OnJoypadChange(JoypadButton.Up, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down))
+            {
+                _atem.OnJoypadChange(JoypadButton.Down, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Down) && _previousKeyboardState.IsKeyDown(Keys.Down))
+            {
+                _atem.OnJoypadChange(JoypadButton.Down, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Left) && !_previousKeyboardState.IsKeyDown(Keys.Left))
+            {
+                _atem.OnJoypadChange(JoypadButton.Left, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Left) && _previousKeyboardState.IsKeyDown(Keys.Left))
+            {
+                _atem.OnJoypadChange(JoypadButton.Left, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Right) && !_previousKeyboardState.IsKeyDown(Keys.Right))
+            {
+                _atem.OnJoypadChange(JoypadButton.Right, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Right) && _previousKeyboardState.IsKeyDown(Keys.Right))
+            {
+                _atem.OnJoypadChange(JoypadButton.Right, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.X) && !_previousKeyboardState.IsKeyDown(Keys.X))
+            {
+                _atem.OnJoypadChange(JoypadButton.A, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.X) && _previousKeyboardState.IsKeyDown(Keys.X))
+            {
+                _atem.OnJoypadChange(JoypadButton.A, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Z) && !_previousKeyboardState.IsKeyDown(Keys.Z))
+            {
+                _atem.OnJoypadChange(JoypadButton.B, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Z) && _previousKeyboardState.IsKeyDown(Keys.Z))
+            {
+                _atem.OnJoypadChange(JoypadButton.B, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Back) && !_previousKeyboardState.IsKeyDown(Keys.Back))
+            {
+                _atem.OnJoypadChange(JoypadButton.Select, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Back) && _previousKeyboardState.IsKeyDown(Keys.Back))
+            {
+                _atem.OnJoypadChange(JoypadButton.Select, false);
+            }
+            if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
+            {
+                _atem.OnJoypadChange(JoypadButton.Start, true);
+            }
+            if (!_currentKeyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
+            {
+                _atem.OnJoypadChange(JoypadButton.Start, false);
             }
 
             if (!_pauseAtem)
