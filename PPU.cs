@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace Atem
 {
     internal class PPU
@@ -10,6 +12,25 @@ namespace Atem
             OAM,
             Draw
         }
+
+        class Sprite
+        {
+            public byte X;
+            public byte Y;
+            public byte Tile;
+            public byte Flags;
+
+            public Sprite(byte x, byte y, byte tile, byte flags)
+            {
+                X = x;
+                Y = y;
+                Tile = tile;
+                Flags = flags;
+            }
+        }
+
+        List<Sprite> _spriteBuffer = new List<Sprite>();
+        private int _oamScanIndex = 0;
 
         private Bus _bus;
 
@@ -86,6 +107,12 @@ namespace Atem
                 STAT = STAT
                     .SetBit(0, ((byte)value).GetBit(0))
                     .SetBit(1, ((byte)value).GetBit(1));
+
+                if (value == PPUMode.OAM)
+                {
+                    _oamScanIndex = 0;
+                    _spriteBuffer.Clear();
+                }
             }
         }
 
@@ -98,8 +125,8 @@ namespace Atem
         public void WriteVRAM(ushort address, byte value)
         {
             if (Mode == PPUMode.Draw)
-            {
-                return;
+             {
+                //return;
             }
             _vram[address & 0x1FFF] = value;
         }
@@ -111,6 +138,24 @@ namespace Atem
                 return 0xFF;
             }
             return _vram[address & 0x1FFF];
+        }
+
+        public void WriteOAM(ushort address, byte value)
+        {
+            if (Mode == PPUMode.OAM || Mode == PPUMode.Draw)
+            {
+                return;
+            }
+            _oam[address & 0x00FF] = value;
+        }
+
+        public byte ReadOAM(ushort address)
+        {
+            if (Mode == PPUMode.OAM || Mode == PPUMode.Draw)
+            {
+                return 0xFF;
+            }
+            return _oam[address & 0x00FF];
         }
 
         private ushort GetTileMapAddress()
@@ -144,7 +189,27 @@ namespace Atem
                 return;
             }
 
-            if (Mode == PPUMode.Draw)
+            if (Mode == PPUMode.OAM)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    if (_spriteBuffer.Count >= 10)
+                    {
+                        break;
+                    }
+
+                    byte y = _oam[_oamScanIndex++];
+                    byte x = _oam[_oamScanIndex++];
+                    byte tile = _oam[_oamScanIndex++];
+                    byte flags = _oam[_oamScanIndex++];
+
+                    if (x > 0 && LY + 16 >= y && LY + 16 < y + 8)
+                    {
+                        _spriteBuffer.Add(new Sprite(x, y, tile, flags));
+                    }
+                }
+            }
+            else if (Mode == PPUMode.Draw)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -160,7 +225,47 @@ namespace Atem
                     byte low = _vram[tileDataAddress + relativeY * 2];
                     byte high = _vram[tileDataAddress + relativeY * 2 + 1];
                     int id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
-                    byte color = (byte)((BGP >> 2 * id) & 0b11);
+                    byte bgColor = (byte)((BGP >> 2 * id) & 0b11);
+
+                    bool foundSprite = false;
+                    byte spriteColor = 0;
+                    Sprite sprite = null;
+                    for (int j = 0; j < _spriteBuffer.Count; j++)
+                    {
+                        sprite = _spriteBuffer[j];
+                        if (sprite.X - 8 > _linePixel - 8 && sprite.X - 8 <= _linePixel)
+                        {
+                            foundSprite = true;
+                            relativeX = _linePixel - (sprite.X - 8); // coordinates of pixel inside tile
+                            relativeY = LY - (sprite.Y - 16);
+
+                            tileDataAddress = GetTileDataAddress() + sprite.Tile * 16;
+                            low = _vram[tileDataAddress + relativeY * 2];
+                            high = _vram[tileDataAddress + relativeY * 2 + 1];
+                            id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
+                            if (sprite.Flags.GetBit(4))
+                            {
+                                spriteColor = (byte)((OBP1 >> 2 * id) & 0b11);
+                            }
+                            else
+                            {
+                                spriteColor = (byte)((OBP0 >> 2 * id) & 0b11);
+                            }
+                        }
+                    }
+
+                    byte color = bgColor;
+
+                    if (foundSprite)
+                    {
+                        if (spriteColor != 0)
+                        {
+                            if (!sprite.Flags.GetBit(7) || bgColor == 0)
+                            {
+                                color = spriteColor;
+                            }
+                        }
+                    }
 
                     _screen[LY * 160 + _linePixel] = color;
                     _linePixel++;
