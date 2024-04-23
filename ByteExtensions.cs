@@ -30,9 +30,29 @@ namespace Atem
             }
         }
 
+        public static bool WillCarry(this ushort u, int value)
+        {
+            return u + value > ushort.MaxValue;
+        }
+
+        public static bool WillBorrow(this ushort u, int value)
+        {
+            return value > u;
+        }
+
+        public static bool WillHalfCarry(this ushort u, int value)
+        {
+            return (((u & 0xFFF) + (value & 0xFFF)) & 0x1000) == 0x1000;
+        }
+
+        public static bool WillHalfBorrow(this ushort u, int value)
+        {
+            return (((u & 0xFFF) - (value & 0xFFF)) & 0x1000) == 0x1000;
+        }
+
         public static bool WillCarry(this byte b, int value)
         {
-            return b + value > byte.MaxValue;
+            return (b & 0xFF) + (value & 0xFF) > byte.MaxValue;
         }
 
         public static bool WillBorrow(this byte b, int value)
@@ -42,6 +62,7 @@ namespace Atem
 
         public static bool WillHalfCarry(this byte b, int value)
         {
+            //return (b & 0xF) + (value & 0xF) > 0xF;
             return (((b & 0xF) + (value & 0xF)) & 0x10) == 0x10;
         }
 
