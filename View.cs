@@ -162,7 +162,7 @@ namespace Atem
                 }
                 else if (bColor == 2)
                 {
-                    color = Color.DarkGray;
+                    color = Color.DarkGray * 0.7f;
                 }
                 else if (bColor == 3)
                 {
