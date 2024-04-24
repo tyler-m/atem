@@ -13,6 +13,12 @@ namespace Atem
 
         private int _divTick;
         private int _timaTick;
+        private Bus _bus;
+
+        public Timer(Bus bus)
+        {
+            _bus = bus;
+        }
 
         public byte DIV
         { 
@@ -100,6 +106,7 @@ namespace Atem
             if (_tima.WillCarry(1))
             {
                 _tima = _tma;
+                _bus.RequestInterrupt(InterruptType.Timer);
             }
             else
             {

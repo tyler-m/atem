@@ -38,7 +38,7 @@ namespace Atem
             _bus = new Bus();
             _cpu = new CPU(_bus);
             _ppu = new PPU(_bus);
-            _timer = new Timer();
+            _timer = new Timer(_bus);
             _interrupt = new Interrupt();
             _joypad = new Joypad();
             _serial = new Serial();
