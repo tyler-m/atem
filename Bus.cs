@@ -58,7 +58,7 @@ namespace Atem
             }
             else if (block <= 0xDF) // WRAM
             {
-                return _wram[address & 0x1FFF];
+                return _wram[address - 0xC000];
             }
             else if (block <= 0xFD) // echo RAM
             {
@@ -113,29 +113,65 @@ namespace Atem
             {
                 return _interrupt.IF;
             }
+            else if (offset < 0x40)
+            {
+
+            }
             else if (offset == 0x40)
             {
                 return _ppu.LCDC;
+            }
+            else if (offset == 0x41)
+            {
+                return _ppu.STAT;
             }
             else if (offset == 0x42)
             {
                 return _ppu.SCY;
             }
+            else if (offset == 0x43)
+            {
+                return _ppu.SCX;
+            }
             else if (offset == 0x44)
             {
                 return _ppu.LY;
+            }
+            else if (offset == 0x45)
+            {
+                return _ppu.LYC;
             }
             else if (offset == 0x46)
             {
                 return _ppu.DMA;
             }
+            else if (offset == 0x47)
+            {
+                return _ppu.BGP;
+            }
+            else if (offset == 0x48)
+            {
+                return _ppu.OBP0;
+            }
+            else if (offset == 0x49)
+            {
+                return _ppu.OBP1;
+            }
+            else if (offset == 0x4A)
+            {
+                return _ppu.WY;
+            }
+            else if (offset == 0x4B)
+            {
+                return _ppu.WX;
+            }
             else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
 
             }
-            else if (offset <= 0xFE)
+            else if (offset > 0x7F && offset <= 0xFE)
             {
-                return _hram[offset & 0x7F];
+                return _hram[offset - 0x80];
             }
             else if (offset == 0xFF)
             {
@@ -203,6 +239,14 @@ namespace Atem
             {
                 _ppu.SCX = value;
             }
+            else if (offset == 0x44)
+            {
+
+            }
+            else if (offset == 0x45)
+            {
+                _ppu.LYC = value;
+            }
             else if (offset == 0x46)
             {
                 _ppu.DMA = value;
@@ -235,9 +279,9 @@ namespace Atem
             {
 
             }
-            else if (offset <= 0xFE)
+            else if (offset > 0x7F && offset <= 0xFE)
             {
-                _hram[offset & 0x7F] = value;
+                _hram[offset - 0x80] = value;
             }
             else if (offset == 0xFF)
             {
@@ -260,7 +304,7 @@ namespace Atem
             }
             else if (block <= 0x7F) // cartridge ROM
             {
-
+                _cartridge.WriteROM(address, value);
             }
             else if (block <= 0x9F) // VRAM
             {
@@ -272,7 +316,7 @@ namespace Atem
             }
             else if (block <= 0xDF) // WRAM
             {
-                _wram[address & 0x1FFF] = value;
+                _wram[address - 0xC000] = value;
             }
             else if (block <= 0xFD) // echo RAM
             {
@@ -282,7 +326,7 @@ namespace Atem
             {
                 if (offset <= 0x9F) // OAM
                 {
-
+                    _ppu.WriteOAM(address, value);
                 }
             }
             else if (block <= 0xFF)
