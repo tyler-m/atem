@@ -18,6 +18,7 @@ namespace Atem
         public bool CB = false;
         public bool IME = false;
 
+        private bool _halted = false;
         private bool _operationFinished = true;
         private int _tick = 0;
 
@@ -112,6 +113,21 @@ namespace Atem
 
         public bool Clock()
         {
+            if (_halted)
+            {
+                byte IE = _bus.Read(0xFFFF);
+                byte IF = _bus.Read(0xFF0F);
+                if ((IE & IF) != 0)
+                {
+                    _halted = false;
+                    _operationFinished = true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
             if (_operationFinished)
             {
                 _tick = 0;
@@ -579,7 +595,8 @@ namespace Atem
 
         public void Halt()
         {
-            throw new NotImplementedException("HALT not implemented.");
+            Length = 1;
+            _halted = true;
         }
 
         public void Adc(string dest, string source)
