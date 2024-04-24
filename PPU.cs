@@ -20,6 +20,11 @@ namespace Atem
             public byte Tile;
             public byte Flags;
 
+            public bool Palette { get { return Flags.GetBit(4); } }
+            public bool FlipX  { get { return Flags.GetBit(5); } }
+            public bool FlipY { get { return Flags.GetBit(6); } }
+            public bool Priority { get { return Flags.GetBit(7); } }
+
             public Sprite(byte x, byte y, byte tile, byte flags)
             {
                 X = x;
@@ -44,15 +49,17 @@ namespace Atem
         public event VerticalBlankEvent OnVerticalBlank;
 
         public byte LCDC;
-        public byte STAT;
         public byte SCY;
         public byte SCX;
         public byte LY;
+        public byte LYC;
         public byte BGP;
         public byte OBP0;
         public byte OBP1;
         public byte WY;
         public byte WX;
+
+        public byte STAT;
 
         private byte _dma;
 
@@ -72,29 +79,11 @@ namespace Atem
             }
         }
 
-        public bool LCDEnabled
-        {
-            get
-            {
-                return LCDC.GetBit(7);
-            }
-        }
-
-        public bool TileDataMode
-        {
-            get
-            {
-                return LCDC.GetBit(4);
-            }
-        }
-
-        public bool BackgroundTileMapMode
-        {
-            get
-            {
-                return LCDC.GetBit(3);
-            }
-        }
+        public bool LCDEnabled { get { return LCDC.GetBit(7); } }
+        public bool WindowTileMapMode { get { return LCDC.GetBit(6); } }
+        public bool WindowEnabled { get { return LCDC.GetBit(5); } }
+        public bool TileDataMode { get { return LCDC.GetBit(4); } }
+        public bool BackgroundTileMapMode { get { return LCDC.GetBit(3); } }
 
         public PPUMode Mode
         {
@@ -126,7 +115,7 @@ namespace Atem
         {
             if (Mode == PPUMode.Draw)
              {
-                //return;
+                return;
             }
             _vram[address & 0x1FFF] = value;
         }
@@ -170,15 +159,28 @@ namespace Atem
             }
         }
 
-        private ushort GetTileDataAddress()
+        private ushort GetWindowTileMapAddress()
         {
-            if (TileDataMode)
+            if (WindowTileMapMode)
             {
-                return 0x0000;
+                return 0x1C00;
             }
             else
             {
-                return 0x1000;
+                return 0x1800;
+            }
+        }
+
+        private ushort GetTileDataAddress(int tileIndex)
+        {
+            if (TileDataMode)
+            {
+                return (ushort)(0x0000 + tileIndex * 16);
+            }
+            else
+            {
+                sbyte offset = (sbyte)tileIndex;
+                return (ushort)(0x1000 + offset * 16);
             }
         }
 
@@ -219,7 +221,7 @@ namespace Atem
                     int tileMapAddress = GetTileMapAddress() + tileMapOffset;
                     byte tileIndex = _vram[tileMapAddress];
 
-                    int tileDataAddress = GetTileDataAddress() + tileIndex * 16;
+                    int tileDataAddress = GetTileDataAddress(tileIndex);
                     int relativeX = tileMapX % 8;
                     int relativeY = tileMapY % 8;
                     byte low = _vram[tileDataAddress + relativeY * 2];
@@ -227,23 +229,49 @@ namespace Atem
                     int id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
                     byte bgColor = (byte)((BGP >> 2 * id) & 0b11);
 
+                    if (WindowEnabled)
+                    {
+                        if (_linePixel > WX - 8 && WY <= LY)
+                        {
+                            tileMapX = _linePixel - (WX - 8);
+                            tileMapY = LY - WY;
+                            tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
+                            tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
+                            tileIndex = _vram[tileMapAddress];
+
+                            tileDataAddress = GetTileDataAddress(tileIndex);
+                            relativeX = tileMapX % 8;
+                            relativeY = tileMapY % 8;
+                            low = _vram[tileDataAddress + relativeY * 2];
+                            high = _vram[tileDataAddress + relativeY * 2 + 1];
+                            id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
+                            bgColor = (byte)((BGP >> 2 * id) & 0b11);
+                        }
+                    }
+
                     bool foundSprite = false;
                     byte spriteColor = 0;
                     Sprite sprite = null;
                     for (int j = 0; j < _spriteBuffer.Count; j++)
                     {
                         sprite = _spriteBuffer[j];
-                        if (sprite.X - 8 > _linePixel - 8 && sprite.X - 8 <= _linePixel)
+                        if (sprite.X > _linePixel && sprite.X <= _linePixel + 8)
                         {
-                            foundSprite = true;
                             relativeX = _linePixel - (sprite.X - 8); // coordinates of pixel inside tile
                             relativeY = LY - (sprite.Y - 16);
 
-                            tileDataAddress = GetTileDataAddress() + sprite.Tile * 16;
+                            tileDataAddress = sprite.Tile * 16;
                             low = _vram[tileDataAddress + relativeY * 2];
                             high = _vram[tileDataAddress + relativeY * 2 + 1];
-                            id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
-                            if (sprite.Flags.GetBit(4))
+                            byte relativeBit = (byte)(sprite.FlipX ? relativeX : 7 - relativeX);
+                            id = ((low >> relativeBit) & 1) | (((high >> relativeBit) & 1) << 1);
+
+                            if (id == 0) // the pixel on this sprite is transparent
+                            {
+                                continue;
+                            }
+
+                            if (sprite.Palette)
                             {
                                 spriteColor = (byte)((OBP1 >> 2 * id) & 0b11);
                             }
@@ -251,6 +279,8 @@ namespace Atem
                             {
                                 spriteColor = (byte)((OBP0 >> 2 * id) & 0b11);
                             }
+                            foundSprite = true;
+                            break;
                         }
                     }
 
@@ -258,12 +288,9 @@ namespace Atem
 
                     if (foundSprite)
                     {
-                        if (spriteColor != 0)
+                        if (!sprite.Flags.GetBit(7) || bgColor == 0)
                         {
-                            if (!sprite.Flags.GetBit(7) || bgColor == 0)
-                            {
-                                color = spriteColor;
-                            }
+                            color = spriteColor;
                         }
                     }
 
@@ -275,6 +302,12 @@ namespace Atem
             _lineDotCount += 4;
 
             UpdateMode();
+
+            STAT = STAT.SetBit(2, LYC == LY);
+            if (STAT.GetBit(6) && STAT.GetBit(2))
+            {
+                _bus.RequestInterrupt(InterruptType.STAT);
+            }
         }
 
         public void UpdateMode()
