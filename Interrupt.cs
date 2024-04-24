@@ -3,7 +3,11 @@ namespace Atem
 {
     public enum InterruptType
     {
-        VerticalBlank
+        VerticalBlank,
+        STAT,
+        Timer,
+        Serial,
+        Joypad
     }
 
     internal class Interrupt
