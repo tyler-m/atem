@@ -8,6 +8,8 @@ namespace Atem
 {
     internal class CPU
     {
+        public static int Frequency = 4194304;
+
         private Bus _bus;
         public CPURegisters Registers;
         private Dictionary<byte, (OperationFunc Method, OperationInfo Info)> _operations = new Dictionary<byte, (OperationFunc, OperationInfo)>();
@@ -890,10 +892,6 @@ namespace Atem
             Registers.Flags.N = false;
             Registers.Flags.H = true;
             Registers.Flags.Z = !value.Value.GetLowByte().GetBit(Convert.ToInt32(bit));
-            if (source.Length > 1)
-            {
-                Length -= 1; // BIT b,(HL) would otherwise be 4 cycles rather than 3
-            }
         }
 
         public void Res(string bit, string source)
