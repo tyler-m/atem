@@ -5,6 +5,8 @@ namespace Atem
 {
     internal class PPU
     {
+        public static float FrameRate = 59.73f;
+
         public enum PPUMode
         {
             HorizontalBlank,
@@ -84,6 +86,7 @@ namespace Atem
         public bool WindowEnabled { get { return LCDC.GetBit(5); } }
         public bool TileDataMode { get { return LCDC.GetBit(4); } }
         public bool BackgroundTileMapMode { get { return LCDC.GetBit(3); } }
+        public bool LargeSprites { get { return LCDC.GetBit(2); } }
 
         public PPUMode Mode
         {
@@ -205,7 +208,7 @@ namespace Atem
                     byte tile = _oam[_oamScanIndex++];
                     byte flags = _oam[_oamScanIndex++];
 
-                    if (x > 0 && LY + 16 >= y && LY + 16 < y + 8)
+                    if (x > 0 && LY + 16 >= y && LY + 16 < y + 8 + (LargeSprites ? 8 : 0))
                     {
                         _spriteBuffer.Add(new Sprite(x, y, tile, flags));
                     }
@@ -233,7 +236,7 @@ namespace Atem
                     {
                         if (_linePixel > WX - 8 && WY <= LY)
                         {
-                            tileMapX = _linePixel - (WX - 8);
+                            tileMapX = _linePixel - (WX - 7);
                             tileMapY = LY - WY;
                             tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                             tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
@@ -259,6 +262,11 @@ namespace Atem
                         {
                             relativeX = _linePixel - (sprite.X - 8); // coordinates of pixel inside tile
                             relativeY = LY - (sprite.Y - 16);
+
+                            if (LargeSprites && sprite.FlipY)
+                            {
+                                relativeY = 15 - relativeY;
+                            }
 
                             tileDataAddress = sprite.Tile * 16;
                             low = _vram[tileDataAddress + relativeY * 2];
@@ -303,11 +311,14 @@ namespace Atem
 
             UpdateMode();
 
-            STAT = STAT.SetBit(2, LYC == LY);
-            if (STAT.GetBit(6) && STAT.GetBit(2))
+            if (!STAT.GetBit(2) && LY == LYC)
             {
-                _bus.RequestInterrupt(InterruptType.STAT);
+                if (STAT.GetBit(6))
+                {
+                    _bus.RequestInterrupt(InterruptType.STAT);
+                }
             }
+            STAT = STAT.SetBit(2, LYC == LY);
         }
 
         public void UpdateMode()
