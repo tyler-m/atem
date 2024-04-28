@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Atem.Core.Audio.Channel
 {
     internal class NoiseChannel : AudioChannel
@@ -21,21 +20,20 @@ namespace Atem.Core.Audio.Channel
         {
             get
             {
-                double clockShift = ClockShift;
-                
-                if (ClockShift == 0)
+                int divisor = 8;
+
+                if (ClockDivider > 0)
                 {
-                    clockShift = 0.5;
+                    divisor = ClockDivider * 16;
                 }
 
-                return (int)(4 * Math.Pow(2, clockShift) * ClockDivider);
+                return (divisor << ClockShift) / 4;
             }
         }
 
         public override void OnTrigger()
         {
             _shiftRegister = 0;
-            _shiftTimer = 0;
         }
 
         public override void OnClock()
@@ -68,8 +66,7 @@ namespace Atem.Core.Audio.Channel
             {
                 _shiftRegister = _shiftRegister.SetBit(7, result);
             }
-
-            _shiftRegister = (ushort)(_shiftRegister >> 1);
+            _shiftRegister >>= 1;
         }
     }
 }
