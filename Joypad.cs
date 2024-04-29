@@ -17,6 +17,7 @@ namespace Atem
     {
         private bool[] _joypad = new bool[8];
         private byte _joyp;
+        private Bus _bus;
 
         private bool Up => _joypad[(int)JoypadButton.Up];
         private bool Down => _joypad[(int)JoypadButton.Down];
@@ -26,6 +27,11 @@ namespace Atem
         private bool B => _joypad[(int)JoypadButton.B];
         private bool Select => _joypad[(int)JoypadButton.Select];
         private bool Start => _joypad[(int)JoypadButton.Start];
+
+        public Joypad(Bus bus)
+        {
+            _bus = bus;
+        }
 
         public byte JOYP
         {
@@ -53,6 +59,7 @@ namespace Atem
         public void OnJoypadChange(JoypadButton button, bool down)
         {
             _joypad[(int)button] = down;
+            _bus.RequestInterrupt(InterruptType.Joypad);
         }
     }
 }

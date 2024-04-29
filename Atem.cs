@@ -1,4 +1,5 @@
 ﻿using static Atem.PPU;
+using Atem.Core.Audio;
 
 namespace Atem
 {
@@ -18,8 +19,21 @@ namespace Atem
         private Interrupt _interrupt;
         private Joypad _joypad;
         private Serial _serial;
+        private AudioManager _audioManager;
 
         public ViewHelper ViewHelper { get; private set; }
+
+        public event AudioManager.FullAudioBufferEvent OnFullAudioBuffer
+        {
+            add
+            {
+                _audioManager.OnFullBuffer += value;
+            }
+            remove
+            {
+                _audioManager.OnFullBuffer -= value;
+            }
+        }
 
         public event VerticalBlankEvent OnVerticalBlank
         {
@@ -40,9 +54,10 @@ namespace Atem
             _ppu = new PPU(_bus);
             _timer = new Timer(_bus);
             _interrupt = new Interrupt();
-            _joypad = new Joypad();
+            _joypad = new Joypad(_bus);
             _serial = new Serial();
-            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt, _joypad, _serial);
+            _audioManager = new AudioManager();
+            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt, _joypad, _serial, _audioManager);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
@@ -55,13 +70,13 @@ namespace Atem
             int additionalClocks = (int)(_leftoverClocks / _clockCost);
             float clocksForCurrentFrame = ClocksPerFrame + additionalClocks;
 
-            for (int i = 0; i < clocksForCurrentFrame; i += _clockCost) {
+            for (int i = 0; i < clocksForCurrentFrame; i += _clockCost)
+            {
                 Clock();
             }
 
-            _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost*additionalClocks;
+            _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost * additionalClocks;
         }
-
 
         public void ClockOneCPUOp()
         {
@@ -72,6 +87,7 @@ namespace Atem
         {
             bool opFinished = _cpu.Clock();
             _ppu.Clock();
+            _audioManager.Clock();
             _timer.Clock();
             return opFinished;
         }

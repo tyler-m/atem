@@ -1,4 +1,6 @@
 ﻿
+using Atem.Core.Audio;
+
 namespace Atem
 {
     internal class Bus
@@ -11,11 +13,11 @@ namespace Atem
         private Serial _serial;
         private BootROM _bootROM;
         private Cartridge _cartridge;
+        private AudioManager _audioManager;
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-
-        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial)
+        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
         {
             _cpu = cpu;
             _ppu = ppu;
@@ -23,6 +25,7 @@ namespace Atem
             _interrupt = interrupt;
             _joypad = joypad;
             _serial = serial;
+            _audioManager = audioManager;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
@@ -113,9 +116,97 @@ namespace Atem
             {
                 return _interrupt.IF;
             }
-            else if (offset < 0x40)
+            else if (offset == 0x10)
+            {
+                return _audioManager.Registers.NR10;
+            }
+            else if (offset == 0x11)
+            {
+                return _audioManager.Registers.NR11;
+            }
+            else if (offset == 0x12)
+            {
+                return _audioManager.Registers.NR12;
+            }
+            else if (offset == 0x13)
+            {
+                return _audioManager.Registers.NR13;
+            }
+            else if (offset == 0x14)
+            {
+                return _audioManager.Registers.NR14;
+            }
+            else if (offset == 0x16)
+            {
+                return _audioManager.Registers.NR21;
+            }
+            else if (offset == 0x17)
+            {
+                return _audioManager.Registers.NR22;
+            }
+            else if (offset == 0x18)
+            {
+                return _audioManager.Registers.NR23;
+            }
+            else if (offset == 0x19)
+            {
+                return _audioManager.Registers.NR24;
+            }
+            else if (offset == 0x1A)
+            {
+                return _audioManager.Registers.NR30;
+            }
+            else if (offset == 0x1B)
+            {
+                return _audioManager.Registers.NR31;
+            }
+            else if (offset == 0x1C)
+            {
+                return _audioManager.Registers.NR32;
+            }
+            else if (offset == 0x1D)
+            {
+                return _audioManager.Registers.NR33;
+            }
+            else if (offset == 0x1E)
+            {
+                return _audioManager.Registers.NR34;
+            }
+            else if (offset == 0x20)
+            {
+                return _audioManager.Registers.NR41;
+            }
+            else if (offset == 0x21)
+            {
+                return _audioManager.Registers.NR42;
+            }
+            else if (offset == 0x22)
+            {
+                return _audioManager.Registers.NR43;
+            }
+            else if (offset == 0x23)
+            {
+                return _audioManager.Registers.NR44;
+            }
+            else if (offset == 0x24)
+            {
+                return _audioManager.Registers.NR50;
+            }
+            else if (offset == 0x25)
+            {
+                return _audioManager.Registers.NR51;
+            }
+            else if (offset == 0x26)
+            {
+                return _audioManager.Registers.NR52;
+            }
+            else if (offset >= 27 && offset <= 0x2F)
             {
 
+            }
+            else if (offset >= 0x30 && offset <= 0x3F)
+            {
+                return _audioManager.ReadWaveRAM((byte)(offset - 0x30));
             }
             else if (offset == 0x40)
             {
@@ -169,7 +260,7 @@ namespace Atem
             {
 
             }
-            else if (offset > 0x7F && offset <= 0xFE)
+            else if (offset >= 0x80 && offset <= 0xFE)
             {
                 return _hram[offset - 0x80];
             }
@@ -219,9 +310,97 @@ namespace Atem
             {
                 _interrupt.IF = value;
             }
-            else if (offset <= 0x3F) // audio
+            else if (offset == 0x10)
+            {
+                _audioManager.Registers.NR10 = value;
+            }
+            else if (offset == 0x11)
+            {
+                _audioManager.Registers.NR11 = value;
+            }
+            else if (offset == 0x12)
+            {
+                _audioManager.Registers.NR12 = value;
+            }
+            else if (offset == 0x13)
+            {
+                _audioManager.Registers.NR13 = value;
+            }
+            else if (offset == 0x14)
+            {
+                _audioManager.Registers.NR14 = value;
+            }
+            else if (offset == 0x16)
+            {
+                _audioManager.Registers.NR21 = value;
+            }
+            else if (offset == 0x17)
+            {
+                _audioManager.Registers.NR22 = value;
+            }
+            else if (offset == 0x18)
+            {
+                _audioManager.Registers.NR23 = value;
+            }
+            else if (offset == 0x19)
+            {
+                _audioManager.Registers.NR24 = value;
+            }
+            else if (offset == 0x1A)
+            {
+                _audioManager.Registers.NR30 = value;
+            }
+            else if (offset == 0x1B)
+            {
+                _audioManager.Registers.NR31 = value;
+            }
+            else if (offset == 0x1C)
+            {
+                _audioManager.Registers.NR32 = value;
+            }
+            else if (offset == 0x1D)
+            {
+                _audioManager.Registers.NR33 = value;
+            }
+            else if (offset == 0x1E)
+            {
+                _audioManager.Registers.NR34 = value;
+            }
+            else if (offset == 0x20)
+            {
+                _audioManager.Registers.NR41 = value;
+            }
+            else if (offset == 0x21)
+            {
+                _audioManager.Registers.NR42 = value;
+            }
+            else if (offset == 0x22)
+            {
+                _audioManager.Registers.NR43 = value;
+            }
+            else if (offset == 0x23)
+            {
+                _audioManager.Registers.NR44 = value;
+            }
+            else if (offset == 0x24)
+            {
+                _audioManager.Registers.NR50 = value;
+            }
+            else if (offset == 0x25)
+            {
+                _audioManager.Registers.NR51 = value;
+            }
+            else if (offset == 0x26)
+            {
+                _audioManager.Registers.NR52 = value;
+            }
+            else if (offset >= 0x27 && offset <= 0x2F)
             {
 
+            }
+            else if (offset >= 0x30 && offset <= 0x3F)
+            {
+                _audioManager.WriteWaveRAM((byte)(offset & 0xF), value);
             }
             else if (offset == 0x40)
             {
@@ -279,7 +458,7 @@ namespace Atem
             {
 
             }
-            else if (offset > 0x7F && offset <= 0xFE)
+            else if (offset >= 0x80 && offset <= 0xFE)
             {
                 _hram[offset - 0x80] = value;
             }
