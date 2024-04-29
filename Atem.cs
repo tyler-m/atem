@@ -1,4 +1,4 @@
-﻿using static Atem.Graphics;
+﻿using Atem.Core.Graphics;
 using Atem.Core.Processor;
 using Atem.Core.Audio;
 
@@ -36,7 +36,7 @@ namespace Atem
             }
         }
 
-        public event VerticalBlankEvent OnVerticalBlank
+        public event Graphics.VerticalBlankEvent OnVerticalBlank
         {
             add
             {

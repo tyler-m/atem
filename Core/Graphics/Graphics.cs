@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Atem
+namespace Atem.Core.Graphics
 {
     internal class Graphics
     {
