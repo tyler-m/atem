@@ -33,7 +33,7 @@ namespace Atem.Core.Input
             _bus = bus;
         }
 
-        public byte JOYP
+        public byte P1
         {
             get
             {

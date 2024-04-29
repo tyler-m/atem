@@ -89,7 +89,7 @@ namespace Atem.Core
         {
             if (offset == 0x00)
             {
-                return _joypad.JOYP;
+                return _joypad.P1;
             }
             else if (offset == 0x01)
             {
@@ -283,7 +283,7 @@ namespace Atem.Core
         {
             if (offset == 0x00)
             {
-                _joypad.JOYP = value;
+                _joypad.P1 = value;
             }
             else if (offset == 0x01)
             {
