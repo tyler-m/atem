@@ -158,11 +158,11 @@ namespace Atem
 
                 if (bColor == 1)
                 {
-                    color = Color.LightGray;
+                    color = Color.LightGray * 0.9f;
                 }
                 else if (bColor == 2)
                 {
-                    color = Color.DarkGray * 0.7f;
+                    color = Color.DarkGray * 0.5f;
                 }
                 else if (bColor == 3)
                 {
