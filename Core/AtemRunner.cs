@@ -7,9 +7,13 @@ namespace Atem.Core
 {
     internal class AtemRunner
     {
-        private const int ClockFrequency = 4194304;
-        private const float FrameFrequency = 59.73f;
-        private const float ClocksPerFrame = ClockFrequency / FrameFrequency;
+        private static float ClocksPerFrame
+        {
+            get
+            {
+                return Processor.Frequency / GraphicsManager.FrameRate;
+            }
+        }
 
         private float _leftoverClocks = 0.0f;
         private int _clockCost = 4;
