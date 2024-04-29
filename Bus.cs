@@ -6,7 +6,7 @@ namespace Atem
     internal class Bus
     {
         private Processor _processor;
-        private PPU _ppu;
+        private Graphics _graphics;
         private Timer _timer;
         private Interrupt _interrupt;
         private Joypad _joypad;
@@ -17,10 +17,10 @@ namespace Atem
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-        public void SetComponents(Processor processor, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
+        public void SetComponents(Processor processor, Graphics graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
         {
             _processor = processor;
-            _ppu = ppu;
+            _graphics = graphics;
             _timer = timer;
             _interrupt = interrupt;
             _joypad = joypad;
@@ -53,7 +53,7 @@ namespace Atem
             }
             else if (block <= 0x9F) // VRAM
             {
-                return _ppu.ReadVRAM(address);
+                return _graphics.ReadVRAM(address);
             }
             else if (block <= 0xBF) // cartridge RAM
             {
@@ -71,7 +71,7 @@ namespace Atem
             {
                 if (offset <= 0x9F) // OAM
                 {
-                    return _ppu.ReadOAM(address);
+                    return _graphics.ReadOAM(address);
                 }
             }
             else if (block <= 0xFF)
@@ -210,51 +210,51 @@ namespace Atem
             }
             else if (offset == 0x40)
             {
-                return _ppu.LCDC;
+                return _graphics.LCDC;
             }
             else if (offset == 0x41)
             {
-                return _ppu.STAT;
+                return _graphics.STAT;
             }
             else if (offset == 0x42)
             {
-                return _ppu.SCY;
+                return _graphics.SCY;
             }
             else if (offset == 0x43)
             {
-                return _ppu.SCX;
+                return _graphics.SCX;
             }
             else if (offset == 0x44)
             {
-                return _ppu.LY;
+                return _graphics.LY;
             }
             else if (offset == 0x45)
             {
-                return _ppu.LYC;
+                return _graphics.LYC;
             }
             else if (offset == 0x46)
             {
-                return _ppu.DMA;
+                return _graphics.DMA;
             }
             else if (offset == 0x47)
             {
-                return _ppu.BGP;
+                return _graphics.BGP;
             }
             else if (offset == 0x48)
             {
-                return _ppu.OBP0;
+                return _graphics.OBP0;
             }
             else if (offset == 0x49)
             {
-                return _ppu.OBP1;
+                return _graphics.OBP1;
             }
             else if (offset == 0x4A)
             {
-                return _ppu.WY;
+                return _graphics.WY;
             }
             else if (offset == 0x4B)
             {
-                return _ppu.WX;
+                return _graphics.WX;
             }
             else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
@@ -404,19 +404,19 @@ namespace Atem
             }
             else if (offset == 0x40)
             {
-                _ppu.LCDC = value;
+                _graphics.LCDC = value;
             }
             else if (offset == 0x41)
             {
-                _ppu.STAT = value;
+                _graphics.STAT = value;
             }
             else if (offset == 0x42)
             {
-                _ppu.SCY = value;
+                _graphics.SCY = value;
             }
             else if (offset == 0x43)
             {
-                _ppu.SCX = value;
+                _graphics.SCX = value;
             }
             else if (offset == 0x44)
             {
@@ -424,31 +424,31 @@ namespace Atem
             }
             else if (offset == 0x45)
             {
-                _ppu.LYC = value;
+                _graphics.LYC = value;
             }
             else if (offset == 0x46)
             {
-                _ppu.DMA = value;
+                _graphics.DMA = value;
             }
             else if (offset == 0x47)
             {
-                _ppu.BGP = value;
+                _graphics.BGP = value;
             }
             else if (offset == 0x48)
             {
-                _ppu.OBP0 = value;
+                _graphics.OBP0 = value;
             }
             else if (offset == 0x49)
             {
-                _ppu.OBP1 = value;
+                _graphics.OBP1 = value;
             }
             else if (offset == 0x4A)
             {
-                _ppu.WY = value;
+                _graphics.WY = value;
             }
             else if (offset == 0x4B)
             {
-                _ppu.WX = value;
+                _graphics.WX = value;
             }
             else if (offset == 0x50)
             {
@@ -487,7 +487,7 @@ namespace Atem
             }
             else if (block <= 0x9F) // VRAM
             {
-                _ppu.WriteVRAM(address, value);
+                _graphics.WriteVRAM(address, value);
             }
             else if (block <= 0xBF) // cartridge RAM
             {
@@ -505,7 +505,7 @@ namespace Atem
             {
                 if (offset <= 0x9F) // OAM
                 {
-                    _ppu.WriteOAM(address, value);
+                    _graphics.WriteOAM(address, value);
                 }
             }
             else if (block <= 0xFF)

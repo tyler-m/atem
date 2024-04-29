@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Atem
 {
-    internal class PPU
+    internal class Graphics
     {
         public static float FrameRate = 59.73f;
 
-        public enum PPUMode
+        public enum RenderMode
         {
             HorizontalBlank,
             VerticalBlank,
@@ -88,11 +88,11 @@ namespace Atem
         public bool BackgroundTileMapMode { get { return LCDC.GetBit(3); } }
         public bool LargeSprites { get { return LCDC.GetBit(2); } }
 
-        public PPUMode Mode
+        public RenderMode Mode
         {
             get
             {
-                return (PPUMode)(STAT & 0b11);
+                return (RenderMode)(STAT & 0b11);
             }
             set
             {
@@ -100,7 +100,7 @@ namespace Atem
                     .SetBit(0, ((byte)value).GetBit(0))
                     .SetBit(1, ((byte)value).GetBit(1));
 
-                if (value == PPUMode.OAM)
+                if (value == RenderMode.OAM)
                 {
                     _oamScanIndex = 0;
                     _spriteBuffer.Clear();
@@ -108,15 +108,15 @@ namespace Atem
             }
         }
 
-        public PPU(Bus bus)
+        public Graphics(Bus bus)
         {
             _bus = bus;
-            Mode = PPUMode.OAM;
+            Mode = RenderMode.OAM;
         }
 
         public void WriteVRAM(ushort address, byte value)
         {
-            if (Mode == PPUMode.Draw)
+            if (Mode == RenderMode.Draw)
              {
                 return;
             }
@@ -125,7 +125,7 @@ namespace Atem
 
         public byte ReadVRAM(ushort address)
         {
-            if (Mode == PPUMode.Draw)
+            if (Mode == RenderMode.Draw)
             {
                 return 0xFF;
             }
@@ -134,7 +134,7 @@ namespace Atem
 
         public void WriteOAM(ushort address, byte value)
         {
-            if (Mode == PPUMode.OAM || Mode == PPUMode.Draw)
+            if (Mode == RenderMode.OAM || Mode == RenderMode.Draw)
             {
                 return;
             }
@@ -143,7 +143,7 @@ namespace Atem
 
         public byte ReadOAM(ushort address)
         {
-            if (Mode == PPUMode.OAM || Mode == PPUMode.Draw)
+            if (Mode == RenderMode.OAM || Mode == RenderMode.Draw)
             {
                 return 0xFF;
             }
@@ -194,7 +194,7 @@ namespace Atem
                 return;
             }
 
-            if (Mode == PPUMode.OAM)
+            if (Mode == RenderMode.OAM)
             {
                 for (int i = 0; i < 2; i++)
                 {
@@ -214,7 +214,7 @@ namespace Atem
                     }
                 }
             }
-            else if (Mode == PPUMode.Draw)
+            else if (Mode == RenderMode.Draw)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -332,17 +332,17 @@ namespace Atem
 
                     if (LY >= 144)
                     {
-                        Mode = PPUMode.VerticalBlank;
+                        Mode = RenderMode.VerticalBlank;
                         OnVerticalBlank?.Invoke(_screen);
                         _bus.RequestInterrupt(InterruptType.VerticalBlank);
                     }
                     else
                     {
-                        Mode = PPUMode.OAM;
+                        Mode = RenderMode.OAM;
                     }
                 }
             }
-            else if (Mode == PPUMode.VerticalBlank)
+            else if (Mode == RenderMode.VerticalBlank)
             {
                 if (_lineDotCount >= 456)
                 {
@@ -354,17 +354,17 @@ namespace Atem
                 {
                     LY = 0;
                     _lineDotCount = 0;
-                    Mode = PPUMode.OAM;
+                    Mode = RenderMode.OAM;
                 }
             }
-            else if (Mode == PPUMode.OAM)
+            else if (Mode == RenderMode.OAM)
             {
                 if (_lineDotCount >= 80)
                 {
-                    Mode = PPUMode.Draw;
+                    Mode = RenderMode.Draw;
                 }
             }
-            else if (Mode == PPUMode.Draw)
+            else if (Mode == RenderMode.Draw)
             {
                 if (_linePixel >= 160)
                 {

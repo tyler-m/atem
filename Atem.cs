@@ -1,4 +1,4 @@
-﻿using static Atem.PPU;
+﻿using static Atem.Graphics;
 using Atem.Core.Processor;
 using Atem.Core.Audio;
 
@@ -14,7 +14,7 @@ namespace Atem
         private int _clockCost = 4;
 
         private Processor _processor;
-        private PPU _ppu;
+        private Graphics _graphics;
         private Bus _bus;
         private Timer _timer;
         private Interrupt _interrupt;
@@ -40,11 +40,11 @@ namespace Atem
         {
             add
             {
-                _ppu.OnVerticalBlank += value;
+                _graphics.OnVerticalBlank += value;
             }
             remove
             {
-                _ppu.OnVerticalBlank -= value;
+                _graphics.OnVerticalBlank -= value;
             }
         }
 
@@ -52,13 +52,13 @@ namespace Atem
         {
             _bus = new Bus();
             _processor = new Processor(_bus);
-            _ppu = new PPU(_bus);
+            _graphics = new Graphics(_bus);
             _timer = new Timer(_bus);
             _interrupt = new Interrupt();
             _joypad = new Joypad(_bus);
             _serial = new Serial();
             _audioManager = new AudioManager();
-            _bus.SetComponents(_processor, _ppu, _timer, _interrupt, _joypad, _serial, _audioManager);
+            _bus.SetComponents(_processor, _graphics, _timer, _interrupt, _joypad, _serial, _audioManager);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
@@ -87,7 +87,7 @@ namespace Atem
         public bool Clock()
         {
             bool opFinished = _processor.Clock();
-            _ppu.Clock();
+            _graphics.Clock();
             _audioManager.Clock();
             _timer.Clock();
             return opFinished;
