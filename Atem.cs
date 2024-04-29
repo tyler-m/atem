@@ -20,7 +20,7 @@ namespace Atem
         private Interrupt _interrupt;
         private Joypad _joypad;
         private Serial _serial;
-        private AudioManager _audioManager;
+        private AudioManager _audio;
 
         public ViewHelper ViewHelper { get; private set; }
 
@@ -28,11 +28,11 @@ namespace Atem
         {
             add
             {
-                _audioManager.OnFullBuffer += value;
+                _audio.OnFullBuffer += value;
             }
             remove
             {
-                _audioManager.OnFullBuffer -= value;
+                _audio.OnFullBuffer -= value;
             }
         }
 
@@ -57,8 +57,8 @@ namespace Atem
             _interrupt = new Interrupt();
             _joypad = new Joypad(_bus);
             _serial = new Serial();
-            _audioManager = new AudioManager();
-            _bus.SetComponents(_processor, _graphics, _timer, _interrupt, _joypad, _serial, _audioManager);
+            _audio = new AudioManager();
+            _bus.SetComponents(_processor, _graphics, _timer, _interrupt, _joypad, _serial, _audio);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
@@ -88,7 +88,7 @@ namespace Atem
         {
             bool opFinished = _processor.Clock();
             _graphics.Clock();
-            _audioManager.Clock();
+            _audio.Clock();
             _timer.Clock();
             return opFinished;
         }
