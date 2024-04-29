@@ -1,5 +1,5 @@
 ﻿
-namespace Atem
+namespace Atem.Core.Input
 {
     internal enum JoypadButton
     {

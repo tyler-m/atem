@@ -6,7 +6,7 @@ namespace Atem
     {
         static void Main(string[] args)
         {
-            Atem atem = new Atem();
+            Core.Atem atem = new Core.Atem();
             using View view = new View(atem);
             view.Run();
         }

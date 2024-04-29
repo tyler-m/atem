@@ -1,8 +1,9 @@
 ﻿using Atem.Core.Audio;
 using Atem.Core.Processing;
 using Atem.Core.Graphics;
+using Atem.Core.Input;
 
-namespace Atem
+namespace Atem.Core
 {
     internal class Bus
     {
