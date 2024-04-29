@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -22,6 +23,7 @@ namespace Atem
         private Color[] _screenData = new Color[ScreenWidth * ScreenHeight];
         private Texture2D _screenTexture;
         private bool _pauseAtem = true;
+        private DynamicSoundEffectInstance _soundInstance;
 
         public View(Atem atem)
         {
@@ -34,6 +36,19 @@ namespace Atem
 
             _atem = atem;
             _atem.OnVerticalBlank += OnVerticalBlank;
+            _atem.OnFullAudioBuffer += OnFullAudioBuffer;
+        }
+
+        private void OnFullAudioBuffer(byte[] buffer)
+        {
+            if (_soundInstance.PendingBufferCount > 10)
+            {
+                return;
+            }
+            else
+            {
+                _soundInstance.SubmitBuffer(buffer);
+            }
         }
 
         protected override void Initialize()
@@ -46,6 +61,9 @@ namespace Atem
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _screenTexture = new Texture2D(GraphicsDevice, ScreenWidth, ScreenHeight);
             _font = Content.Load<SpriteFont>("Default");
+
+            _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
+            _soundInstance.Play();
         }
 
         protected override void Update(GameTime gameTime)
