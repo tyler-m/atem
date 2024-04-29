@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace Atem
 {
     internal class Program
