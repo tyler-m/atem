@@ -2,6 +2,7 @@
 using Atem.Core.Processing;
 using Atem.Core.Graphics;
 using Atem.Core.Input;
+using Atem.Core.Memory;
 
 namespace Atem.Core
 {

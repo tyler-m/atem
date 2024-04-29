@@ -1,19 +1,17 @@
 ﻿using System.IO;
 using System.Text;
+using Atem.Core.Memory.Mapper;
 
-namespace Atem
+namespace Atem.Core.Memory
 {
     internal class Cartridge
     {
-        private byte[] _rom;
-        private byte[] _ram;
-
         private byte _type;
-        private byte _romSize;
-        private byte _ramSize;
 
         public bool Loaded;
         public string Title;
+
+        public IMapper _mbc;
 
         public Cartridge(string filepath)
         {
@@ -29,15 +27,15 @@ namespace Atem
                 return false;
             }
 
-            byte[] data = File.ReadAllBytes(filepath);
+            byte[] rom = File.ReadAllBytes(filepath);
 
             byte checksum = 0;
             for (ushort address = 0x0134; address <= 0x014C; address++)
             {
-                checksum -= (byte)(data[address] + 1);
+                checksum -= (byte)(rom[address] + 1);
             }
 
-            if (checksum != data[0x014d])
+            if (checksum != rom[0x014d])
             {
                 return false;
             }
@@ -45,40 +43,47 @@ namespace Atem
             Title = string.Empty;
             for (ushort address = 0x0134; address <= 0x0143; address++)
             {
-                byte c = data[address];
+                byte c = rom[address];
                 if (c != 0)
                 {
                     Title += Encoding.UTF8.GetString(new byte[] { c });
                 }
             }
 
-            _type = data[0x0147];
-            _romSize = data[0x0148];
-            _ramSize = data[0x0149];
+            _type = rom[0x0147];
+            int ramSize = rom[0x0149];
 
-            if (_romSize == 0x00)
+            int ramSizeInBytes;
+            if (ramSize == 2)
             {
-                _rom = new byte[0x8000];
-                
-                if (data.Length > _rom.Length)
-                {
-                    return false;
-                }
-
-                data.CopyTo(_rom, 0);
+                ramSizeInBytes = 1 << 13;
+            }
+            else if (ramSize == 3)
+            {
+                ramSizeInBytes = 1 << 15;
+            }
+            else if (ramSize == 4)
+            {
+                ramSizeInBytes = 1 << 17;
             }
             else
             {
-                return false;
+                ramSizeInBytes = 1 << 16;
             }
 
-            if (_ramSize == 0x00)
+            if (_type == 0x00) // ROM Only
             {
-                _ram = new byte[0x00];
+
             }
-            else
+            else if (_type >= 0x01 && _type <= 0x03) // MBC1
             {
-                return false;
+                _mbc = new Mapper.MBC1();
+                _mbc.Init(_type, rom, ramSizeInBytes);
+            }
+            else if (_type >= 0x0F && _type <= 0x13) // MBC3
+            {
+                _mbc = new Mapper.MBC3();
+                _mbc.Init(_type, rom, ramSizeInBytes);
             }
 
             Loaded = true;
@@ -87,36 +92,33 @@ namespace Atem
 
         public byte ReadROM(ushort address)
         {
-            address &= 0x7FFF;
+            byte block = address.GetHighByte();
 
-            if (address >= _rom.Length)
+            if (block <= 0x3F)
             {
-                return 0xFF;
+                return _mbc.ReadROM(address);
+            }
+            else if (block <= 0x7F)
+            {
+                return _mbc.ReadROMBank(address);
             }
 
-            return _rom[address];
+            return 0xFF;
+        }
+
+        internal void WriteROM(ushort address, byte value)
+        {
+            _mbc.WriteRegister(address, value);
         }
 
         public byte ReadRAM(ushort address)
         {
-            address &= 0x1FFF;
-
-            if (address >= _ram.Length)
-            {
-                return 0xFF;
-            }
-
-            return _ram[address];
+            return _mbc.ReadRAM((ushort)(address - 0xA000));
         }
 
         public void WriteRAM(ushort address, byte value)
         {
-            address &= 0x1FFF;
-
-            if (address < _ram.Length)
-            {
-                _ram[address] = value;
-            }
+            _mbc.WriteRAM((ushort)(address - 0xA000), value);
         }
     }
 }
