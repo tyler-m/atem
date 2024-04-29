@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualBasic;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Atem.Core.Processor;
 
 namespace Atem
 {

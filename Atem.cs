@@ -1,4 +1,5 @@
 ﻿using static Atem.PPU;
+using Atem.Core.Processor;
 using Atem.Core.Audio;
 
 namespace Atem

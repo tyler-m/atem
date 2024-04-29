@@ -1,5 +1,6 @@
 ﻿using Atem.Core.Audio.Channel;
 using Atem.Core.Audio.Filter;
+using Atem.Core.Processor;
 using System;
 
 namespace Atem.Core.Audio

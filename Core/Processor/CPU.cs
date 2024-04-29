@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using System.Numerics;
 
-namespace Atem
+namespace Atem.Core.Processor
 {
     internal class CPU
     {
@@ -49,7 +49,7 @@ namespace Atem
             for (int i = 0; i < operations.Length; i++)
             {
                 OperationInfo opInfo = operations[i];
-                MethodInfo? methodInfo = typeof(CPU).GetMethod(opInfo.Name);
+                MethodInfo methodInfo = typeof(CPU).GetMethod(opInfo.Name);
                 if (methodInfo != null)
                 {
                     if (i <= 0xFF)
@@ -154,7 +154,7 @@ namespace Atem
                         return false;
                     }
                 }
-                
+
                 IR = ReadByte();
                 if (!CB)
                 {
@@ -557,12 +557,12 @@ namespace Atem
         {
             Length = 1;
             int adj = 0;
-            if (Registers.Flags.C || (Registers.A > 0x99 && !Registers.Flags.N))
+            if (Registers.Flags.C || Registers.A > 0x99 && !Registers.Flags.N)
             {
-                Registers.Flags.C = (!Registers.Flags.N || Registers.Flags.C);
+                Registers.Flags.C = !Registers.Flags.N || Registers.Flags.C;
                 adj += 0x60;
             }
-            if (Registers.Flags.H || ((Registers.A & 0x0F) > 0x09 && !Registers.Flags.N))
+            if (Registers.Flags.H || (Registers.A & 0x0F) > 0x09 && !Registers.Flags.N)
             {
                 adj += 0x06;
             }
