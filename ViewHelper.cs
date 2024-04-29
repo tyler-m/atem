@@ -5,18 +5,18 @@ namespace Atem
 {
     internal class ViewHelper
     {
-        private CPU _cpu;
+        private Processor _processor;
         private Bus _bus;
 
-        public ViewHelper(CPU cpu, Bus bus)
+        public ViewHelper(Processor processor, Bus bus)
         {
-            _cpu = cpu;
+            _processor = processor;
             _bus = bus;
         }
 
         public ushort GetAddressOfNextOperation()
         {
-            return _cpu.AddressOfNextOperation;
+            return _processor.AddressOfNextOperation;
         }
 
         public byte PeekAt(int address)

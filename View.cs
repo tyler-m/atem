@@ -73,7 +73,7 @@ namespace Atem
 
             if (_currentKeyboardState.IsKeyDown(Keys.PageUp) && _previousKeyboardState.IsKeyUp(Keys.PageUp))
             {
-                _atem.ClockOneCPUOp();
+                _atem.ClockOneOperation();
                 _pauseAtem = true;
             }
             if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))

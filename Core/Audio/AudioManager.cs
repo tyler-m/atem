@@ -1,6 +1,5 @@
 ﻿using Atem.Core.Audio.Channel;
 using Atem.Core.Audio.Filter;
-using Atem.Core.Processor;
 using System;
 
 namespace Atem.Core.Audio
@@ -17,7 +16,7 @@ namespace Atem.Core.Audio
         private int _sampleTimer = 0;
         private int _bufferIndex = 0;
         private float _sampleTimerRemainder = 0.0f;
-        private float _samplePeriod = CPU.Frequency / SAMPLE_RATE;
+        private float _samplePeriod = Processor.Processor.Frequency / SAMPLE_RATE;
 
         private byte _leftChannelVolume = 0;
         private byte _rightChannelVolume = 0;

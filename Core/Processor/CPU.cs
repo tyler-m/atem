@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace Atem.Core.Processor
 {
-    internal class CPU
+    internal class Processor
     {
         public static int Frequency = 4194304;
 
@@ -35,7 +35,7 @@ namespace Atem.Core.Processor
             }
         }
 
-        public CPU(Bus bus)
+        public Processor(Bus bus)
         {
             _bus = bus;
             BuildOperationList();
@@ -49,7 +49,7 @@ namespace Atem.Core.Processor
             for (int i = 0; i < operations.Length; i++)
             {
                 OperationInfo opInfo = operations[i];
-                MethodInfo methodInfo = typeof(CPU).GetMethod(opInfo.Name);
+                MethodInfo methodInfo = typeof(Processor).GetMethod(opInfo.Name);
                 if (methodInfo != null)
                 {
                     if (i <= 0xFF)

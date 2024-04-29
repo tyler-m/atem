@@ -5,7 +5,7 @@ namespace Atem
 {
     internal class Bus
     {
-        private CPU _cpu;
+        private Processor _processor;
         private PPU _ppu;
         private Timer _timer;
         private Interrupt _interrupt;
@@ -17,9 +17,9 @@ namespace Atem
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-        public void SetComponents(CPU cpu, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
+        public void SetComponents(Processor processor, PPU ppu, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
         {
-            _cpu = cpu;
+            _processor = processor;
             _ppu = ppu;
             _timer = timer;
             _interrupt = interrupt;

@@ -13,7 +13,7 @@ namespace Atem
         private float _leftoverClocks = 0.0f;
         private int _clockCost = 4;
 
-        private CPU _cpu;
+        private Processor _processor;
         private PPU _ppu;
         private Bus _bus;
         private Timer _timer;
@@ -51,19 +51,19 @@ namespace Atem
         public Atem()
         {
             _bus = new Bus();
-            _cpu = new CPU(_bus);
+            _processor = new Processor(_bus);
             _ppu = new PPU(_bus);
             _timer = new Timer(_bus);
             _interrupt = new Interrupt();
             _joypad = new Joypad(_bus);
             _serial = new Serial();
             _audioManager = new AudioManager();
-            _bus.SetComponents(_cpu, _ppu, _timer, _interrupt, _joypad, _serial, _audioManager);
+            _bus.SetComponents(_processor, _ppu, _timer, _interrupt, _joypad, _serial, _audioManager);
 
             _bus.LoadBootROM("BOOT.bin");
             _bus.LoadCartridge("Game.gb");
 
-            ViewHelper = new ViewHelper(_cpu, _bus);
+            ViewHelper = new ViewHelper(_processor, _bus);
         }
 
         public void Update()
@@ -79,14 +79,14 @@ namespace Atem
             _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost * additionalClocks;
         }
 
-        public void ClockOneCPUOp()
+        public void ClockOneOperation()
         {
             while (!Clock()) ;
         }
 
         public bool Clock()
         {
-            bool opFinished = _cpu.Clock();
+            bool opFinished = _processor.Clock();
             _ppu.Clock();
             _audioManager.Clock();
             _timer.Clock();
