@@ -62,7 +62,6 @@ namespace Atem
 
         public static bool WillHalfCarry(this byte b, int value)
         {
-            //return (b & 0xF) + (value & 0xF) > 0xF;
             return (((b & 0xF) + (value & 0xF)) & 0x10) == 0x10;
         }
 
@@ -104,6 +103,32 @@ namespace Atem
         public static byte SwapNibbles(this byte b)
         {
             return (byte)((b >> 4) | (b << 4));
+        }
+        public static bool GetBit(this ushort u, int index)
+        {
+            return (u & (1 << index)) != 0;
+        }
+
+        public static ushort SetBit(this ushort u, int index)
+        {
+            return (ushort)(u | (1 << index));
+        }
+
+        public static ushort ClearBit(this ushort u, int index)
+        {
+            return (ushort)(u & ~(1 << index));
+        }
+
+        public static ushort SetBit(this ushort u, int index, bool value)
+        {
+            if (value)
+            {
+                return SetBit(u, index);
+            }
+            else
+            {
+                return ClearBit(u, index);
+            }
         }
     }
 }
