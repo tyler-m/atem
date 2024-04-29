@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Atem
+namespace Atem.Core.Processing
 {
     internal struct CPUFlags
     {

@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Linq;
 using System.Numerics;
 
-namespace Atem.Core.Processor
+namespace Atem.Core.Processing
 {
     internal class Processor
     {

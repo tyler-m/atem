@@ -1,5 +1,5 @@
 ﻿using Atem.Core.Audio;
-using Atem.Core.Processor;
+using Atem.Core.Processing;
 using Atem.Core.Graphics;
 
 namespace Atem
