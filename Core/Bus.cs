@@ -93,11 +93,11 @@ namespace Atem.Core
             }
             else if (offset == 0x01)
             {
-                return _serial.SC;
+                return _serial.SB;
             }
             else if (offset == 0x02)
             {
-                return _serial.SB;
+                return _serial.SC;
             }
             else if (offset == 0x04)
             {
@@ -287,11 +287,11 @@ namespace Atem.Core
             }
             else if (offset == 0x01)
             {
-                _serial.SC = value;
+                _serial.SB = value;
             }
             else if (offset == 0x02)
             {
-                _serial.SB = value;
+                _serial.SC = value;
             }
             else if (offset == 0x04)
             {
