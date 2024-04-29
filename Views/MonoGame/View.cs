@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using Atem.Core.Input;
 using System;
 
-namespace Atem
+namespace Atem.Views.MonoGame
 {
     internal class View : Game
     {

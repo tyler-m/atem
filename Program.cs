@@ -1,4 +1,5 @@
-﻿
+﻿using Atem.Views.MonoGame;
+
 namespace Atem
 {
     internal class Program
