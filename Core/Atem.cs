@@ -5,7 +5,7 @@ using Atem.Core.Input;
 
 namespace Atem.Core
 {
-    internal class Atem
+    internal class AtemRunner
     {
         private const int ClockFrequency = 4194304;
         private const float FrameFrequency = 59.73f;
@@ -49,7 +49,7 @@ namespace Atem.Core
             }
         }
 
-        public Atem()
+        public AtemRunner()
         {
             _bus = new Bus();
             _processor = new Processor(_bus);

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Atem.Core.Input;
+using Atem.Core;
 using System;
 
 namespace Atem.Views.MonoGame
@@ -20,13 +21,13 @@ namespace Atem.Views.MonoGame
         private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
 
-        private Core.Atem _atem;
+        private AtemRunner _atem;
         private Color[] _screenData = new Color[ScreenWidth * ScreenHeight];
         private Texture2D _screenTexture;
         private bool _pauseAtem = true;
         private DynamicSoundEffectInstance _soundInstance;
 
-        public View(Core.Atem atem)
+        public View(AtemRunner atem)
         {
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = (int)(ScreenWidth * ScreenSizeFactor);

@@ -1,4 +1,5 @@
-﻿using Atem.Views.MonoGame;
+﻿using Atem.Core;
+using Atem.Views.MonoGame;
 
 namespace Atem
 {
@@ -6,7 +7,7 @@ namespace Atem
     {
         static void Main(string[] args)
         {
-            Core.Atem atem = new Core.Atem();
+            AtemRunner atem = new AtemRunner();
             using View view = new View(atem);
             view.Run();
         }
