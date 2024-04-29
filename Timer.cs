@@ -64,7 +64,7 @@ namespace Atem
             }
             set
             {
-                _tac = TAC;
+                _tac = value;
             }
         }
 
