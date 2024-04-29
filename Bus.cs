@@ -7,7 +7,7 @@ namespace Atem
     internal class Bus
     {
         private Processor _processor;
-        private Graphics _graphics;
+        private GraphicsManager _graphics;
         private Timer _timer;
         private Interrupt _interrupt;
         private Joypad _joypad;
@@ -18,7 +18,7 @@ namespace Atem
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000];
 
-        public void SetComponents(Processor processor, Graphics graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
+        public void SetComponents(Processor processor, GraphicsManager graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audioManager)
         {
             _processor = processor;
             _graphics = graphics;

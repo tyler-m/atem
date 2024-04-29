@@ -14,7 +14,7 @@ namespace Atem
         private int _clockCost = 4;
 
         private Processor _processor;
-        private Graphics _graphics;
+        private GraphicsManager _graphics;
         private Bus _bus;
         private Timer _timer;
         private Interrupt _interrupt;
@@ -36,7 +36,7 @@ namespace Atem
             }
         }
 
-        public event Graphics.VerticalBlankEvent OnVerticalBlank
+        public event GraphicsManager.VerticalBlankEvent OnVerticalBlank
         {
             add
             {
@@ -52,7 +52,7 @@ namespace Atem
         {
             _bus = new Bus();
             _processor = new Processor(_bus);
-            _graphics = new Graphics(_bus);
+            _graphics = new GraphicsManager(_bus);
             _timer = new Timer(_bus);
             _interrupt = new Interrupt();
             _joypad = new Joypad(_bus);

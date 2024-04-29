@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Atem.Core.Graphics
 {
-    internal class Graphics
+    internal class GraphicsManager
     {
         public static float FrameRate = 59.73f;
 
@@ -108,7 +108,7 @@ namespace Atem.Core.Graphics
             }
         }
 
-        public Graphics(Bus bus)
+        public GraphicsManager(Bus bus)
         {
             _bus = bus;
             Mode = RenderMode.OAM;
