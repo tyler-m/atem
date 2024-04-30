@@ -96,15 +96,30 @@ namespace Atem.Core.Graphics
             }
             set
             {
-                STAT = STAT
-                    .SetBit(0, ((byte)value).GetBit(0))
-                    .SetBit(1, ((byte)value).GetBit(1));
+                RenderMode prevMode = Mode;
 
                 if (value == RenderMode.OAM)
                 {
                     _oamScanIndex = 0;
                     _spriteBuffer.Clear();
+
+                    if (prevMode != RenderMode.OAM && STAT.GetBit(5))
+                    {
+                        _bus.RequestInterrupt(InterruptType.STAT);
+                    }
                 }
+                else if (value == RenderMode.VerticalBlank && prevMode != RenderMode.VerticalBlank && STAT.GetBit(4))
+                {
+                    _bus.RequestInterrupt(InterruptType.STAT);
+                }
+                else if (value == RenderMode.HorizontalBlank && prevMode != RenderMode.HorizontalBlank && STAT.GetBit(3))
+                {
+                    _bus.RequestInterrupt(InterruptType.STAT);
+                }
+
+                STAT = STAT
+                    .SetBit(0, ((byte)value).GetBit(0))
+                    .SetBit(1, ((byte)value).GetBit(1));
             }
         }
 
