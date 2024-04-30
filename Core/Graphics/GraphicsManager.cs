@@ -61,7 +61,24 @@ namespace Atem.Core.Graphics
         public byte WY;
         public byte WX;
 
-        public byte STAT;
+        private byte _stat;
+
+        public byte STAT
+        {
+            get
+            {
+                return _stat;
+            }
+            set
+            {
+                if (STAT.GetBit(6) && value.GetBit(2) && !STAT.GetBit(2))
+                {
+                    _bus.RequestInterrupt(InterruptType.STAT);
+                }
+
+                _stat = value;
+            }
+        }
 
         private byte _dma;
 
@@ -333,13 +350,6 @@ namespace Atem.Core.Graphics
 
             UpdateMode();
 
-            if (!STAT.GetBit(2) && LY == LYC)
-            {
-                if (STAT.GetBit(6))
-                {
-                    _bus.RequestInterrupt(InterruptType.STAT);
-                }
-            }
             STAT = STAT.SetBit(2, LYC == LY);
         }
 
