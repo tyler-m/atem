@@ -3,6 +3,15 @@ namespace Atem
 {
     internal static class ByteExtensions
     {
+        public static int Int(this bool b)
+        {
+            return b ? 1 : 0;
+        }
+        public static byte Byte(this bool b)
+        {
+            return (byte)(b ? 1 : 0);
+        }
+
         public static bool GetBit(this byte b, int index)
         {
             return (b & (1 << index)) != 0;
