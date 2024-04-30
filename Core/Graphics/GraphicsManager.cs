@@ -108,10 +108,17 @@ namespace Atem.Core.Graphics
                         _bus.RequestInterrupt(InterruptType.STAT);
                     }
                 }
-                else if (value == RenderMode.VerticalBlank && prevMode != RenderMode.VerticalBlank && STAT.GetBit(4))
+                else if (value == RenderMode.VerticalBlank)
                 {
-                    _bus.RequestInterrupt(InterruptType.STAT);
+                    OnVerticalBlank?.Invoke(_screen);
+                    _bus.RequestInterrupt(InterruptType.VerticalBlank);
+                    
+                    if (prevMode != RenderMode.VerticalBlank && STAT.GetBit(4))
+                    {
+                        _bus.RequestInterrupt(InterruptType.STAT);
+                    }
                 }
+                
                 else if (value == RenderMode.HorizontalBlank && prevMode != RenderMode.HorizontalBlank && STAT.GetBit(3))
                 {
                     _bus.RequestInterrupt(InterruptType.STAT);
@@ -348,8 +355,6 @@ namespace Atem.Core.Graphics
                     if (LY >= 144)
                     {
                         Mode = RenderMode.VerticalBlank;
-                        OnVerticalBlank?.Invoke(_screen);
-                        _bus.RequestInterrupt(InterruptType.VerticalBlank);
                     }
                     else
                     {
