@@ -102,5 +102,10 @@ namespace Atem.Core
         {
             _joypad.OnJoypadChange(button, down);
         }
+
+        public void OnExit()
+        {
+            _bus.SaveCartridgeRAM();
+        }
     }
 }

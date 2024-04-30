@@ -13,6 +13,8 @@ namespace Atem.Core.Memory.Mapper
         private int _extraBank = 0;
         private int _bankingMode = 0;
 
+        public byte[] RAM { get => _ram; set => _ram = value; }
+
         public void Init(byte type, byte[] rom, int ramSize)
         {
             _type = type;

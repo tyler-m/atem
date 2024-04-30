@@ -39,6 +39,13 @@ namespace Atem.Views.MonoGame
             _atem = atem;
             _atem.OnVerticalBlank += OnVerticalBlank;
             _atem.OnFullAudioBuffer += OnFullAudioBuffer;
+
+            Exiting += OnExit;
+        }
+
+        private void OnExit(object sender, EventArgs e)
+        {
+            _atem.OnExit();
         }
 
         private void OnFullAudioBuffer(byte[] buffer)

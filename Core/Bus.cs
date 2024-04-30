@@ -41,6 +41,11 @@ namespace Atem.Core
             _cartridge = new Cartridge(filepath);
         }
 
+        public void SaveCartridgeRAM()
+        {
+            _cartridge.SaveRAM();
+        }
+
         public byte Read(ushort address)
         {
             byte block = address.GetHighByte();

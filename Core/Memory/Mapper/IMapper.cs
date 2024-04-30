@@ -3,6 +3,7 @@ namespace Atem.Core.Memory.Mapper
 {
     internal interface IMapper
     {
+        public byte[] RAM { get; set; }
         public void Init(byte type, byte[] rom, int ramSize);
         public byte ReadROM(ushort address);
         public byte ReadROMBank(ushort address);

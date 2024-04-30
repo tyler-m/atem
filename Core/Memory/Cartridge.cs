@@ -6,6 +6,7 @@ namespace Atem.Core.Memory
 {
     internal class Cartridge
     {
+        private string _filepath;
         private byte _type;
 
         public bool Loaded;
@@ -16,6 +17,11 @@ namespace Atem.Core.Memory
         public Cartridge(string filepath)
         {
             Load(filepath);
+        }
+
+        public void SaveRAM()
+        {
+            File.WriteAllBytes(_filepath + ".sav", _mbc.RAM);
         }
 
         private bool Load(string filepath)
@@ -71,21 +77,27 @@ namespace Atem.Core.Memory
                 ramSizeInBytes = 1 << 16;
             }
 
-            if (_type == 0x00) // ROM Only
+            if (_type == 0x00) // No MBC
             {
 
             }
             else if (_type >= 0x01 && _type <= 0x03) // MBC1
             {
-                _mbc = new Mapper.MBC1();
+                _mbc = new MBC1();
                 _mbc.Init(_type, rom, ramSizeInBytes);
             }
             else if (_type >= 0x0F && _type <= 0x13) // MBC3
             {
-                _mbc = new Mapper.MBC3();
+                _mbc = new MBC3();
                 _mbc.Init(_type, rom, ramSizeInBytes);
             }
 
+            if (File.Exists(filepath + ".sav"))
+            {
+                _mbc.RAM = File.ReadAllBytes(filepath + ".sav");
+            }
+
+            _filepath = filepath;
             Loaded = true;
             return Loaded;
         }

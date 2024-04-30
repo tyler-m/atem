@@ -10,6 +10,8 @@ namespace Atem.Core.Memory.Mapper
         private int _romBank = 1;
         private int _ramBank = 0;
 
+        public byte[] RAM { get => _ram; set => _ram = value; }
+
         public void Init(byte type, byte[] rom, int ramSize)
         {
             _type = type;
