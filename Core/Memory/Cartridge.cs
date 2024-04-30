@@ -79,7 +79,8 @@ namespace Atem.Core.Memory
 
             if (_type == 0x00) // No MBC
             {
-
+                _mbc = new NoMap();
+                _mbc.Init(_type, rom, ramSizeInBytes);
             }
             else if (_type >= 0x01 && _type <= 0x03) // MBC1
             {
