@@ -218,51 +218,51 @@ namespace Atem.Core
             }
             else if (offset == 0x40)
             {
-                return _graphics.LCDC;
+                return _graphics.Registers.LCDC;
             }
             else if (offset == 0x41)
             {
-                return _graphics.STAT;
+                return _graphics.Registers.STAT;
             }
             else if (offset == 0x42)
             {
-                return _graphics.SCY;
+                return _graphics.Registers.SCY;
             }
             else if (offset == 0x43)
             {
-                return _graphics.SCX;
+                return _graphics.Registers.SCX;
             }
             else if (offset == 0x44)
             {
-                return _graphics.LY;
+                return _graphics.Registers.LY;
             }
             else if (offset == 0x45)
             {
-                return _graphics.LYC;
+                return _graphics.Registers.LYC;
             }
             else if (offset == 0x46)
             {
-                return _graphics.DMA;
+                return _graphics.Registers.DMA;
             }
             else if (offset == 0x47)
             {
-                return _graphics.BGP;
+                return _graphics.Registers.BGP;
             }
             else if (offset == 0x48)
             {
-                return _graphics.OBP0;
+                return _graphics.Registers.OBP0;
             }
             else if (offset == 0x49)
             {
-                return _graphics.OBP1;
+                return _graphics.Registers.OBP1;
             }
             else if (offset == 0x4A)
             {
-                return _graphics.WY;
+                return _graphics.Registers.WY;
             }
             else if (offset == 0x4B)
             {
-                return _graphics.WX;
+                return _graphics.Registers.WX;
             }
             else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
@@ -412,19 +412,19 @@ namespace Atem.Core
             }
             else if (offset == 0x40)
             {
-                _graphics.LCDC = value;
+                _graphics.Registers.LCDC = value;
             }
             else if (offset == 0x41)
             {
-                _graphics.STAT = value;
+                _graphics.Registers.STAT = value;
             }
             else if (offset == 0x42)
             {
-                _graphics.SCY = value;
+                _graphics.Registers.SCY = value;
             }
             else if (offset == 0x43)
             {
-                _graphics.SCX = value;
+                _graphics.Registers.SCX = value;
             }
             else if (offset == 0x44)
             {
@@ -432,31 +432,31 @@ namespace Atem.Core
             }
             else if (offset == 0x45)
             {
-                _graphics.LYC = value;
+                _graphics.Registers.LYC = value;
             }
             else if (offset == 0x46)
             {
-                _graphics.DMA = value;
+                _graphics.Registers.DMA = value;
             }
             else if (offset == 0x47)
             {
-                _graphics.BGP = value;
+                _graphics.Registers.BGP = value;
             }
             else if (offset == 0x48)
             {
-                _graphics.OBP0 = value;
+                _graphics.Registers.OBP0 = value;
             }
             else if (offset == 0x49)
             {
-                _graphics.OBP1 = value;
+                _graphics.Registers.OBP1 = value;
             }
             else if (offset == 0x4A)
             {
-                _graphics.WY = value;
+                _graphics.Registers.WY = value;
             }
             else if (offset == 0x4B)
             {
-                _graphics.WX = value;
+                _graphics.Registers.WX = value;
             }
             else if (offset == 0x50)
             {

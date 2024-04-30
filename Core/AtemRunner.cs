@@ -41,7 +41,7 @@ namespace Atem.Core
             }
         }
 
-        public event GraphicsManager.VerticalBlankEvent OnVerticalBlank
+        public event VerticalBlankEvent OnVerticalBlank
         {
             add
             {
