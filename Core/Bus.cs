@@ -486,6 +486,11 @@ namespace Atem.Core
             }
             else if (offset == 0x50)
             {
+                if (ColorMode)
+                {
+                    _processor.Registers.A = 0x11;
+                }
+
                 _bootROM.Enabled = false;
             }
             else if (offset == 0x70)
