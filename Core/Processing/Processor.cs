@@ -20,6 +20,22 @@ namespace Atem.Core.Processing
         public bool CB = false;
         public bool IME = false;
 
+        public bool DoubleSpeed = false;
+        public bool SpeedSwitchFlag = false;
+
+        public byte KEY1
+        {
+            get
+            {
+                return (byte)((DoubleSpeed.Int() << 7) | (SpeedSwitchFlag.Int()));
+            }
+            set
+            {
+                DoubleSpeed = value.GetBit(7);
+                SpeedSwitchFlag = value.GetBit(0);
+            }
+        }
+
         private bool _halted = false;
         private bool _operationFinished = true;
         private int _tick = 0;
@@ -505,7 +521,11 @@ namespace Atem.Core.Processing
         public void Stop()
         {
             Length = 1;
-            throw new NotImplementedException("STOP not implemented.");
+            if (SpeedSwitchFlag)
+            {
+                SpeedSwitchFlag = false;
+                DoubleSpeed = !DoubleSpeed;
+            }
         }
 
         public void Rla()

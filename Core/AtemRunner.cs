@@ -92,9 +92,16 @@ namespace Atem.Core
         public bool Clock()
         {
             bool opFinished = _processor.Clock();
+            _timer.Clock();
+
+            if (_processor.DoubleSpeed)
+            {
+                opFinished |= _processor.Clock();
+                _timer.Clock();
+            }
+
             _graphics.Clock();
             _audio.Clock();
-            _timer.Clock();
             return opFinished;
         }
 

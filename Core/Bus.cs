@@ -273,6 +273,10 @@ namespace Atem.Core
             {
                 return _graphics.Registers.WX;
             }
+            else if (offset == 0x4D)
+            {
+                return _processor.KEY1;
+            }
             else if (offset == 0x70)
             {
                 return SVBK;
@@ -470,6 +474,10 @@ namespace Atem.Core
             else if (offset == 0x4B)
             {
                 _graphics.Registers.WX = value;
+            }
+            else if (offset == 0x4D)
+            {
+                _processor.KEY1 = value;
             }
             else if (offset == 0x50)
             {
