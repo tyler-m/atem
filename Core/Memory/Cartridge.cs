@@ -8,11 +8,17 @@ namespace Atem.Core.Memory
     {
         private string _filepath;
         private byte _type;
+        private byte _colorFlag;
 
         public bool Loaded;
         public string Title;
 
         public IMapper _mbc;
+
+        public bool SupportsColor
+        {
+            get => _colorFlag == 0x80 || _colorFlag == 0xC0;
+        }
 
         public Cartridge(string filepath)
         {
@@ -58,6 +64,9 @@ namespace Atem.Core.Memory
                 {
                     break;
                 }
+            }
+
+            _colorFlag = rom[0x143];
 
             _type = rom[0x0147];
             int ramSize = rom[0x0149];
