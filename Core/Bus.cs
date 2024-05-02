@@ -18,7 +18,9 @@ namespace Atem.Core
         private Cartridge _cartridge;
         private AudioManager _audio;
         private byte[] _hram = new byte[0x7F];
-        private byte[] _wram = new byte[0x2000];
+        private byte[] _wram = new byte[0x2000 * 4];
+
+        private byte SVBK = 0;
 
         public void SetComponents(Processor processor, GraphicsManager graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audio)
         {
@@ -69,7 +71,14 @@ namespace Atem.Core
             }
             else if (block <= 0xDF) // WRAM
             {
+                if (block <= 0xCF)
+                {
                 return _wram[address - 0xC000];
+            }
+                else
+                {
+                    return _wram[address - 0xC000 + SVBK * 0x1000];
+                }
             }
             else if (block <= 0xFD) // echo RAM
             {
@@ -263,6 +272,10 @@ namespace Atem.Core
             else if (offset == 0x4B)
             {
                 return _graphics.Registers.WX;
+            }
+            else if (offset == 0x70)
+            {
+                return SVBK;
             }
             else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
@@ -462,6 +475,10 @@ namespace Atem.Core
             {
                 _bootROM.Enabled = false;
             }
+            else if (offset == 0x70)
+            {
+                SVBK = (byte)(value & 0b111);
+            }
             else if (offset >= 0x78 && offset <= 0x7F) // unused?
             {
 
@@ -503,7 +520,14 @@ namespace Atem.Core
             }
             else if (block <= 0xDF) // WRAM
             {
+                if (block <= 0xCF)
+                {
                 _wram[address - 0xC000] = value;
+            }
+                else
+                {
+                    _wram[address - 0xC000 + SVBK * 0x1000] = value;
+                }
             }
             else if (block <= 0xFD) // echo RAM
             {
