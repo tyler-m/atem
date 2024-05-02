@@ -484,6 +484,10 @@ namespace Atem.Core
             {
                 _processor.KEY1 = value;
             }
+            else if (offset == 0x4F)
+            {
+                _graphics.Registers.VBK = value;
+            }
             else if (offset == 0x50)
             {
                 if (_bootROM.Enabled && ColorMode)
@@ -492,6 +496,22 @@ namespace Atem.Core
                 }
 
                 _bootROM.Enabled = false;
+            }
+            else if (offset == 0x68)
+            {
+                _graphics.Registers.BGPI = value;
+            }
+            else if (offset == 0x69)
+            {
+                _graphics.Registers.BGPD = value;
+            }
+            else if (offset == 0x6A)
+            {
+                _graphics.Registers.OBPI = value;
+            }
+            else if (offset == 0x6B)
+            {
+                _graphics.Registers.OBPD = value;
             }
             else if (offset == 0x70)
             {

@@ -8,15 +8,17 @@ namespace Atem.Core.Graphics
         public byte Tile;
         public byte Flags;
 
-        public bool Palette { get { return Flags.GetBit(4); } }
-        public bool FlipX { get { return Flags.GetBit(5); } }
-        public bool FlipY { get { return Flags.GetBit(6); } }
-        public bool Priority { get { return Flags.GetBit(7); } }
+        public byte ColorPalette { get => (byte)(Flags & 0b111); }
+        public int Bank { get => Flags.GetBit(3).Int(); }
+        public bool Palette { get => Flags.GetBit(4); }
+        public bool FlipX { get => Flags.GetBit(5); }
+        public bool FlipY { get => Flags.GetBit(6); }
+        public bool Priority { get => Flags.GetBit(7); }
 
-        public Sprite(byte x, byte y, byte tile, byte flags)
+        public void Populate(byte y, byte x, byte tile, byte flags)
         {
-            X = x;
             Y = y;
+            X = x;
             Tile = tile;
             Flags = flags;
         }

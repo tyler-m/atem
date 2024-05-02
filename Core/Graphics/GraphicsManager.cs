@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Graphics
 {
-    internal delegate void VerticalBlankEvent(byte[] screen);
+    internal delegate void VerticalBlankEvent(GBColor[] screen);
 
     internal enum RenderMode
     {
@@ -18,12 +18,14 @@ namespace Atem.Core.Graphics
 
         private Bus _bus;
         private List<Sprite> _spriteBuffer = new List<Sprite>();
-        private int _oamScanIndex = 0;
         private int _lineDotCount;
         private byte _linePixel;
-        private byte[] _vram = new byte[0x2000];
-        private byte[] _oam = new byte[160];
-        private byte[] _screen = new byte[160 * 144];
+        private byte[] _vram = new byte[0x2000 * 2];
+        private GBColor[] _screen = new GBColor[160 * 144];
+        private Sprite[] _objects = new Sprite[40];
+        private int _objectIndex = 0;
+
+        private bool _windowWasTriggeredThisFrame;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
@@ -35,7 +37,7 @@ namespace Atem.Core.Graphics
         public bool WindowEnabled = false;
         public bool LargeObjects = false;
         public bool ObjectsEnabled = false;
-        public bool BackgroundAndWindowEnabled = false;
+        public bool BackgroundAndWindowEnabledOrPriority = false;
         public bool InterruptOnLineY = false;
         public bool InterruptOnOAM = false;
         public bool InterruptOnVerticalBlank = false;
@@ -45,12 +47,14 @@ namespace Atem.Core.Graphics
         public int WindowX = 0;
         public int WindowY = 0;
         public byte CurrentLine = 0;
+        public byte CurrentWindowLine = 0;
         public int LineYToCompare = 0;
-        public Palette BackgroundPalette = new Palette(0);
-        public Palette ObjectPalette0 = new Palette(0);
-        public Palette ObjectPalette1 = new Palette(0);
+        public PaletteGroup TilePalettes = new PaletteGroup();
+        public PaletteGroup ObjectPalettes = new PaletteGroup();
+        public PaletteGroup DMGPalettes = new PaletteGroup();
 
         private bool _currentlyOnLineY;
+
         public bool CurrentlyOnLineY
         {
             get
@@ -78,9 +82,15 @@ namespace Atem.Core.Graphics
             }
             set
             {
-                for (int i = 0; i < 160; i++)
+                int address = value << 8;
+
+                for (int i = 0; i < 40; i++)
                 {
-                    _oam[i] = _bus.Read((ushort)((value << 8) + i));
+                    _objects[i].Populate(
+                        _bus.Read((ushort)(address + 4*i)),
+                        _bus.Read((ushort)(address + 4*i + 1)),
+                        _bus.Read((ushort)(address + 4*i + 2)),
+                        _bus.Read((ushort)(address + 4*i + 3)));
                 }
 
                 _dma = value;
@@ -88,6 +98,7 @@ namespace Atem.Core.Graphics
         }
 
         RenderMode _mode;
+
         public RenderMode Mode
         {
             get
@@ -100,7 +111,7 @@ namespace Atem.Core.Graphics
 
                 if (value == RenderMode.OAM)
                 {
-                    _oamScanIndex = 0;
+                    _objectIndex = 0;
                     _spriteBuffer.Clear();
 
                     if (prevMode != RenderMode.OAM && InterruptOnOAM)
@@ -128,29 +139,42 @@ namespace Atem.Core.Graphics
             }
         }
 
+        public byte Bank { get; set; }
+
         public GraphicsManager(Bus bus)
         {
             _bus = bus;
             Registers = new GraphicsRegisters(this);
+            TilePalettes[0] = new Palette(new GBColor[] { GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0) });
+            for (int i = 0; i < _objects.Length; i++)
+            {
+                _objects[i] = new Sprite();
+            }
             Mode = RenderMode.OAM;
         }
 
         public void WriteVRAM(ushort address, byte value)
         {
+            address -= 0x8000;
+
             if (Mode == RenderMode.Draw)
              {
                 return;
             }
-            _vram[address & 0x1FFF] = value;
+
+            _vram[address + 0x2000 * Bank] = value;
         }
 
         public byte ReadVRAM(ushort address)
         {
+            address -= 0x8000;
+
             if (Mode == RenderMode.Draw)
             {
                 return 0xFF;
             }
-            return _vram[address & 0x1FFF];
+
+            return _vram[address + 0x2000 * Bank];
         }
 
         public void WriteOAM(ushort address, byte value)
@@ -159,7 +183,26 @@ namespace Atem.Core.Graphics
             {
                 return;
             }
-            _oam[address & 0x00FF] = value;
+
+            int adjustedAddress = address & 0xFF;
+            int index = adjustedAddress / 4;
+
+            if (adjustedAddress % 4 == 0)
+            {
+                _objects[index].Y = value;
+            }
+            else if (adjustedAddress % 4 == 1)
+            {
+                _objects[index].X = value;
+            }
+            else if (adjustedAddress % 4 == 2)
+            {
+                _objects[index].Tile = value;
+            }
+            else
+            {
+                _objects[index].Flags = value;
+            }
         }
 
         public byte ReadOAM(ushort address)
@@ -168,7 +211,26 @@ namespace Atem.Core.Graphics
             {
                 return 0xFF;
             }
-            return _oam[address & 0x00FF];
+
+            int adjustedAddress = address & 0xFF;
+            int index = adjustedAddress / 4;
+
+            if (adjustedAddress % 4 == 0)
+            {
+                return _objects[index].Y;
+            }
+            else if (adjustedAddress % 4 == 1)
+            {
+                return _objects[index].X;
+            }
+            else if (adjustedAddress % 4 == 2)
+            {
+                return _objects[index].Tile;
+            }
+            else
+            {
+                return _objects[index].Flags;
+            }
         }
 
         private ushort GetBackgroundTileMapAddress()
@@ -195,40 +257,109 @@ namespace Atem.Core.Graphics
             }
         }
 
-        private ushort GetTileDataAddress(int tileIndex)
+        private ushort GetTileDataAddress(int tileIndex, int bank = 0)
         {
             if (TileDataArea == 1)
             {
-                return (ushort)(0x0000 + tileIndex * 16);
+                return (ushort)((0x0000 + tileIndex * 16) + bank * 0x2000);
             }
             else
             {
                 sbyte offset = (sbyte)tileIndex;
-                return (ushort)(0x1000 + offset * 16);
+                return (ushort)((0x1000 + offset * 16) + bank * 0x2000);
             }
         }
 
-        private void FindObject(byte lineY)
+        private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
         {
-            byte y = _oam[_oamScanIndex++];
-            byte x = _oam[_oamScanIndex++];
-            byte tile = _oam[_oamScanIndex++];
-            byte flags = _oam[_oamScanIndex++];
+            bool window = WindowEnabled && pixelX > WindowX - 8 && WindowY <= pixelY;
+            _windowWasTriggeredThisFrame |= window;
 
-            if (x > 0 && lineY + 16 >= y && lineY + 16 < y + 8 + (LargeObjects ? 8 : 0))
+            (GBColor tileColor, int tileId, bool tilePriority) = GetTileInfo(pixelX, window ? CurrentWindowLine : pixelY, window);
+
+            if (!_bus.ColorMode && !BackgroundAndWindowEnabledOrPriority)
             {
-                _spriteBuffer.Add(new Sprite(x, y, tile, flags));
+                tileColor = new GBColor(0xFFFF);
             }
+
+            (GBColor spriteColor, int spriteId, Sprite sprite) = GetSpriteInfo(pixelX, pixelY);
+
+            GBColor pixelColor = tileColor;
+            if (sprite != null && spriteId != 0 && ObjectsEnabled)
+            {
+                if (!sprite.Priority || tileId == 0)
+                {
+                    pixelColor = spriteColor;
+                }
+            }
+
+            if (_bus.ColorMode)
+            {
+                if (tilePriority && tileId != 0 && BackgroundAndWindowEnabledOrPriority)
+                {
+                    pixelColor = tileColor;
+                }
+            }
+
+            return pixelColor;
         }
 
-        private byte GetTileColorFromScreenPixel(int pixelX, int pixelY, bool window = false)
+        public int GetTileId(int tileDataAddress, int offsetX, int offsetY, bool flipX = false, bool flipY = false)
         {
-            int tileMapX, tileMapY, tileMapAddress;
+            if (flipX)
+            {
+                offsetX = 7 - offsetX;
+            }
+
+            if (flipY)
+            {
+                offsetY = 7 - offsetY;
+            }
+
+            byte low = _vram[tileDataAddress + offsetY * 2];
+            byte high = _vram[tileDataAddress + offsetY * 2 + 1];
+            return ((low >> (7 - offsetX)) & 1) | (((high >> (7 - offsetX)) & 1) << 1);
+        }
+
+        public int GetSpriteId(Sprite sprite, int pixelX, int pixelY)
+        {
+            int offsetX = pixelX - (sprite.X - 8); // coordinates of pixel inside tile at (x, y)
+            int offsetY = pixelY - (sprite.Y - 16);
+            int spriteTile = sprite.Tile;
+
+            if (LargeObjects)
+            {
+                // ignore first bit of tile with 8x16 objects
+                spriteTile &= 0b11111110;
+
+                if (sprite.FlipY)
+                {
+                    offsetY = 15 - offsetY;
+                }
+            }
+            else
+            {
+                if (sprite.FlipY)
+                {
+                    offsetY = 7 - offsetY;
+                }
+            }
+
+            int tileDataAddress = spriteTile * 16 + (_bus.ColorMode ? 0x2000 * sprite.Bank : 0);
+            int id = GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
+            return id;
+        }
+
+        public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfo(int pixelX, int pixelY, bool window)
+        {
+            int tileMapX, tileMapY, tileMapAddress, tileId, tileIndex;
+            Palette tilePalette;
+            bool tilePriority;
 
             if (window)
             {
                 tileMapX = pixelX - (WindowX - 7);
-                tileMapY = pixelY - WindowY;
+                tileMapY = pixelY;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
             }
@@ -238,76 +369,89 @@ namespace Atem.Core.Graphics
                 tileMapY = (ScreenY + pixelY) % 256;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetBackgroundTileMapAddress() + tileMapOffset;
+
             }
 
-            byte tileIndex = _vram[tileMapAddress];
+            tileIndex = _vram[tileMapAddress]; // the index of the tile that the pixel at (x, y) belongs to
 
-            int tileDataAddress = GetTileDataAddress(tileIndex);
-            int relativeX = tileMapX % 8;
-            int relativeY = tileMapY % 8;
-            byte low = _vram[tileDataAddress + relativeY * 2];
-            byte high = _vram[tileDataAddress + relativeY * 2 + 1];
+            if (_bus.ColorMode)
+            {
+                byte bgMapAttributes = _vram[tileMapAddress + 0x2000];
+                int paletteIndex = bgMapAttributes & 0b111;
+                int bank = bgMapAttributes.GetBit(3).Int();
+                bool flipX = bgMapAttributes.GetBit(5);
+                bool flipY = bgMapAttributes.GetBit(6);
+                tilePriority = bgMapAttributes.GetBit(7);
+                tilePalette = TilePalettes[paletteIndex];
+                int tileDataAddress = GetTileDataAddress(tileIndex, bank);
+                tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8, flipX, flipY);
+            }
+            else
+            {
+                tilePalette = DMGPalettes[0];
+                int tileDataAddress = GetTileDataAddress(tileIndex);
+                tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8);
+                tilePriority = false;
+            }
 
-            int id = ((low >> (7 - relativeX)) & 1) | (((high >> (7 - relativeX)) & 1) << 1);
-            return BackgroundPalette[id];
+            return (tilePalette[tileId], tileId, tilePriority);
         }
 
-        private byte GetColorOfScreenPixel(byte pixelX, byte pixelY)
+        public (GBColor spriteColor, int spriteId, Sprite sprite) GetSpriteInfo(int pixelX, int pixelY)
         {
-            bool window = WindowEnabled && pixelX > WindowX - 8 && WindowY <= pixelY;
-            byte tileColor = GetTileColorFromScreenPixel(pixelX, pixelY, window);
-
-            bool foundSprite = false;
-            byte spriteColor = 0;
+            GBColor spriteColor = null;
             Sprite sprite = null;
+            int spriteId = 0;
+
             for (int j = 0; j < _spriteBuffer.Count; j++)
             {
-                sprite = _spriteBuffer[j];
-                if (sprite.X > pixelX && sprite.X <= pixelX + 8)
+                Sprite tempSprite = _spriteBuffer[j];
+
+                if (tempSprite.X > pixelX && tempSprite.X <= pixelX + 8)
                 {
-                    int relativeX = pixelX - (sprite.X - 8); // coordinates of pixel inside tile
-                    int relativeY = pixelY - (sprite.Y - 16);
+                    int id = GetSpriteId(tempSprite, pixelX, pixelY);
 
-                    if (LargeObjects && sprite.FlipY)
-                    {
-                        relativeY = 15 - relativeY;
-                    }
-
-                    int tileDataAddress = sprite.Tile * 16;
-                    byte low = _vram[tileDataAddress + relativeY * 2];
-                    byte high = _vram[tileDataAddress + relativeY * 2 + 1];
-                    byte relativeBit = (byte)(sprite.FlipX ? relativeX : 7 - relativeX);
-                    int id = ((low >> relativeBit) & 1) | (((high >> relativeBit) & 1) << 1);
-
-                    if (id == 0) // the pixel on this sprite is transparent
+                    if (id == 0)
                     {
                         continue;
                     }
 
-                    if (sprite.Palette)
+                    if (_bus.ColorMode)
                     {
-                        spriteColor = ObjectPalette1[id];
+                        // in color mode object locations in OAM determines priority
+                        // (the object list is populated in order of OAM location, so we
+                        // just take the first visible object we encounter in the list)
+                        if (sprite == null)
+                        {
+                            spriteColor = ObjectPalettes[tempSprite.ColorPalette][id];
+                            sprite = tempSprite;
+                            spriteId = id;
+                        }
                     }
                     else
                     {
-                        spriteColor = ObjectPalette0[id];
+                        // in no-color mode, object X coordinates determine priority.
+                        // if X coordinates between objects are identical, the object
+                        // earliest in OAM is prioritized
+                        if (sprite == null || tempSprite.X < sprite.X)
+                        {
+                            if (tempSprite.Palette)
+                            {
+                                spriteColor = DMGPalettes[2][id];
+                            }
+                            else
+                            {
+                                spriteColor = DMGPalettes[1][id];
+                            }
+
+                            sprite = tempSprite;
+                            spriteId = id;
+                        }
                     }
-
-                    foundSprite = true;
-                    break;
                 }
             }
 
-            byte color = tileColor;
-            if (foundSprite)
-            {
-                if (!sprite.Flags.GetBit(7) || tileColor == 0)
-                {
-                    color = spriteColor;
-                }
-            }
-
-            return color;
+            return (spriteColor, spriteId, sprite);
         }
 
         public void Clock()
@@ -321,9 +465,15 @@ namespace Atem.Core.Graphics
             {
                 for (int i = 0; i < 2; i++)
                 {
+                    // find object to add to the object buffer for the current line
                     if (_spriteBuffer.Count < 10)
                     {
-                        FindObject(CurrentLine);
+                        Sprite sprite = _objects[_objectIndex++];
+
+                        if (sprite.X > 0 && CurrentLine + 16 >= sprite.Y && CurrentLine + 16 < sprite.Y + 8 + (LargeObjects ? 8 : 0))
+                        {
+                            _spriteBuffer.Add(sprite);
+                        }
                     }
                 }
             }
@@ -374,6 +524,7 @@ namespace Atem.Core.Graphics
                 {
                     CurrentLine = 0;
                     _lineDotCount = 0;
+                    CurrentWindowLine = 0;
                     Mode = RenderMode.OAM;
                 }
             }
@@ -390,7 +541,14 @@ namespace Atem.Core.Graphics
                 {
                     Mode = 0;
                     _linePixel = 0;
-                }
+                    
+                    if (_windowWasTriggeredThisFrame)
+                    {
+                        CurrentWindowLine++;
+                    }
+
+                    _windowWasTriggeredThisFrame = false;
+    }
             }
         }
     }

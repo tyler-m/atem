@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core;
 using System;
@@ -176,27 +177,19 @@ namespace Atem.Views.MonoGame
             base.Draw(gameTime);
         }
 
-        private void OnVerticalBlank(byte[] screen)
+        private Color GBColorToColor(GBColor gbColor)
         {
+            float r = gbColor.Red / 31.0f;
+            float g = gbColor.Green / 31.0f;
+            float b = gbColor.Blue / 31.0f;
+            return new Color(r, g, b);
+        }
+
+        private void OnVerticalBlank(GBColor[] screen)
+                {
             for (int i = 0; i < _screenData.Length; i++)
-            {
-                byte bColor = screen[i];
-                Color color = Color.White;
-
-                if (bColor == 1)
                 {
-                    color = Color.LightGray * 0.9f;
-                }
-                else if (bColor == 2)
-                {
-                    color = Color.DarkGray * 0.5f;
-                }
-                else if (bColor == 3)
-                {
-                    color = Color.Black;
-                }
-
-                _screenData[i] = color;
+                _screenData[i] = GBColorToColor(screen[i]);
             }
 
             _screenTexture.SetData(_screenData);
