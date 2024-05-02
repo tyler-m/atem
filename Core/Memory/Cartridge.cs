@@ -54,7 +54,10 @@ namespace Atem.Core.Memory
                 {
                     Title += Encoding.UTF8.GetString(new byte[] { c });
                 }
-            }
+                else
+                {
+                    break;
+                }
 
             _type = rom[0x0147];
             int ramSize = rom[0x0149];
@@ -90,6 +93,11 @@ namespace Atem.Core.Memory
             else if (_type >= 0x0F && _type <= 0x13) // MBC3
             {
                 _mbc = new MBC3();
+                _mbc.Init(_type, rom, ramSizeInBytes);
+            }
+            else if (_type >= 0x19 && _type <= 0x1E)
+            {
+                _mbc = new MBC5();
                 _mbc.Init(_type, rom, ramSizeInBytes);
             }
 
