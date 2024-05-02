@@ -105,7 +105,7 @@ namespace Atem.Core
             return opFinished;
         }
 
-        internal void OnJoypadChange(JoypadButton button, bool down)
+        public void OnJoypadChange(JoypadButton button, bool down)
         {
             _joypad.OnJoypadChange(button, down);
         }
