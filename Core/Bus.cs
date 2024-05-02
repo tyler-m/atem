@@ -22,6 +22,11 @@ namespace Atem.Core
 
         private byte SVBK = 0;
 
+        public bool ColorMode
+        {
+            get => _cartridge.SupportsColor;
+        }
+
         public void SetComponents(Processor processor, GraphicsManager graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audio)
         {
             _processor = processor;
