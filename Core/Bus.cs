@@ -82,7 +82,12 @@ namespace Atem.Core
             }
                 else
                 {
-                    return _wram[address - 0xC000 + SVBK * 0x1000];
+                    int bank = SVBK;
+                    if (bank == 0)
+                    {
+                        bank = 1;
+                    }
+                    return _wram[address - 0xD000 + bank * 0x1000];
                 }
             }
             else if (block <= 0xFD) // echo RAM
@@ -564,7 +569,12 @@ namespace Atem.Core
             }
                 else
                 {
-                    _wram[address - 0xC000 + SVBK * 0x1000] = value;
+                    int bank = SVBK;
+                    if (bank == 0)
+                    {
+                        bank = 1;
+                    }
+                    _wram[address - 0xD000 + bank * 0x1000] = value;
                 }
             }
             else if (block <= 0xFD) // echo RAM
