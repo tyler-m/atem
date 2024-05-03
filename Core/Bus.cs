@@ -602,5 +602,15 @@ namespace Atem.Core
         {
             _interrupt.SetInterrupt(interruptType);
         }
+
+        internal void Halt()
+        {
+            _processor.RequestHalt();
+        }
+
+        internal void Unhalt()
+        {
+            _processor.RequestUnhalt();
+        }
     }
 }

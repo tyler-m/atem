@@ -37,6 +37,7 @@ namespace Atem.Core.Processing
         }
 
         private bool _halted = false;
+        private bool _busHalted = false;
         private bool _operationFinished = true;
         private int _tick = 0;
 
@@ -131,6 +132,11 @@ namespace Atem.Core.Processing
 
         public bool Clock()
         {
+            if (_busHalted)
+            {
+                return false;
+            }
+
             if (_halted)
             {
                 byte IE = _bus.Read(0xFFFF);
@@ -928,6 +934,16 @@ namespace Atem.Core.Processing
             var value = GetValue(source);
             value.Value = value.Value.GetLowByte().SetBit(Convert.ToInt32(bit));
             SetValue(source, value);
+        }
+
+        internal void RequestHalt()
+        {
+            _busHalted = true;
+        }
+
+        internal void RequestUnhalt()
+        {
+            _busHalted = false;
         }
     }
 }
