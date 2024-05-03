@@ -101,15 +101,15 @@ namespace Atem.Core.Graphics
             }
         }
 
-        public byte DMA
+        public byte ODMA
         {
             get
             {
-                return _manager.DMA;
+                return _manager.ODMA;
             }
             set
             {
-                _manager.DMA = value;
+                _manager.ODMA = value;
             }
         }
 
@@ -238,6 +238,68 @@ namespace Atem.Core.Graphics
             set
             {
                 _manager.ObjectPalettes.WriteAtAddress(value);
+            }
+        }
+
+        public byte DMA1
+        {
+            get
+            {
+                return 0xFF;
+            }
+            set
+            {
+                _manager.SourceAddressDMA = _manager.SourceAddressDMA.SetHighByte(value);
+            }
+        }
+
+        public byte DMA2
+        {
+            get
+            {
+                return 0xFF;
+            }
+            set
+            {
+                // bottom 4 bits are ignored
+                _manager.SourceAddressDMA = _manager.SourceAddressDMA.SetLowByte((byte)(value & 0xF0));
+            }
+        }
+
+        public byte DMA3
+        {
+            get
+            {
+                return 0xFF;
+            }
+            set
+            {
+                // ensure address begins at 0x8000 (start of VRAM). top 3 bits are ignored
+                _manager.DestAddressDMA = _manager.DestAddressDMA.SetHighByte((byte)((value & 0x1F) | 0x80));
+            }
+        }
+
+        public byte DMA4
+        {
+            get
+            {
+                return 0xFF;
+            }
+            set
+            {
+                _manager.DestAddressDMA = _manager.DestAddressDMA.SetLowByte((byte)(value & 0xF0));
+            }
+        }
+
+        public byte DMA5
+        {
+            get
+            {
+                return (byte)((((!_manager.TransferActive).Int()) << 7) | (_manager.TransferLengthRemaining & 0x7F));
+            }
+            set
+            {
+                _manager.StartTransfer(value);
             }
         }
     }

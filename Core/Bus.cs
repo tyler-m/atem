@@ -261,7 +261,7 @@ namespace Atem.Core
             }
             else if (offset == 0x46)
             {
-                return _graphics.Registers.DMA;
+                return _graphics.Registers.ODMA;
             }
             else if (offset == 0x47)
             {
@@ -290,6 +290,26 @@ namespace Atem.Core
             else if (offset == 0x4F)
             {
                 return _graphics.Registers.VBK;
+            }
+            else if (offset == 0x51)
+            {
+                return _graphics.Registers.DMA1;
+            }
+            else if (offset == 0x52)
+            {
+                return _graphics.Registers.DMA2;
+            }
+            else if (offset == 0x53)
+            {
+                return _graphics.Registers.DMA3;
+            }
+            else if (offset == 0x54)
+            {
+                return _graphics.Registers.DMA4;
+            }
+            else if (offset == 0x55)
+            {
+                return _graphics.Registers.DMA5;
             }
             else if (offset == 0x70)
             {
@@ -467,7 +487,7 @@ namespace Atem.Core
             }
             else if (offset == 0x46)
             {
-                _graphics.Registers.DMA = value;
+                _graphics.Registers.ODMA = value;
             }
             else if (offset == 0x47)
             {
@@ -505,6 +525,26 @@ namespace Atem.Core
                 }
 
                 _bootROM.Enabled = false;
+            }
+            else if (offset == 0x51)
+            {
+                _graphics.Registers.DMA1 = value;
+            }
+            else if (offset == 0x52)
+            {
+                _graphics.Registers.DMA2 = value;
+            }
+            else if (offset == 0x53)
+            {
+                _graphics.Registers.DMA3 = value;
+            }
+            else if (offset == 0x54)
+            {
+                _graphics.Registers.DMA4 = value;
+            }
+            else if (offset == 0x55)
+            {
+                _graphics.Registers.DMA5 = value;
             }
             else if (offset == 0x68)
             {

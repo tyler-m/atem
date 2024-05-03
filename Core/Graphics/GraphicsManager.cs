@@ -20,12 +20,13 @@ namespace Atem.Core.Graphics
         private List<Sprite> _spriteBuffer = new List<Sprite>();
         private int _lineDotCount;
         private byte _linePixel;
-        private byte[] _vram = new byte[0x2000 * 2];
+        private byte[] _vram = new byte[0x4000];
         private GBColor[] _screen = new GBColor[160 * 144];
         private Sprite[] _objects = new Sprite[40];
         private int _objectIndex = 0;
 
         private bool _windowWasTriggeredThisFrame;
+        private bool _justEnteredHorizontalBlank;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
@@ -52,6 +53,12 @@ namespace Atem.Core.Graphics
         public PaletteGroup TilePalettes = new PaletteGroup();
         public PaletteGroup ObjectPalettes = new PaletteGroup();
         public PaletteGroup DMGPalettes = new PaletteGroup();
+        public ushort SourceAddressDMA = 0;
+        public ushort DestAddressDMA = 0;
+        public byte TransferLengthRemaining = 0;
+        public bool TransferActive = false;
+        public bool HorizontalBlankTransferActive = false;
+        public bool HorizontalBlankTransfer = false;
 
         private bool _currentlyOnLineY;
 
@@ -72,13 +79,13 @@ namespace Atem.Core.Graphics
             }
         }
 
-        private byte _dma;
+        private byte _odma;
 
-        public byte DMA
+        public byte ODMA
         {
             get
             {
-                return _dma;
+                return _odma;
             }
             set
             {
@@ -93,7 +100,7 @@ namespace Atem.Core.Graphics
                         _bus.Read((ushort)(address + 4*i + 3)));
                 }
 
-                _dma = value;
+                _odma = value;
             }
         }
 
@@ -129,7 +136,6 @@ namespace Atem.Core.Graphics
                         _bus.RequestInterrupt(InterruptType.STAT);
                     }
                 }
-                
                 else if (value == RenderMode.HorizontalBlank && prevMode != RenderMode.HorizontalBlank && InterruptOnHorizontalBlank)
                 {
                     _bus.RequestInterrupt(InterruptType.STAT);
@@ -153,12 +159,12 @@ namespace Atem.Core.Graphics
             Mode = RenderMode.OAM;
         }
 
-        public void WriteVRAM(ushort address, byte value)
+        public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
         {
             address -= 0x8000;
 
-            if (Mode == RenderMode.Draw)
-             {
+            if (Mode == RenderMode.Draw & !ignoreRenderMode)
+            {
                 return;
             }
 
@@ -461,6 +467,8 @@ namespace Atem.Core.Graphics
                 return;
             }
 
+            ClockTransfer();
+
             if (Mode == RenderMode.OAM)
             {
                 for (int i = 0; i < 2; i++)
@@ -495,7 +503,7 @@ namespace Atem.Core.Graphics
 
         private void UpdateMode()
         {
-            if (Mode == 0)
+            if (Mode == RenderMode.HorizontalBlank)
             {
                 if (_lineDotCount >= 456) 
                 {
@@ -539,7 +547,7 @@ namespace Atem.Core.Graphics
             {
                 if (_linePixel >= 160)
                 {
-                    Mode = 0;
+                    Mode = RenderMode.HorizontalBlank;
                     _linePixel = 0;
                     
                     if (_windowWasTriggeredThisFrame)
@@ -548,7 +556,78 @@ namespace Atem.Core.Graphics
                     }
 
                     _windowWasTriggeredThisFrame = false;
-    }
+                    _justEnteredHorizontalBlank = true;
+                }
+            }
+        }
+
+        private void ClockTransfer()
+        {
+            if(TransferActive && _justEnteredHorizontalBlank && HorizontalBlankTransfer)
+            {
+                HorizontalBlankTransferActive = true;
+            }
+
+            // this condition is satisfied only once per horizontal blank
+            if (HorizontalBlankTransferActive)
+            {
+                for (int i = 0; i < 16; i++)
+                {
+                    WriteVRAM(DestAddressDMA, _bus.Read(SourceAddressDMA), true);
+                    DestAddressDMA++;
+                    SourceAddressDMA++;
+                }
+
+                TransferLengthRemaining--;
+                HorizontalBlankTransferActive = false;
+
+                if (TransferLengthRemaining == 0xFF)
+                {
+                    TransferActive = false;
+                }
+            }
+
+            if (_justEnteredHorizontalBlank)
+            {
+                _justEnteredHorizontalBlank = false;
+            }
+        }
+
+        public void StartTransfer(byte value)
+        {
+            if (TransferActive && !value.GetBit(7))
+            {
+                // cancel current horizontal blank transfer
+                TransferActive = false;
+            }
+            else
+            {
+                HorizontalBlankTransfer = value.GetBit(7);
+
+                // number of bytes to transfer divided by 16, minus 1
+                // e.g. a length of 0 means 16 bytes to transfer
+                TransferLengthRemaining = (byte)(value & 0x7F);
+
+                if (HorizontalBlankTransfer)
+                {
+                    TransferActive = true;
+                }
+                else
+                {
+                    // because we aren't waiting for horizontal blank
+                    // we fulfill the transfer request in-place
+                    while (TransferLengthRemaining != 0xFF)
+                    {
+                        WriteVRAM(DestAddressDMA, _bus.Read(SourceAddressDMA), true);
+                        DestAddressDMA++;
+                        SourceAddressDMA++;
+
+                        if ((DestAddressDMA & 0xF) == 0)
+                        {
+                            TransferLengthRemaining--;
+                        }
+                    }
+                }
             }
         }
     }
