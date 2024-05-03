@@ -287,6 +287,10 @@ namespace Atem.Core
             {
                 return _processor.KEY1;
             }
+            else if (offset == 0x4F)
+            {
+                return _graphics.Registers.VBK;
+            }
             else if (offset == 0x70)
             {
                 return SVBK;
