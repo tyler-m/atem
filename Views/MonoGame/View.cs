@@ -181,9 +181,9 @@ namespace Atem.Views.MonoGame
         }
 
         private void OnVerticalBlank(GBColor[] screen)
-                {
+        {
             for (int i = 0; i < _screenData.Length; i++)
-                {
+            {
                 _screenData[i] = GBColorToColor(screen[i]);
             }
 
