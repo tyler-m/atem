@@ -12,7 +12,7 @@ namespace Atem.Core.Audio
 
         public const int SAMPLE_RATE = 44100;
 
-        private AudioChannelMixer _mixer = new();
+        private AudioChannelMixer _mixer = new AudioChannelMixer();
         private byte[] _buffer = new byte[BUFFER_SIZE];
         private int _sampleTimer = 0;
         private int _bufferIndex = 0;
@@ -25,10 +25,10 @@ namespace Atem.Core.Audio
         public byte LeftChannelVolume { get { return _leftChannelVolume; } set { _leftChannelVolume = value; } }
         public byte RightChannelVolume { get { return _rightChannelVolume; } set { _rightChannelVolume = value; } }
 
-        internal PulseChannel Channel1 = new(true);
-        internal PulseChannel Channel2 = new();
-        internal WaveChannel Channel3 = new();
-        internal NoiseChannel Channel4 = new();
+        internal PulseChannel Channel1 = new PulseChannel(true);
+        internal PulseChannel Channel2 = new PulseChannel();
+        internal WaveChannel Channel3 = new WaveChannel();
+        internal NoiseChannel Channel4 = new NoiseChannel();
 
         public AudioRegisters Registers;
         public delegate void FullAudioBufferEvent(byte[] buffer);
