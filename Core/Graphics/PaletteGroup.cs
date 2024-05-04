@@ -69,7 +69,7 @@ namespace Atem.Core.Graphics
 
             if (Increment)
             {
-                Address++;
+                Address = (Address + 1) % 0x40;
             }
         }
     }
