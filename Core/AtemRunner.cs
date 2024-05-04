@@ -84,11 +84,6 @@ namespace Atem.Core
             _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost * additionalClocks;
         }
 
-        public void ClockOneOperation()
-        {
-            while (!Clock()) ;
-        }
-
         public bool Clock()
         {
             bool opFinished = _processor.Clock();

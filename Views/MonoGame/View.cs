@@ -81,11 +81,6 @@ namespace Atem.Views.MonoGame
             _previousKeyboardState = _currentKeyboardState;
             _currentKeyboardState = Keyboard.GetState();
 
-            if (_currentKeyboardState.IsKeyDown(Keys.PageUp) && _previousKeyboardState.IsKeyUp(Keys.PageUp))
-            {
-                _atem.ClockOneOperation();
-                _pauseAtem = true;
-            }
             if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
             {
                 _pauseAtem = !_pauseAtem;
