@@ -1,6 +1,6 @@
 atem
 ===
-A cross-platform emulator for the Game Boy Color written in C# with .NET and MonoGame.
+An emulator for the Game Boy Color written in C# with .NET and MonoGame.
 
 Notes
 ---
