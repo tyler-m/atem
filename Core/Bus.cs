@@ -78,8 +78,8 @@ namespace Atem.Core
             {
                 if (block <= 0xCF)
                 {
-                return _wram[address - 0xC000];
-            }
+                    return _wram[address - 0xC000];
+                }
                 else
                 {
                     int bank = SVBK;
@@ -103,13 +103,13 @@ namespace Atem.Core
             }
             else if (block <= 0xFF)
             {
-                return ReadIO(offset);
+                return ReadRegister(offset);
             }
 
             return 0xFF;
         }
 
-        private byte ReadIO(byte offset)
+        private byte ReadRegister(byte offset)
         {
             if (offset == 0x00)
             {
@@ -329,13 +329,13 @@ namespace Atem.Core
             }
             else
             {
-                throw new System.Exception($"ReadIO undefined at offset {offset:X2}.");
+                
             }
 
             return 0xFF;
         }
 
-        private void WriteIO(byte offset, byte value)
+        private void WriteRegister(byte offset, byte value)
         {
             if (offset == 0x00)
             {
@@ -580,7 +580,7 @@ namespace Atem.Core
             }
             else
             {
-                throw new System.Exception($"WriteIO undefined at offset {offset:X2}.");
+                
             }
         }
 
@@ -609,8 +609,8 @@ namespace Atem.Core
             {
                 if (block <= 0xCF)
                 {
-                _wram[address - 0xC000] = value;
-            }
+                    _wram[address - 0xC000] = value;
+                }
                 else
                 {
                     int bank = SVBK;
@@ -634,7 +634,7 @@ namespace Atem.Core
             }
             else if (block <= 0xFF)
             {
-                WriteIO(offset, value);
+                WriteRegister(offset, value);
             }
         }
 
