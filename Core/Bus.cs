@@ -58,7 +58,7 @@ namespace Atem.Core
             byte block = address.GetHighByte();
             byte offset = address.GetLowByte();
 
-            if (block <= 0x00 && _bootROM.Enabled) // boot ROM
+            if (block <= 0x00 && _bootROM != null && _bootROM.Enabled) // boot ROM
             {
                 return _bootROM.Read(address);
             }
@@ -517,7 +517,7 @@ namespace Atem.Core
             {
                 _graphics.Registers.VBK = value;
             }
-            else if (offset == 0x50)
+            else if (offset == 0x50 && _bootROM != null)
             {
                 if (_bootROM.Enabled && ColorMode)
                 {
@@ -589,7 +589,7 @@ namespace Atem.Core
             byte block = address.GetHighByte();
             byte offset = address.GetLowByte();
 
-            if (block <= 0x00 && _bootROM.Enabled) // boot ROM
+            if (block <= 0x00 && _bootROM != null && _bootROM.Enabled) // boot ROM
             {
 
             }
