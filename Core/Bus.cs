@@ -20,7 +20,7 @@ namespace Atem.Core
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000 * 4];
 
-        private byte SVBK = 0;
+        public byte SVBK = 0;
 
         public bool ColorMode
         {
