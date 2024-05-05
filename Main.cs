@@ -8,8 +8,8 @@ namespace Atem
         static void Main(string[] args)
         {
             AtemRunner atem = new AtemRunner();
-            using View view = new View(atem);
-            view.Run();
+            ViewStarter viewStarter = new ViewStarter(atem);
+            viewStarter.Run();
         }
     }
 }

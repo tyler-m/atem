@@ -6,15 +6,13 @@ using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core;
 using System;
+using System.IO;
 
 namespace Atem.Views.MonoGame
 {
     internal class View : Game
     {
         private const float ScreenRefreshRate = 59.73f;
-        private const int ScreenWidth = 160;
-        private const int ScreenHeight = 144;
-        private const float ScreenSizeFactor = 2.0f;
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -23,23 +21,29 @@ namespace Atem.Views.MonoGame
         private KeyboardState _previousKeyboardState;
 
         private AtemRunner _atem;
-        private Color[] _screenData = new Color[ScreenWidth * ScreenHeight];
+        private Color[] _screenData;
         private Texture2D _screenTexture;
         private bool _pauseAtem = true;
         private DynamicSoundEffectInstance _soundInstance;
 
-        public View(AtemRunner atem)
-        {
-            _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = (int)(ScreenWidth * ScreenSizeFactor);
-            _graphics.PreferredBackBufferHeight = (int)(ScreenHeight * ScreenSizeFactor);
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-            TargetElapsedTime = TimeSpan.FromSeconds(1/ScreenRefreshRate);
+        private FileSelector _fileSelector;
+        private Config _config;
 
+        public View(AtemRunner atem, Config config)
+        {
             _atem = atem;
             _atem.OnVerticalBlank += OnVerticalBlank;
             _atem.OnFullAudioBuffer += OnFullAudioBuffer;
+            _config = config;
+            _screenData = new Color[config.ScreenWidth * _config.ScreenHeight];
+
+            _graphics = new GraphicsDeviceManager(this);
+            _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
+            _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor);
+
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+            TargetElapsedTime = TimeSpan.FromSeconds(1/ScreenRefreshRate);
 
             Exiting += OnExit;
         }
@@ -64,16 +68,22 @@ namespace Atem.Views.MonoGame
         protected override void Initialize()
         {
             base.Initialize();
+
+            _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
+            _soundInstance.Play();
+
+            Texture2D highlightTexture = new Texture2D(GraphicsDevice, 1, 1);
+            highlightTexture.SetData(new[] { Color.White });
+            _fileSelector = new FileSelector(Path.GetFullPath(_config.RomsDirectory), _font, highlightTexture, _config);
+            _fileSelector.Active = true;
+            _fileSelector.Update();
         }
 
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _screenTexture = new Texture2D(GraphicsDevice, ScreenWidth, ScreenHeight);
+            _screenTexture = new Texture2D(GraphicsDevice, _config.ScreenWidth, _config.ScreenHeight);
             _font = Content.Load<SpriteFont>("Default");
-
-            _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
-            _soundInstance.Play();
         }
 
         protected override void Update(GameTime gameTime)
@@ -88,6 +98,11 @@ namespace Atem.Views.MonoGame
 
             if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
             {
+                if (_fileSelector.Active)
+                {
+                    _fileSelector.MoveCursor(-1);
+                }
+
                 _atem.OnJoypadChange(JoypadButton.Up, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Up) && _previousKeyboardState.IsKeyDown(Keys.Up))
@@ -96,6 +111,11 @@ namespace Atem.Views.MonoGame
             }
             if (_currentKeyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down))
             {
+                if (_fileSelector.Active)
+                {
+                    _fileSelector.MoveCursor(1);
+                }
+
                 _atem.OnJoypadChange(JoypadButton.Down, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Down) && _previousKeyboardState.IsKeyDown(Keys.Down))
@@ -144,6 +164,13 @@ namespace Atem.Views.MonoGame
             }
             if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
             {
+                if (_fileSelector.Active)
+                {
+                    _atem.Load(_fileSelector.SelectedFile);
+                    _fileSelector.Active = false;
+                    _pauseAtem = false;
+                }
+
                 _atem.OnJoypadChange(JoypadButton.Start, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
@@ -161,14 +188,18 @@ namespace Atem.Views.MonoGame
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(new Color(33, 36, 39));
-
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-            _spriteBatch.Draw(_screenTexture,
-                new Rectangle(0, 0, (int)(ScreenWidth * ScreenSizeFactor), (int)(ScreenHeight * ScreenSizeFactor)),
-                new Rectangle(0, 0, ScreenWidth, ScreenHeight), Color.White);
-            _spriteBatch.End();
 
+            _spriteBatch.Draw(_screenTexture,
+                new Rectangle(0, 0, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor)),
+                new Rectangle(0, 0, _config.ScreenWidth, _config.ScreenHeight), Color.White);
+            
+            if (_fileSelector.Active)
+            {
+                _fileSelector.Draw(_spriteBatch);
+            }
+
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
 
