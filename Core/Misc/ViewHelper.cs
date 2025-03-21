@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Atem.Core.Processing;
 using Atem.Core;
+using Atem.Core.Graphics;
 
 namespace Atem
 {
@@ -8,11 +9,13 @@ namespace Atem
     {
         private Processor _processor;
         private Bus _bus;
+        private GraphicsManager _graphics;
 
-        public ViewHelper(Processor processor, Bus bus)
+        public ViewHelper(Processor processor, Bus bus, GraphicsManager graphics)
         {
             _processor = processor;
             _bus = bus;
+            _graphics = graphics;
         }
 
         public ushort GetAddressOfNextOperation()
