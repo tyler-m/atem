@@ -18,9 +18,9 @@ namespace Atem
             _graphics = graphics;
         }
 
-        public ushort GetAddressOfNextOperation()
+        public ushort GetAddressOfNextInstruction()
         {
-            return _processor.AddressOfNextOperation;
+            return _processor.AddressOfNextInstruction;
         }
 
         public byte PeekAt(int address)
