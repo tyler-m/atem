@@ -22,7 +22,7 @@ namespace Atem.Views.MonoGame
             {
                 _config = Config.Load(Directory.GetCurrentDirectory() + "/config.json");
             }
-            catch (FileNotFoundException e)
+            catch
             {
                 Config.CreateDefault(Directory.GetCurrentDirectory() + "/config.json");
 
