@@ -2,9 +2,9 @@
 
 namespace Atem.Core.Graphics
 {
-    internal delegate void VerticalBlankEvent(GBColor[] screen);
+    public delegate void VerticalBlankEvent(GBColor[] screen);
 
-    internal enum RenderMode
+    public enum RenderMode
     {
         HorizontalBlank,
         VerticalBlank,
@@ -12,7 +12,7 @@ namespace Atem.Core.Graphics
         Draw
     }
 
-    internal class GraphicsManager
+    public class GraphicsManager
     {
         public static float FrameRate = 59.73f;
 

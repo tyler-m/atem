@@ -5,7 +5,7 @@ using System;
 
 namespace Atem.Core.Audio
 {
-    internal class AudioManager
+    public class AudioManager
     {
         private const float MAX_VOLUME = 15.0f;
         private const int BUFFER_SIZE = 2048;

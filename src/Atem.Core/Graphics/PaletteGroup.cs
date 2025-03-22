@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Graphics
 {
-    internal class PaletteGroup
+    public class PaletteGroup
     {
         private Palette[] _palettes = new Palette[8];
 

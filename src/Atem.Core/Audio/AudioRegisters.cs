@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Audio
 {
-    internal class AudioRegisters
+    public class AudioRegisters
     {
         private PulseChannel Channel1 => _manager?.Channel1;
         private PulseChannel Channel2 => _manager?.Channel2;

@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace Atem.Core.Processing
 {
-    internal class Processor
+    public class Processor
     {
         public static int Frequency = 4194304;
 

@@ -5,7 +5,7 @@ using Atem.Core.Graphics;
 
 namespace Atem
 {
-    internal class ViewHelper
+    public class ViewHelper
     {
         private Processor _processor;
         private Bus _bus;

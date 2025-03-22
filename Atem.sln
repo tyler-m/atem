@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34322.80
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem", "src/Atem/Atem.csproj", "{E7A7EE12-9597-471E-84C4-D286F63EAD12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem", "src\Atem\Atem.csproj", "{E7A7EE12-9597-471E-84C4-D286F63EAD12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Core", "src\Atem.Core\Atem.Core.csproj", "{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7A7EE12-9597-471E-84C4-D286F63EAD12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

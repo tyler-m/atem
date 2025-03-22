@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Graphics
 {
-    internal class GBColor
+    public class GBColor
     {
         private byte _red;
         private byte _green;

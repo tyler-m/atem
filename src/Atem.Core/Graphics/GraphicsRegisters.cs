@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Graphics
 {
-    internal class GraphicsRegisters
+    public class GraphicsRegisters
     {
         private GraphicsManager _manager;
 

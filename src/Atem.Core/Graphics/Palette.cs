@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Graphics
 {
-    internal class Palette
+    public class Palette
     {
         private GBColor[] _colors = new GBColor[4];
 

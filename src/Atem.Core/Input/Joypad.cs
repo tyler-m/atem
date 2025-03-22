@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Input
 {
-    internal enum JoypadButton
+    public enum JoypadButton
     {
         Up,
         Down,
@@ -13,7 +13,7 @@ namespace Atem.Core.Input
         Start
     }
 
-    internal class Joypad
+    public class Joypad
     {
         private bool[] _joypad = new bool[8];
         private byte _joyp;

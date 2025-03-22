@@ -6,7 +6,7 @@ using Atem.Core.Memory;
 
 namespace Atem.Core
 {
-    internal class Bus
+    public class Bus
     {
         private Processor _processor;
         private GraphicsManager _graphics;

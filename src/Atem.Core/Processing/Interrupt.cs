@@ -10,7 +10,7 @@ namespace Atem
         Joypad
     }
 
-    internal class Interrupt
+    public class Interrupt
     {
         public byte IE { get; set; }
         public byte IF { get; set; }

@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Input
 {
-    internal class Serial
+    public class Serial
     {
         public byte SB, SC;
     }

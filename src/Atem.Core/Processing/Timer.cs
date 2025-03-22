@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Processing
 {
-    internal class Timer
+    public class Timer
     {
         // should probably be incrementing _div every clock
         // and bit shifting it on read instead of using the

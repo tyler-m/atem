@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Graphics
 {
-    internal class Sprite
+    public class Sprite
     {
         public byte X;
         public byte Y;

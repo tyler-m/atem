@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Processing
 {
-    internal struct CPUFlags
+    public struct CPUFlags
     {
         public byte F;
 
@@ -31,7 +31,7 @@ namespace Atem.Core.Processing
         }
     }
 
-    internal struct CPURegisters
+    public struct CPURegisters
     {
         public ushort SP, PC;
         public byte A, B, C, D, E, H, L;

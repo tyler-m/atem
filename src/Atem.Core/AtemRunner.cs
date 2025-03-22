@@ -5,7 +5,7 @@ using Atem.Core.Input;
 
 namespace Atem.Core
 {
-    internal class AtemRunner
+    public class AtemRunner
     {
         private static float ClocksPerFrame => Processor.Frequency / GraphicsManager.FrameRate;
 
