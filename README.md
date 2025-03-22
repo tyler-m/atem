@@ -1,6 +1,5 @@
-atem
+atem [![Build](https://github.com/tyler-m/atem/actions/workflows/ci.yml/badge.svg)](https://github.com/tyler-m/atem/actions/workflows/ci.yml)
 ===
-[![Build](https://github.com/tyler-m/atem/actions/workflows/ci.yml/badge.svg)](https://github.com/tyler-m/atem/actions/workflows/ci.yml)
 
 An emulator for the Game Boy Color written in C# with .NET and MonoGame.
 
