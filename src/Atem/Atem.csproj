@@ -27,6 +27,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Atem.Core\Atem.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Licenses\SpaceMono.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />
     <Exec Command="dotnet tool restore" />

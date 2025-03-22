@@ -30,12 +30,16 @@ namespace Atem.Views.MonoGame
         {
             Vector2 position = Vector2.Zero;
 
-            int height = (int)(9 * _config.ScreenSizeFactor);
+            int height = (int)(14 * _config.ScreenSizeFactor);
             for (int i = 0; i < 16 && _start + i < _files.Count; i++)
             {
                 if (_start + i == _selected)
                 {
                     spriteBatch.Draw(_highlightTexture, new Rectangle(0, i * height, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), height), Color.DarkSlateBlue);
+                }
+                else
+                {
+                    spriteBatch.Draw(_highlightTexture, new Rectangle(0, i * height, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), height), Color.Black);
                 }
                 spriteBatch.DrawString(_font, _files[_start + i].Name, position, Color.White, 0.0f, Vector2.Zero, 0.5f * _config.ScreenSizeFactor, SpriteEffects.None, 0);
                 position.Y += height;
