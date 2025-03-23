@@ -31,6 +31,8 @@ namespace Atem.Core.Memory.Mapper
             int unixTimestamp = BitConverter.ToInt32(timestampData);
 
             _rtc = new RTC(data[0], data[4], data[8], data[12].SetBit(8, data[16].GetBit(0)), data[16].GetBit(7), data[16].GetBit(6), unixTimestamp);
+            _rtcLatched = new RTC(data[20], data[24], data[28], data[32].SetBit(8, data[36].GetBit(0)), data[36].GetBit(7), data[36].GetBit(6), unixTimestamp);
+            _rtcLatched.Latched = true;
         }
 
         public void Init(byte type, byte[] rom, int ramSize)
@@ -192,6 +194,13 @@ namespace Atem.Core.Memory.Mapper
             rtcData[16].SetBit(0, ((ushort)_rtc.Day).GetBit(8));
             rtcData[16].SetBit(6, _rtc.Halt);
             rtcData[16].SetBit(7, _rtc.DayCarry);
+            rtcData[20] = (byte)_rtcLatched.Seconds;
+            rtcData[24] = (byte)_rtcLatched.Minutes;
+            rtcData[28] = (byte)_rtcLatched.Hours;
+            rtcData[32] = (byte)_rtcLatched.Day;
+            rtcData[36].SetBit(0, ((ushort)_rtcLatched.Day).GetBit(8));
+            rtcData[36].SetBit(6, _rtcLatched.Halt);
+            rtcData[36].SetBit(7, _rtcLatched.DayCarry);
 
             byte[] timestampData = BitConverter.GetBytes((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
