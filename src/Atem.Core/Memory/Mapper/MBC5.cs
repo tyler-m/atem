@@ -93,5 +93,10 @@ namespace Atem.Core.Memory.Mapper
 
             }
         }
+
+        public byte[] ExportSave()
+        {
+            return RAM;
+        }
     }
 }

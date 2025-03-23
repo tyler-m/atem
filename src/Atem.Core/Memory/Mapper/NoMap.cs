@@ -43,5 +43,10 @@ namespace Atem.Core.Memory.Mapper
         }
 
         public void WriteRegister(ushort address, byte value) { }
+
+        public byte[] ExportSave()
+        {
+            return RAM;
+        }
     }
 }

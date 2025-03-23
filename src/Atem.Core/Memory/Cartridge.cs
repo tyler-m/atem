@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using Atem.Core.Memory.Mapper;
 
@@ -27,7 +28,7 @@ namespace Atem.Core.Memory
 
         public void SaveRAM()
         {
-            File.WriteAllBytes(_filepath + ".sav", _mbc.RAM);
+            File.WriteAllBytes(_filepath + ".sav", _mbc.ExportSave());
         }
 
         private bool Load(string filepath)
@@ -110,9 +111,22 @@ namespace Atem.Core.Memory
                 _mbc.Init(_type, rom, ramSizeInBytes);
             }
 
+            // check if cartridge RAM has been saved for this game
             if (File.Exists(filepath + ".sav"))
             {
-                _mbc.RAM = File.ReadAllBytes(filepath + ".sav");
+                byte[] saveFile = File.ReadAllBytes(filepath + ".sav");
+                Array.Copy(saveFile, _mbc.RAM, _mbc.RAM.Length);
+
+                // RTC data is appended at the end of a save file and is 48 bytes long
+                if (saveFile.Length - ramSizeInBytes == 48)
+                {
+                    if (_mbc is MBC3 c)
+                    {
+                        byte[] rtcData = new byte[48];
+                        Array.Copy(saveFile, saveFile.Length - 48, rtcData, 0, 48);
+                        c.LoadRTCFromSaveData(rtcData);
+                    }
+                }
             }
 
             _filepath = filepath;
