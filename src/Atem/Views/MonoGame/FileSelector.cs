@@ -52,7 +52,7 @@ namespace Atem.Views.MonoGame
 
             foreach(FileInfo item in new DirectoryInfo(_currentDirectory).GetFiles())
             {
-                if (item.Extension.ToLower() == ".gbc")
+                if (item.Extension.ToLower() == ".gbc" || item.Extension.ToLower() == ".gb")
                 {
                     _files.Add(item);
                 }
@@ -63,9 +63,9 @@ namespace Atem.Views.MonoGame
         {
             _selected = System.Math.Clamp(_selected + offset, 0, _files.Count - 1);
 
-            if (_selected > _start + 15)
+            if (_selected > _start + 9)
             {
-                _start = _selected - 15;
+                _start = _selected - 9;
             }
             else if (_selected < _start)
             {
