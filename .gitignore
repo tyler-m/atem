@@ -37,3 +37,7 @@ bld/
 *.vsp
 *.vspx
 *.sap
+
+# GB
+*.gb
+*.gbc
