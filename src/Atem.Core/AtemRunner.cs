@@ -62,7 +62,9 @@ namespace Atem.Core
             ViewHelper = new ViewHelper(_processor, _bus, _graphics);
         }
 
-        private void PrepareForGameBoot()
+        private void PrepareForGameBoot(bool color)
+        {
+            if (color)
         {
             // CGB Mode
             _processor.Registers.A = 0x11;
@@ -115,11 +117,67 @@ namespace Atem.Core
             _graphics.Registers.WY = 0x00;
             _graphics.Registers.WX = 0x00;
         }
+            else
+            {
+                // DMG mode
+                _processor.Registers.A = 0x01;
+                _processor.Registers.Flags.Z = true;
+                _processor.Registers.B = 0x00;
+                _processor.Registers.C = 0x13;
+                _processor.Registers.D = 0x00;
+                _processor.Registers.E = 0xD8;
+                _processor.Registers.H = 0x01;
+                _processor.Registers.L = 0x4D;
+                _processor.Registers.PC = 0x0100;
+                _processor.Registers.SP = 0xFFFE;
+
+                _joypad.P1 = 0xCF;
+                _serial.SB = 0x00;
+                _serial.SC = 0x7E;
+                _timer.TIMA = 0x00;
+                _timer.TMA = 0x00;
+                _timer.TAC = 0xF8;
+                _interrupt.IF = 0xE1;
+                _interrupt.IE = 0x00;
+                _audio.Registers.NR10 = 0x80;
+                _audio.Registers.NR11 = 0xBF;
+                _audio.Registers.NR12 = 0xF3;
+                _audio.Registers.NR13 = 0xFF;
+                _audio.Registers.NR14 = 0xBF;
+                _audio.Registers.NR21 = 0x3F;
+                _audio.Registers.NR22 = 0x00;
+                _audio.Registers.NR23 = 0xFF;
+                _audio.Registers.NR24 = 0xBF;
+                _audio.Registers.NR30 = 0x7F;
+                _audio.Registers.NR31 = 0xFF;
+                _audio.Registers.NR32 = 0x9F;
+                _audio.Registers.NR33 = 0xFF;
+                _audio.Registers.NR34 = 0xBF;
+                _audio.Registers.NR41 = 0xFF;
+                _audio.Registers.NR42 = 0x00;
+                _audio.Registers.NR43 = 0x00;
+                _audio.Registers.NR44 = 0xBF;
+                _audio.Registers.NR50 = 0x77;
+                _audio.Registers.NR51 = 0xF3;
+                _audio.Registers.NR52 = 0xF1;
+                _graphics.Registers.LCDC = 0x91;
+                _graphics.Registers.SCY = 0x00;
+                _graphics.Registers.SCX = 0x00;
+                _graphics.Registers.LY = 0x00;
+                _graphics.Registers.LYC = 0x00;
+                _graphics.Registers.BGP = 0xFC;
+                _graphics.Registers.OBP0 = 0x00;
+                _graphics.Registers.OBP1 = 0x00;
+                _graphics.Registers.WY = 0x00;
+                _graphics.Registers.WX = 0x00;
+            }
+        }
 
         public void Load(string path)
         {
+            bool color = path.ToLower().EndsWith(".gbc");
             _bus.LoadCartridge(path);
-            PrepareForGameBoot();
+            PrepareForGameBoot(color);
         }
 
         public void Update()
