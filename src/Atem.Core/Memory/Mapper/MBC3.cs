@@ -172,7 +172,7 @@ namespace Atem.Core.Memory.Mapper
                     if (_latch == 0x00)
                     {
                         _rtcLatched = new RTC(_rtc);
-                        _rtcLatched.Halt = true;
+                        _rtcLatched.Latched = true;
                     }
 
                     _latch = 0x01;

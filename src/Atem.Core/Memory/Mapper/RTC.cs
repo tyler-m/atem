@@ -8,6 +8,7 @@ namespace Atem.Core.Memory.Mapper
         private bool _halt, _dayCarry;
         double _secondsElapsed = 0.0;
         long _lastUnixTimestamp = 0;
+        public bool Latched = false;
 
         public int Seconds
         {
@@ -120,7 +121,7 @@ namespace Atem.Core.Memory.Mapper
 
         private void Update()
         {
-            if (!_halt)
+            if (!_halt && !Latched)
             {
                 long _currentUnixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 _secondsElapsed += (_currentUnixTimestamp - _lastUnixTimestamp) / 1000.0;
