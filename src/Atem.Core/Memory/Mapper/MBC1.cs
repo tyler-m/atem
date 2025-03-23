@@ -39,11 +39,22 @@ namespace Atem.Core.Memory.Mapper
 
         public byte ReadROMBank(ushort address)
         {
-            int adjustedAddress = (address - 0x4000) + 0x4000 * (_romBank & 0b11111);
+            int adjustedAddress = address - 0x4000;
+            
+            if ((_romBank & 0b11111) == 0)
+            {
+                adjustedAddress += 0x4000; // adjust to bank 1
+            }
+            else
+            {
+                adjustedAddress += 0x4000 * (_romBank & 0b11111);
+            }
+
             if (address < _rom.Length)
             {
                 return _rom[adjustedAddress];
             }
+
             return 0xFF;
         }
 
