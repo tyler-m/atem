@@ -50,7 +50,10 @@ namespace Atem.Core
 
         public void SaveCartridgeRAM()
         {
-            _cartridge.SaveRAM();
+            if (_cartridge != null && _cartridge.Loaded)
+            {
+                _cartridge.SaveRAM();
+            }
         }
 
         public byte Read(ushort address)
@@ -64,7 +67,14 @@ namespace Atem.Core
             }
             else if (block <= 0x7F) // cartridge ROM
             {
-                return _cartridge.ReadROM(address);
+                if (_cartridge != null)
+                {
+                    return _cartridge.ReadROM(address);
+                }
+                else
+                {
+                    return 0x00;
+                }
             }
             else if (block <= 0x9F) // VRAM
             {
@@ -72,7 +82,14 @@ namespace Atem.Core
             }
             else if (block <= 0xBF) // cartridge RAM
             {
-                return _cartridge.ReadRAM(address);
+                if (_cartridge != null)
+                {
+                    return _cartridge.ReadRAM(address);
+                }
+                else
+                {
+                    return 0x00;
+                }
             }
             else if (block <= 0xDF) // WRAM
             {
