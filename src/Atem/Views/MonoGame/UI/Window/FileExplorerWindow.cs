@@ -2,19 +2,19 @@
 using System.IO;
 using ImGuiNET;
 
-namespace Atem.Views.MonoGame
+namespace Atem.Views.MonoGame.UI.Window
 {
-    internal class FileExplorer
+    internal class FileExplorerWindow
     {
         private View _view;
         private DirectoryInfo _cwd;
         private DirectoryInfo _directory;
 
         public bool Active { get; set; }
-        public int Width {  get; set; }
-        public int Height {  get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
-        public FileExplorer(View view, int width, int height, bool active=true)
+        public FileExplorerWindow(View view, int width, int height, bool active = true)
         {
             _view = view;
             Width = width;
@@ -41,9 +41,9 @@ namespace Atem.Views.MonoGame
             ImGui.SetNextWindowPos(new Vector2(0, 0), ImGuiCond.Always);
 
             ImGui.Begin("File Explorer", ImGuiWindowFlags.NoMove
-                | ImGuiWindowFlags.NoDocking 
-                | ImGuiWindowFlags.NoResize 
-                | ImGuiWindowFlags.NoSavedSettings 
+                | ImGuiWindowFlags.NoDocking
+                | ImGuiWindowFlags.NoResize
+                | ImGuiWindowFlags.NoSavedSettings
                 | ImGuiWindowFlags.NoCollapse);
 
             if (ImGui.ArrowButton("UpDirectory", ImGuiDir.Up))

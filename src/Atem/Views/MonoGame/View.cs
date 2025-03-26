@@ -7,6 +7,7 @@ using Atem.Core.Input;
 using Atem.Core;
 using System;
 using ImGuiNET;
+using Atem.Views.MonoGame.UI.Window;
 
 namespace Atem.Views.MonoGame
 {
@@ -28,7 +29,7 @@ namespace Atem.Views.MonoGame
 
         private Config _config;
         private ImGuiRenderer _imGui;
-        private FileExplorer _fileExplorer;
+        private FileExplorerWindow _fileExplorerWindow;
 
         public View(AtemRunner atem, Config config)
         {
@@ -48,7 +49,7 @@ namespace Atem.Views.MonoGame
 
             Exiting += OnExit;
 
-            _fileExplorer = new FileExplorer(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            _fileExplorerWindow = new FileExplorerWindow(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
         }
 
         public void LoadFile(string filePath)
@@ -56,7 +57,7 @@ namespace Atem.Views.MonoGame
             if (_atem.Load(filePath))
             {
                 _pauseAtem = false;
-                _fileExplorer.Active = false;
+                _fileExplorerWindow.Active = false;
             }
         }
 
@@ -195,8 +196,9 @@ namespace Atem.Views.MonoGame
             _imGui.BeginDraw(gameTime);
 
             if (_fileExplorer.Active)
+            if (_fileExplorerWindow.Active)
             {
-                _fileExplorer.Draw();
+                _fileExplorerWindow.Draw();
             }
 
             _imGui.EndDraw();
