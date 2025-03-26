@@ -32,7 +32,7 @@ namespace Atem.Views.MonoGame.UI
                 {
                     Height = (int)ImGui.GetFrameHeight();
 
-                    if (ImGui.BeginMenu("File", false))
+                    if (ImGui.BeginMenu("File"))
                     {
                         if (ImGui.MenuItem("Exit"))
                         {
