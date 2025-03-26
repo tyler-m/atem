@@ -6,7 +6,7 @@ using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core;
 using System;
-using System.IO;
+using ImGuiNET;
 
 namespace Atem.Views.MonoGame
 {
@@ -26,8 +26,9 @@ namespace Atem.Views.MonoGame
         private bool _pauseAtem = true;
         private DynamicSoundEffectInstance _soundInstance;
 
-        private FileSelector _fileSelector;
         private Config _config;
+        private ImGuiRenderer _imGui;
+        private FileExplorer _fileExplorer;
 
         public View(AtemRunner atem, Config config)
         {
@@ -46,6 +47,15 @@ namespace Atem.Views.MonoGame
             TargetElapsedTime = TimeSpan.FromSeconds(1/ScreenRefreshRate);
 
             Exiting += OnExit;
+
+            _fileExplorer = new FileExplorer(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+        }
+
+        public void LoadFile(string filePath)
+        {
+            _atem.Load(filePath);
+            _pauseAtem = false;
+            _fileExplorer.Active = false;
         }
 
         private void OnExit(object sender, EventArgs e)
@@ -67,6 +77,8 @@ namespace Atem.Views.MonoGame
 
         protected override void Initialize()
         {
+            _imGui = new ImGuiRenderer(this);
+
             base.Initialize();
 
             _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
@@ -74,9 +86,6 @@ namespace Atem.Views.MonoGame
 
             Texture2D highlightTexture = new Texture2D(GraphicsDevice, 1, 1);
             highlightTexture.SetData(new[] { Color.White });
-            _fileSelector = new FileSelector(Path.GetFullPath(_config.RomsDirectory), _font, highlightTexture, _config);
-            _fileSelector.Active = true;
-            _fileSelector.Update();
         }
 
         protected override void LoadContent()
@@ -98,11 +107,6 @@ namespace Atem.Views.MonoGame
 
             if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
             {
-                if (_fileSelector.Active)
-                {
-                    _fileSelector.MoveCursor(-1);
-                }
-
                 _atem.OnJoypadChange(JoypadButton.Up, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Up) && _previousKeyboardState.IsKeyDown(Keys.Up))
@@ -111,11 +115,6 @@ namespace Atem.Views.MonoGame
             }
             if (_currentKeyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down))
             {
-                if (_fileSelector.Active)
-                {
-                    _fileSelector.MoveCursor(1);
-                }
-
                 _atem.OnJoypadChange(JoypadButton.Down, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Down) && _previousKeyboardState.IsKeyDown(Keys.Down))
@@ -164,13 +163,6 @@ namespace Atem.Views.MonoGame
             }
             if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
             {
-                if (_fileSelector.Active)
-                {
-                    _atem.Load(_fileSelector.SelectedFile);
-                    _fileSelector.Active = false;
-                    _pauseAtem = false;
-                }
-
                 _atem.OnJoypadChange(JoypadButton.Start, true);
             }
             if (!_currentKeyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
@@ -188,18 +180,25 @@ namespace Atem.Views.MonoGame
 
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.Clear(Color.Black);
+
             _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
             _spriteBatch.Draw(_screenTexture,
                 new Rectangle(0, 0, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor)),
                 new Rectangle(0, 0, _config.ScreenWidth, _config.ScreenHeight), Color.White);
-            
-            if (_fileSelector.Active)
-            {
-                _fileSelector.Draw(_spriteBatch);
-            }
 
             _spriteBatch.End();
+
+            _imGui.BeginDraw(gameTime);
+
+            if (_fileExplorer.Active)
+            {
+                _fileExplorer.Draw();
+            }
+
+            _imGui.EndDraw();
+
             base.Draw(gameTime);
         }
 
