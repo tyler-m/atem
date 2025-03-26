@@ -53,9 +53,11 @@ namespace Atem.Views.MonoGame
 
         public void LoadFile(string filePath)
         {
-            _atem.Load(filePath);
-            _pauseAtem = false;
-            _fileExplorer.Active = false;
+            if (_atem.Load(filePath))
+            {
+                _pauseAtem = false;
+                _fileExplorer.Active = false;
+            }
         }
 
         private void OnExit(object sender, EventArgs e)

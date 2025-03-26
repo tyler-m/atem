@@ -21,17 +21,12 @@ namespace Atem.Core.Memory
             get => _colorFlag == 0x80 || _colorFlag == 0xC0;
         }
 
-        public Cartridge(string filepath)
-        {
-            Load(filepath);
-        }
-
         public void SaveRAM()
         {
             File.WriteAllBytes(_filepath + ".sav", _mbc.ExportSave());
         }
 
-        private bool Load(string filepath)
+        public bool Load(string filepath)
         {
             Loaded = false;
 
@@ -109,6 +104,10 @@ namespace Atem.Core.Memory
             {
                 _mbc = new MBC5();
                 _mbc.Init(_type, rom, ramSizeInBytes);
+            }
+            else
+            {
+                return false;
             }
 
             // check if cartridge RAM has been saved for this game

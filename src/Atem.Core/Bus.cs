@@ -43,9 +43,10 @@ namespace Atem.Core
             _bootROM = new BootROM(filepath, enabled);
         }
 
-        public void LoadCartridge(string filepath)
+        public bool LoadCartridge(string filepath)
         {
-            _cartridge = new Cartridge(filepath);
+            _cartridge = new Cartridge();
+            return _cartridge.Load(filepath);
         }
 
         public void SaveCartridgeRAM()
