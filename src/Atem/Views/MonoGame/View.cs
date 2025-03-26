@@ -103,7 +103,6 @@ namespace Atem.Views.MonoGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _screenTexture = new Texture2D(GraphicsDevice, _config.ScreenWidth, _config.ScreenHeight);
-            _font = Content.Load<SpriteFont>("Default");
         }
 
         protected override void Update(GameTime gameTime)
