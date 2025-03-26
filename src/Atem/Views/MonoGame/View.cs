@@ -18,7 +18,6 @@ namespace Atem.Views.MonoGame
 
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private SpriteFont _font;
         private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
 
