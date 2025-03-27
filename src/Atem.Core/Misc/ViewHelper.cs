@@ -1,27 +1,25 @@
 ﻿using System.Collections.Generic;
-using Atem.Core.Processing;
 using Atem.Core;
-using Atem.Core.Graphics;
 
 namespace Atem
 {
     public class ViewHelper
     {
-        private Bus _bus;
+        private AtemRunner _atem;
 
-        public ViewHelper(Bus bus)
+        public ViewHelper(AtemRunner atem)
         {
-            _bus = bus;
+            _atem = atem;
         }
 
         public ushort GetAddressOfNextInstruction()
         {
-            return _bus.Processor.AddressOfNextInstruction;
+            return _atem.Bus.Processor.AddressOfNextInstruction;
         }
 
         public byte PeekAt(int address)
         {
-            return _bus.Read((ushort)address);
+            return _atem.Bus.Read((ushort)address);
         }
 
         public IEnumerable<int> PeekBefore(int address, int count)
@@ -36,7 +34,7 @@ namespace Atem
                     }
                     else
                     {
-                        yield return _bus.Read((ushort)addressToPeek);
+                        yield return _atem.Bus.Read((ushort)addressToPeek);
                     }
                 }
             }
@@ -54,7 +52,7 @@ namespace Atem
                     }
                     else
                     {
-                        yield return _bus.Read((ushort)addressToPeek);
+                        yield return _atem.Bus.Read((ushort)addressToPeek);
                     }
                 }
             }

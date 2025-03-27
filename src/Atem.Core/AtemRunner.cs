@@ -18,6 +18,8 @@ namespace Atem.Core
         public Debugger Debugger;
         private bool _forceClock;
 
+        public Bus Bus { get =>  _bus; }
+
         public Processor Processor { get => _bus.Processor; }
 
         public Timer Timer { get => _bus.Timer; }
@@ -54,7 +56,7 @@ namespace Atem.Core
         {
             _bus = new Bus();
             Debugger = new Debugger();
-            ViewHelper = new ViewHelper(_bus);
+            ViewHelper = new ViewHelper(this);
         }
 
         public void Continue()
