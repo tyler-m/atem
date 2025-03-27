@@ -6,7 +6,6 @@ using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core;
 using System;
-using ImGuiNET;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.UI;
 
@@ -28,8 +27,11 @@ namespace Atem.Views.MonoGame
         private DynamicSoundEffectInstance _soundInstance;
 
         private Config _config;
+
+        private bool _debug = false;
         private ImGuiRenderer _imGui;
         private FileExplorerWindow _fileExplorerWindow;
+        private GameDisplayWindow _gameDisplayWindow;
         private MenuBar _menuBar;
 
         public View(AtemRunner atem, Config config)
@@ -41,8 +43,6 @@ namespace Atem.Views.MonoGame
             _screenData = new Color[config.ScreenWidth * _config.ScreenHeight];
 
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
-            _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor);
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -52,12 +52,32 @@ namespace Atem.Views.MonoGame
 
             _fileExplorerWindow = new FileExplorerWindow(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
             _menuBar = new MenuBar();
-            _menuBar.OnExit += OnMenuBarExit;
+            _menuBar.OnExit += Exit;
+            _menuBar.OnDebug += ToggleDebug;
+
+            UpdateWindowSize();
         }
 
-        private void OnMenuBarExit()
+        private void UpdateWindowSize()
         {
-            Exit();
+            if (_debug)
+            {
+                _graphics.PreferredBackBufferWidth = 960;
+                _graphics.PreferredBackBufferHeight = 720;
+                _graphics.ApplyChanges();
+            }
+            else
+            {
+                _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
+                _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor) + _menuBar.Height;
+                _graphics.ApplyChanges();
+            }
+        }
+
+        private void ToggleDebug()
+        {
+            _debug = !_debug;
+            UpdateWindowSize();
         }
 
         public void LoadFile(string filePath)
@@ -103,6 +123,8 @@ namespace Atem.Views.MonoGame
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _screenTexture = new Texture2D(GraphicsDevice, _config.ScreenWidth, _config.ScreenHeight);
+            nint screenTextureId = _imGui.BindTexture(_screenTexture);
+            _gameDisplayWindow = new GameDisplayWindow(screenTextureId, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor));
         }
 
         protected override void Update(GameTime gameTime)
@@ -192,21 +214,27 @@ namespace Atem.Views.MonoGame
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-
-            _spriteBatch.Draw(_screenTexture,
-                new Rectangle(0, _menuBar.Height, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor)),
-                new Rectangle(0, 0, _config.ScreenWidth, _config.ScreenHeight), Color.White);
-
-            _spriteBatch.End();
-
             _imGui.BeginDraw(gameTime);
 
-            _menuBar.Draw();
+            if (!_debug)
+            {
+                _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+                _spriteBatch.Draw(_screenTexture,
+                    new Rectangle(0, _menuBar.Height, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor)),
+                    new Rectangle(0, 0, _config.ScreenWidth, _config.ScreenHeight), Color.White);
+                _spriteBatch.End();
+            }
+            else
+            {
+                _gameDisplayWindow.Draw();
+            }
+
             if (_fileExplorerWindow.Active)
             {
                 _fileExplorerWindow.Draw();
             }
+
+            _menuBar.Draw();
 
             _imGui.EndDraw();
 

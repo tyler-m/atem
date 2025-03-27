@@ -4,47 +4,38 @@ namespace Atem.Views.MonoGame.UI
 {
     internal class MenuBar
     {
-        private bool _visible = true;
+        private int _height = 19;
 
         public delegate void ExitEvent();
         public event ExitEvent OnExit;
+        public delegate void DebugEvent();
+        public event DebugEvent OnDebug;
 
-        public int Height { get; private set; }
-
-        public bool Visible
-        {
-            get => _visible;
-            set
-            {
-                _visible = value;
-                if (!_visible)
-                {
-                    Height = 0;
-                }
-            }
-        }
+        public int Height { get => _height; }
 
         public void Draw()
         {
-            if (Visible)
+            if (ImGui.BeginMainMenuBar())
             {
-                if (ImGui.BeginMainMenuBar())
+                if (ImGui.BeginMenu("File"))
                 {
-                    Height = (int)ImGui.GetFrameHeight();
-
-                    if (ImGui.BeginMenu("File"))
+                    if (ImGui.MenuItem("Debug"))
                     {
-                        if (ImGui.MenuItem("Exit"))
-                        {
-                            OnExit?.Invoke();
-                        }
-
-                        ImGui.EndMenu();
+                        OnDebug?.Invoke();
                     }
-                }
 
-                ImGui.EndMainMenuBar();
+                    ImGui.Separator();
+
+                    if (ImGui.MenuItem("Exit"))
+                    {
+                        OnExit?.Invoke();
+                    }
+
+                    ImGui.EndMenu();
+                }
             }
+
+            ImGui.EndMainMenuBar();
         }
     }
 }
