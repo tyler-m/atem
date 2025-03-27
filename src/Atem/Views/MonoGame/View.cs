@@ -52,7 +52,8 @@ namespace Atem.Views.MonoGame
 
             Exiting += OnExit;
 
-            _fileExplorerWindow = new FileExplorerWindow(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            _fileExplorerWindow = new FileExplorerWindow(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            _fileExplorerWindow.OnSelectFile += LoadFile;
             _memoryWindow = new MemoryWindow(_atem);
             _menuBar = new MenuBar();
             _menuBar.OnExit += Exit;

@@ -6,17 +6,18 @@ namespace Atem.Views.MonoGame.UI.Window
 {
     internal class FileExplorerWindow
     {
-        private View _view;
         private DirectoryInfo _cwd;
         private DirectoryInfo _directory;
+
+        public delegate void SelectFileEvent(string filePath);
+        public event SelectFileEvent OnSelectFile;
 
         public bool Active { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public FileExplorerWindow(View view, int width, int height, bool active = true)
+        public FileExplorerWindow( int width, int height, bool active = true)
         {
-            _view = view;
             Width = width;
             Height = height;
             Active = active;
@@ -27,7 +28,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
         private void SelectFile(FileInfo file)
         {
-            _view.LoadFile(file.FullName);
+            OnSelectFile?.Invoke(file.FullName);
         }
 
         private void SelectDirectory(DirectoryInfo directory)
