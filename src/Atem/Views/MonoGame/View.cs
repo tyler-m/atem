@@ -32,6 +32,7 @@ namespace Atem.Views.MonoGame
         private ImGuiRenderer _imGui;
         private FileExplorerWindow _fileExplorerWindow;
         private GameDisplayWindow _gameDisplayWindow;
+        private MemoryWindow _memoryWindow;
         private MenuBar _menuBar;
 
         public View(AtemRunner atem, Config config)
@@ -51,6 +52,7 @@ namespace Atem.Views.MonoGame
             Exiting += OnExit;
 
             _fileExplorerWindow = new FileExplorerWindow(this, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            _memoryWindow = new MemoryWindow(_atem);
             _menuBar = new MenuBar();
             _menuBar.OnExit += Exit;
             _menuBar.OnDebug += ToggleDebug;
@@ -226,6 +228,7 @@ namespace Atem.Views.MonoGame
             }
             else
             {
+                _memoryWindow.Draw();
                 _gameDisplayWindow.Draw();
             }
 
