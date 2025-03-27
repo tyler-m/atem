@@ -13,6 +13,8 @@ namespace Atem.Views.MonoGame
 {
     public class ImGuiRenderer
     {
+        private Game _game;
+
         private GraphicsDevice _graphicsDevice;
         private BasicEffect _effect;
         private RasterizerState _rasterizerState;
@@ -34,6 +36,8 @@ namespace Atem.Views.MonoGame
 
         public ImGuiRenderer(Game game)
         {
+            _game = game;
+
             unsafe
             {
                 _vertexDeclarationSize = sizeof(ImDrawVert);
@@ -101,7 +105,12 @@ namespace Atem.Views.MonoGame
         public void BeginDraw(GameTime gameTime)
         {
             ImGui.GetIO().DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            UpdateInput();
+
+            if (_game.IsActive)
+            {
+                UpdateInput();
+            }
+
             ImGui.NewFrame();
         }
 
