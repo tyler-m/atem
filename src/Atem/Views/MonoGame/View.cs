@@ -23,7 +23,6 @@ namespace Atem.Views.MonoGame
         private AtemRunner _atem;
         private Color[] _screenData;
         private Texture2D _screenTexture;
-        private bool _pauseAtem = true;
         private DynamicSoundEffectInstance _soundInstance;
 
         private Config _config;
@@ -33,11 +32,13 @@ namespace Atem.Views.MonoGame
         private FileExplorerWindow _fileExplorerWindow;
         private GameDisplayWindow _gameDisplayWindow;
         private MemoryWindow _memoryWindow;
+        private BreakpointWindow _breakpointWindow;
         private MenuBar _menuBar;
 
         public View(AtemRunner atem, Config config)
         {
             _atem = atem;
+            _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
             _atem.OnFullAudioBuffer += OnFullAudioBuffer;
             _config = config;
@@ -56,6 +57,7 @@ namespace Atem.Views.MonoGame
             _menuBar = new MenuBar();
             _menuBar.OnExit += Exit;
             _menuBar.OnDebug += ToggleDebug;
+            _breakpointWindow = new BreakpointWindow(_atem.Debugger);
 
             UpdateWindowSize();
         }
@@ -79,6 +81,7 @@ namespace Atem.Views.MonoGame
         private void ToggleDebug()
         {
             _debug = !_debug;
+            _atem.Debugger.Active = _debug;
             UpdateWindowSize();
         }
 
@@ -86,7 +89,7 @@ namespace Atem.Views.MonoGame
         {
             if (_atem.Load(filePath))
             {
-                _pauseAtem = false;
+                _atem.Paused = false;
                 _fileExplorerWindow.Active = false;
             }
         }
@@ -136,7 +139,7 @@ namespace Atem.Views.MonoGame
 
             if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
             {
-                _pauseAtem = !_pauseAtem;
+                _atem.Paused = !_atem.Paused;
             }
 
             if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
@@ -203,11 +206,12 @@ namespace Atem.Views.MonoGame
             {
                 _atem.OnJoypadChange(JoypadButton.Start, false);
             }
-
-            if (!_pauseAtem)
+            if (!_currentKeyboardState.IsKeyDown(Keys.F5) && _previousKeyboardState.IsKeyDown(Keys.F5))
             {
-                _atem.Update();
+                _atem.Continue();
             }
+
+            _atem.Update();
 
             base.Update(gameTime);
         }
@@ -230,6 +234,7 @@ namespace Atem.Views.MonoGame
             {
                 _memoryWindow.Draw();
                 _gameDisplayWindow.Draw();
+                _breakpointWindow.Draw();
             }
 
             if (_fileExplorerWindow.Active)

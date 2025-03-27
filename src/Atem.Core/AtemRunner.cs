@@ -2,6 +2,7 @@
 using Atem.Core.Processing;
 using Atem.Core.Audio;
 using Atem.Core.Input;
+using Atem.Core.Debugging;
 
 namespace Atem.Core
 {
@@ -20,6 +21,11 @@ namespace Atem.Core
         private Joypad _joypad;
         private Serial _serial;
         private AudioManager _audio;
+        
+        public Debugger Debugger;
+        private bool _forceClock;
+
+        public bool Paused { get; set; }
 
         public ViewHelper ViewHelper { get; private set; }
 
@@ -58,8 +64,15 @@ namespace Atem.Core
             _serial = new Serial();
             _audio = new AudioManager();
             _bus.SetComponents(_processor, _graphics, _timer, _interrupt, _joypad, _serial, _audio);
+            Debugger = new Debugger();
 
             ViewHelper = new ViewHelper(_processor, _bus, _graphics);
+        }
+
+        public void Continue()
+        {
+            Paused = false;
+            _forceClock = true;
         }
 
         private void PrepareForGameBoot(bool color)
@@ -191,7 +204,24 @@ namespace Atem.Core
 
             for (int i = 0; i < clocksForCurrentFrame; i += _clockCost)
             {
-                Clock();
+                if (Debugger.Active && !Paused)
+                {
+                    // we don't pause if we're forcing a clock
+                    // this prevents breaking on the same breakpoint repeatedly
+                    if (!_forceClock && Debugger.CheckBreakpoints(_processor.Registers.PC))
+                    {
+                        Paused = true;
+                    }
+                }
+
+                if (!Paused)
+                {
+                    Clock();
+                }
+                else
+                {
+                    break;
+                }
             }
 
             _leftoverClocks += ClocksPerFrame - (int)ClocksPerFrame - _clockCost * additionalClocks;
@@ -199,6 +229,8 @@ namespace Atem.Core
 
         public bool Clock()
         {
+            _forceClock = false;
+
             bool opFinished = _processor.Clock();
             _timer.Clock();
 
