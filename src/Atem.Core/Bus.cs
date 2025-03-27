@@ -22,6 +22,31 @@ namespace Atem.Core
 
         public byte SVBK = 0;
 
+        public Processor Processor { get => _processor; }
+
+        public Timer Timer { get => _timer; }
+
+        public AudioManager Audio { get => _audio; }
+
+        public GraphicsManager Graphics { get => _graphics; }
+
+        public Joypad Joypad { get => _joypad; }
+
+        public Serial Serial { get => _serial; }
+
+        public Interrupt Interrupt { get => _interrupt; }
+
+        public Bus()
+        {
+            _processor = new Processor(this);
+            _timer = new Timer(this);
+            _audio = new AudioManager();
+            _graphics = new GraphicsManager(this);
+            _joypad = new Joypad(this);
+            _serial = new Serial();
+            _interrupt = new Interrupt();
+        }
+
         public bool ColorMode
         {
             get => _cartridge.SupportsColor;

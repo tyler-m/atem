@@ -7,20 +7,16 @@ namespace Atem
 {
     public class ViewHelper
     {
-        private Processor _processor;
         private Bus _bus;
-        private GraphicsManager _graphics;
 
-        public ViewHelper(Processor processor, Bus bus, GraphicsManager graphics)
+        public ViewHelper(Bus bus)
         {
-            _processor = processor;
             _bus = bus;
-            _graphics = graphics;
         }
 
         public ushort GetAddressOfNextInstruction()
         {
-            return _processor.AddressOfNextInstruction;
+            return _bus.Processor.AddressOfNextInstruction;
         }
 
         public byte PeekAt(int address)
