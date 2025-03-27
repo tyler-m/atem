@@ -33,6 +33,7 @@ namespace Atem.Views.MonoGame
         private GameDisplayWindow _gameDisplayWindow;
         private MemoryWindow _memoryWindow;
         private BreakpointWindow _breakpointWindow;
+        private ProcessorRegistersWindow _processorRegistersWindow;
         private MenuBar _menuBar;
 
         public View(AtemRunner atem, Config config)
@@ -59,6 +60,7 @@ namespace Atem.Views.MonoGame
             _menuBar.OnExit += Exit;
             _menuBar.OnDebug += ToggleDebug;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
+            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Processor);
 
             UpdateWindowSize();
         }
@@ -236,6 +238,7 @@ namespace Atem.Views.MonoGame
                 _memoryWindow.Draw();
                 _gameDisplayWindow.Draw();
                 _breakpointWindow.Draw();
+                _processorRegistersWindow.Draw();
             }
 
             if (_fileExplorerWindow.Active)

@@ -25,6 +25,8 @@ namespace Atem.Core
         public Debugger Debugger;
         private bool _forceClock;
 
+        public Processor Processor { get => _processor; }
+
         public bool Paused { get; set; }
 
         public ViewHelper ViewHelper { get; private set; }
