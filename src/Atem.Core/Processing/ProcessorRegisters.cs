@@ -90,19 +90,6 @@ namespace Atem.Core.Processing
             }
         }
 
-        public ushort WZ
-        {
-            get
-            {
-                return (ushort)(Z | (W << 8));
-            }
-            set
-            {
-                W = value.GetHighByte();
-                Z = value.GetLowByte();
-            }
-        }
-
         public ushort this[string register]
         {
             get
@@ -139,8 +126,6 @@ namespace Atem.Core.Processing
                         value = DE; break;
                     case "HL":
                         value = HL; break;
-                    case "WZ":
-                        value = WZ; break;
                     case "PC":
                         value = PC; break;
                     case "SP":
@@ -183,8 +168,6 @@ namespace Atem.Core.Processing
                         DE = value; break;
                     case "HL":
                         HL = value; break;
-                    case "WZ":
-                        WZ = value; break;
                     case "PC":
                         PC = value; break;
                     case "SP":
