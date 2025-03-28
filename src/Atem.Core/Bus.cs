@@ -20,6 +20,10 @@ namespace Atem.Core
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000 * 4];
 
+        public byte[] HRAM { get => _hram; }
+        
+        public byte[] WRAM { get => _wram; }
+
         public byte SVBK = 0;
 
         public Processor Processor { get => _processor; }
@@ -35,6 +39,8 @@ namespace Atem.Core
         public Serial Serial { get => _serial; }
 
         public Interrupt Interrupt { get => _interrupt; }
+
+        public Cartridge Cartridge { get => _cartridge; }
 
         public Bus()
         {
