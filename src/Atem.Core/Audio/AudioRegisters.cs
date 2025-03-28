@@ -84,7 +84,7 @@ namespace Atem.Core.Audio
             }
             get
             {
-                return (byte)((On ? 1 : 0) << 7 | (Channel4.IsOn ? 1 : 0) << 3 | (Channel3.IsOn ? 1 : 0) << 2 | (Channel2.IsOn ? 1 : 0) << 1 | (Channel1.IsOn ? 1 : 0));
+                return (byte)((On ? 1 : 0) << 7 | (Channel4.On ? 1 : 0) << 3 | (Channel3.On ? 1 : 0) << 2 | (Channel2.On ? 1 : 0) << 1 | (Channel1.On ? 1 : 0));
             }
         }
 

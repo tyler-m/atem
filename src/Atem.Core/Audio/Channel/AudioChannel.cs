@@ -1,6 +1,6 @@
-﻿using Atem.Core.State;
-using System;
+﻿using System;
 using System.IO;
+using Atem.Core.State;
 
 namespace Atem.Core.Audio.Channel
 {
@@ -15,47 +15,47 @@ namespace Atem.Core.Audio.Channel
         protected const int MAX_CHANNEL_VOLUME = 15;
         protected const int MIN_CHANNEL_VOLUME = 0;
 
-        private int _channelTimer = 0;
-        private int _periodTimer = 0;
-        private int _lengthTimer = 0;
-        private int _volumeEnvelopeTimer = 0;
-        private byte _volume = 0;
+        private int _channelTimer;
+        private int _periodTimer;
+        private int _lengthTimer;
+        private int _volumeEnvelopeTimer;
+        private byte _volume;
+        private bool _channelOn;
+        private bool _lengthEnabled;
+        private byte _initialVolume;
+        private ushort _initialPeriod;
+        private byte _volumeEnvelopeDirection;
+        private byte _volumeEnvelopePeriod;
+        private byte _initialLengthTimer;
+        private bool _leftChannel;
+        private bool _rightChannel;
+        private bool _trigger;
 
-        protected int ChannelTimer { get { return _channelTimer; } set { } }
+        private static float NormalizeSample(byte volume) => (float)volume / MAX_CHANNEL_VOLUME;
 
-        public byte Volume { get { return _volume; } set { _volume = value; } }
+        protected int ChannelTimer { get => _channelTimer; }
 
-        private bool _channelOn = false;
-        private bool _lengthEnabled = false;
-        private byte _initialVolume = 0;
-        private ushort _initialPeriod = 0;
-        private byte _volumeEnvelopeDirection = 0;
-        private byte _volumeEnvelopePeriod = 0;
-        private byte _initialLengthTimer = 0;
-        private bool _leftChannel = false;
-        private bool _rightChannel = false;
-        private bool _trigger = false;
-
-        public bool IsOn { get { return _channelOn; } set { _channelOn = value; } }
-        public bool LengthEnabled { get { return _lengthEnabled; } set { _lengthEnabled = value; } }
-        public byte InitialVolume { get { return _initialVolume; } set { _initialVolume = value; } }
-        public ushort InitialPeriod { get { return _initialPeriod; } set { _initialPeriod = value; } }
-        public byte VolumeEnvelopeDirection { get { return _volumeEnvelopeDirection; } set { _volumeEnvelopeDirection = value; } }
-        public byte VolumeEnvelopePeriod { get { return _volumeEnvelopePeriod; } set { _volumeEnvelopePeriod = value; } }
-        public byte InitialLengthTimer { get { return _initialLengthTimer; } set { _initialLengthTimer = value; } }
-        public bool LeftChannel { get { return _leftChannel; } set { _leftChannel = value; } }
-        public bool RightChannel { get { return _rightChannel; } set { _rightChannel = value; } }
+        public byte Volume { get => _volume; set => _volume = value; }
+        public bool On { get => _channelOn; set => _channelOn = value; }
+        public bool LengthEnabled { get => _lengthEnabled; set => _lengthEnabled = value; }
+        public byte InitialVolume { get => _initialVolume; set => _initialVolume = value; }
+        public ushort InitialPeriod { get => _initialPeriod; set => _initialPeriod = value; }
+        public byte VolumeEnvelopeDirection { get => _volumeEnvelopeDirection; set => _volumeEnvelopeDirection = value; }
+        public byte VolumeEnvelopePeriod { get => _volumeEnvelopePeriod; set => _volumeEnvelopePeriod = value; }
+        public byte InitialLengthTimer { get => _initialLengthTimer; set => _initialLengthTimer = value; }
+        public bool LeftChannel { get => _leftChannel; set => _leftChannel = value; }
+        public bool RightChannel { get => _rightChannel; set => _rightChannel = value; }
 
         public bool Trigger
         {
-            get { return _trigger; }
+            get => _trigger;
             set
             {
                 _trigger = value;
 
                 if (_trigger && IsOutputting)
                 {
-                    IsOn = true;
+                    On = true;
                     Volume = InitialVolume;
                     _volumeEnvelopeTimer = 0;
                     _periodTimer = InitialPeriod;
@@ -65,17 +65,9 @@ namespace Atem.Core.Audio.Channel
             }
         }
 
-        protected virtual int PeriodUpdatesPerClock { get { return 1; } }
-        protected virtual int ChannelLength { get { return DEFAULT_CHANNEL_LENGTH; } }
-
-        public virtual bool IsOutputting
-        {
-            get
-            {
-                return InitialVolume != 0 || VolumeEnvelopeDirection != 0;
-            }
-            set { }
-        }
+        protected virtual int PeriodUpdatesPerClock { get => 1; }
+        protected virtual int ChannelLength { get => DEFAULT_CHANNEL_LENGTH; }
+        public virtual bool IsOutputting { get => InitialVolume != 0 || VolumeEnvelopeDirection != 0; set { } }
 
         public virtual void OnPeriodReset() { }
         public virtual void OnTrigger() { }
@@ -83,16 +75,37 @@ namespace Atem.Core.Audio.Channel
 
         public abstract byte ProvideSample();
 
-        private float NormalizeSample(byte volume)
+        public void Clock()
         {
-            return (float)volume / MAX_CHANNEL_VOLUME;
+            if (On)
+            {
+                _channelTimer++;
+
+                for (int i = 0; i < PeriodUpdatesPerClock; i++)
+                {
+                    UpdatePeriod();
+                }
+
+                if (_channelTimer % LENGTH_UPDATE_PERIOD == 0)
+                {
+                    UpdateLength();
+                }
+
+                if (_channelTimer % VOLUME_ENVELOPE_UPDATE_PERIOD == 0)
+                {
+                    UpdateVolumeEnvelope();
+                    _channelTimer = 0;
+                }
+
+                OnClock();
+            }
         }
 
         public float Sample()
         {
             float normalizedSample = 0.0f;
 
-            if (IsOutputting && IsOn)
+            if (IsOutputting && On)
             {
                 normalizedSample = NormalizeSample(ProvideSample());
             }
@@ -119,7 +132,7 @@ namespace Atem.Core.Audio.Channel
 
                 if (_lengthTimer >= ChannelLength)
                 {
-                    IsOn = false;
+                    On = false;
                 }
             }
         }
@@ -140,32 +153,6 @@ namespace Atem.Core.Audio.Channel
                 {
                     Volume = (byte)Math.Max(Volume - 1, MIN_CHANNEL_VOLUME);
                 }
-            }
-        }
-
-        public void Clock()
-        {
-            if (IsOn)
-            {
-                _channelTimer++;
-
-                for (int i = 0; i < PeriodUpdatesPerClock; i++)
-                {
-                    UpdatePeriod();
-                }
-
-                if (_channelTimer % LENGTH_UPDATE_PERIOD == 0)
-                {
-                    UpdateLength();
-                }
-
-                if (_channelTimer % VOLUME_ENVELOPE_UPDATE_PERIOD == 0)
-                {
-                    UpdateVolumeEnvelope();
-                    _channelTimer = 0;
-                }
-
-                OnClock();
             }
         }
 

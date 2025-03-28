@@ -71,7 +71,7 @@ namespace Atem.Core.Audio.Channel
                     {
                         if (InitialPeriod + InitialPeriod / Math.Pow(2, PeriodSweepStep) > 0x7FF)
                         {
-                            IsOn = false;
+                            On = false;
                             return;
                         }
 

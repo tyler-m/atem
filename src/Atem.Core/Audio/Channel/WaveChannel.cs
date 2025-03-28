@@ -27,7 +27,7 @@ namespace Atem.Core.Audio.Channel
 
                 if (!IsOutputting)
                 {
-                    IsOn = false;
+                    On = false;
                 }
             }
         }
