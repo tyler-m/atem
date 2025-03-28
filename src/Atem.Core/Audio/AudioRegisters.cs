@@ -9,7 +9,7 @@ namespace Atem.Core.Audio
         private WaveChannel Channel3 => _manager?.Channel3;
         private NoiseChannel Channel4 => _manager?.Channel4;
 
-        AudioManager _manager;
+        private readonly AudioManager _manager;
 
         public AudioRegisters(AudioManager manager)
         {
@@ -26,12 +26,11 @@ namespace Atem.Core.Audio
             return result;
         }
 
+        private bool On { get => _manager.On; }
+
         public byte NR50
         {
-            get
-            {
-                return (byte)((_manager.LeftChannelVolume << 4) | _manager.RightChannelVolume);
-            }
+            get => (byte)((_manager.LeftChannelVolume << 4) | _manager.RightChannelVolume);
             set
             {
                 _manager.LeftChannelVolume = (byte)(value & 0b01110000 >> 4);
@@ -41,11 +40,8 @@ namespace Atem.Core.Audio
 
         public byte NR51
         {
-            get
-            {
-                return BitsToByte(Channel4.LeftChannel, Channel3.LeftChannel, Channel2.LeftChannel, Channel1.LeftChannel,
+            get => BitsToByte(Channel4.LeftChannel, Channel3.LeftChannel, Channel2.LeftChannel, Channel1.LeftChannel,
                     Channel4.RightChannel, Channel3.RightChannel, Channel2.RightChannel, Channel1.RightChannel);
-            }
             set
             {
                 Channel4.LeftChannel = value.GetBit(7);
@@ -61,6 +57,7 @@ namespace Atem.Core.Audio
 
         public byte NR52
         {
+            get => (byte)((On ? 1 : 0) << 7 | (Channel4.On ? 1 : 0) << 3 | (Channel3.On ? 1 : 0) << 2 | (Channel2.On ? 1 : 0) << 1 | (Channel1.On ? 1 : 0));
             set
             {
                 if (!On && value.GetBit(7))
@@ -82,22 +79,13 @@ namespace Atem.Core.Audio
 
                 _manager.On = value.GetBit(7);
             }
-            get
-            {
-                return (byte)((On ? 1 : 0) << 7 | (Channel4.On ? 1 : 0) << 3 | (Channel3.On ? 1 : 0) << 2 | (Channel2.On ? 1 : 0) << 1 | (Channel1.On ? 1 : 0));
-            }
         }
-
-        private bool On { get => _manager.On; }
 
         public byte NR10
         {
-            get
-            {
-                return (byte)((Channel1.InitialPeriodSweepPeriod & 0b111) << 4
+            get => (byte)((Channel1.InitialPeriodSweepPeriod & 0b111) << 4
                     | (Channel1.PeriodSweepDirection & 0b1) << 3
                     | Channel1.PeriodSweepStep & 0b111);
-            }
             set
             {
                 if (On)
@@ -111,10 +99,7 @@ namespace Atem.Core.Audio
 
         public byte NR11
         {
-            get
-            {
-                return (byte)(Channel1.Duty << 6 | Channel1.InitialLengthTimer & 0b111111);
-            }
+            get => (byte)(Channel1.Duty << 6 | Channel1.InitialLengthTimer & 0b111111);
             set
             {
                 if (On)
@@ -127,10 +112,7 @@ namespace Atem.Core.Audio
 
         public byte NR12
         {
-            get
-            {
-                return (byte)(Channel1.InitialVolume << 4 | (Channel1.VolumeEnvelopeDirection & 0b1) << 3 | Channel1.VolumeEnvelopePeriod & 0b111);
-            }
+            get => (byte)(Channel1.InitialVolume << 4 | (Channel1.VolumeEnvelopeDirection & 0b1) << 3 | Channel1.VolumeEnvelopePeriod & 0b111);
             set
             {
                 if (On)
@@ -144,10 +126,7 @@ namespace Atem.Core.Audio
 
         public byte NR13
         {
-            get
-            {
-                return (byte)(Channel1.InitialPeriod & 0xFF);
-            }
+            get => (byte)(Channel1.InitialPeriod & 0xFF);
             set
             {
                 if (On)
@@ -159,12 +138,9 @@ namespace Atem.Core.Audio
 
         public byte NR14
         {
-            get
-            {
-                return (byte)((Channel1.Trigger ? 1 : 0) << 7
+            get => (byte)((Channel1.Trigger ? 1 : 0) << 7
                     | (Channel1.LengthEnabled ? 1 : 0) << 6
                     | Channel1.InitialPeriod.GetHighByte() & 0b111);
-            }
             set
             {
                 if (On)
@@ -178,10 +154,7 @@ namespace Atem.Core.Audio
 
         public byte NR21
         {
-            get
-            {
-                return (byte)(Channel2.Duty << 6 | Channel2.InitialLengthTimer & 0b111111);
-            }
+            get => (byte)(Channel2.Duty << 6 | Channel2.InitialLengthTimer & 0b111111);
             set
             {
                 if (On)
@@ -194,10 +167,7 @@ namespace Atem.Core.Audio
 
         public byte NR22
         {
-            get
-            {
-                return (byte)(Channel2.InitialVolume << 4 | (Channel2.VolumeEnvelopeDirection & 0b1) << 3 | Channel2.VolumeEnvelopePeriod & 0b111);
-            }
+            get => (byte)(Channel2.InitialVolume << 4 | (Channel2.VolumeEnvelopeDirection & 0b1) << 3 | Channel2.VolumeEnvelopePeriod & 0b111);
             set
             {
                 if (On)
@@ -211,10 +181,7 @@ namespace Atem.Core.Audio
 
         public byte NR23
         {
-            get
-            {
-                return (byte)(Channel2.InitialPeriod & 0xFF);
-            }
+            get => (byte)(Channel2.InitialPeriod & 0xFF);
             set
             {
                 if (On)
@@ -226,12 +193,9 @@ namespace Atem.Core.Audio
 
         public byte NR24
         {
-            get
-            {
-                return (byte)((Channel2.Trigger ? 1 : 0) << 7
+            get => (byte)((Channel2.Trigger ? 1 : 0) << 7
                     | (Channel2.LengthEnabled ? 1 : 0) << 6
                     | Channel2.InitialPeriod.GetHighByte() & 0b111);
-            }
             set
             {
                 if (On)
@@ -245,10 +209,7 @@ namespace Atem.Core.Audio
 
         public byte NR30
         {
-            get
-            {
-                return (byte)((Channel3.IsOutputting ? 1 : 0) << 7);
-            }
+            get => (byte)((Channel3.IsOutputting ? 1 : 0) << 7);
             set
             {
                 if (On)
@@ -260,10 +221,7 @@ namespace Atem.Core.Audio
 
         public byte NR31
         {
-            get
-            {
-                return Channel3.InitialLengthTimer;
-            }
+            get => Channel3.InitialLengthTimer;
             set
             {
                 if (On)
@@ -275,10 +233,7 @@ namespace Atem.Core.Audio
 
         public byte NR32
         {
-            get
-            {
-                return (byte)((Channel3.OutputLevel & 0b11) << 5);
-            }
+            get => (byte)((Channel3.OutputLevel & 0b11) << 5);
             set
             {
                 if (On)
@@ -290,10 +245,7 @@ namespace Atem.Core.Audio
 
         public byte NR33
         {
-            get
-            {
-                return (byte)(Channel3.InitialPeriod & 0xFF);
-            }
+            get => (byte)(Channel3.InitialPeriod & 0xFF);
             set
             {
                 if (On)
@@ -305,12 +257,9 @@ namespace Atem.Core.Audio
 
         public byte NR34
         {
-            get
-            {
-                return (byte)((Channel3.Trigger ? 1 : 0) << 7
+            get => (byte)((Channel3.Trigger ? 1 : 0) << 7
                     | (Channel3.LengthEnabled ? 1 : 0) << 6
                     | Channel3.InitialPeriod.GetHighByte() & 0b111);
-            }
             set
             {
                 if (On)
@@ -324,10 +273,7 @@ namespace Atem.Core.Audio
 
         public byte NR41
         {
-            get
-            {
-                return (byte)(Channel4.InitialLengthTimer & 0b00111111);
-            }
+            get => (byte)(Channel4.InitialLengthTimer & 0b00111111);
             set
             {
                 if (On)
@@ -339,10 +285,7 @@ namespace Atem.Core.Audio
 
         public byte NR42
         {
-            get
-            {
-                return (byte)(Channel4.InitialVolume << 4 | (Channel4.VolumeEnvelopeDirection & 0b1) << 3 | Channel4.VolumeEnvelopePeriod & 0b111);
-            }
+            get => (byte)(Channel4.InitialVolume << 4 | (Channel4.VolumeEnvelopeDirection & 0b1) << 3 | Channel4.VolumeEnvelopePeriod & 0b111);
             set
             {
                 if (On)
@@ -356,10 +299,7 @@ namespace Atem.Core.Audio
 
         public byte NR43
         {
-            get
-            {
-                return (byte)(Channel4.ClockShift << 4 | ((Channel4.ShiftRegisterMode & 0b1) << 3) | Channel4.ClockDivider & 0b111);
-            }
+            get => (byte)(Channel4.ClockShift << 4 | ((Channel4.ShiftRegisterMode & 0b1) << 3) | Channel4.ClockDivider & 0b111);
             set
             {
                 if (On)
@@ -373,10 +313,7 @@ namespace Atem.Core.Audio
 
         public byte NR44
         {
-            get
-            {
-                return (byte)((Channel4.Trigger ? 1 : 0) << 7 | (Channel4.LengthEnabled ? 1 : 0) << 6);
-            }
+            get => (byte)((Channel4.Trigger ? 1 : 0) << 7 | (Channel4.LengthEnabled ? 1 : 0) << 6);
             set
             {
                 if (On)
