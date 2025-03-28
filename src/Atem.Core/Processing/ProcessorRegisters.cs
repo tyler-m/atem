@@ -35,7 +35,6 @@ namespace Atem.Core.Processing
     {
         public ushort SP, PC;
         public byte A, B, C, D, E, H, L;
-        public byte W, Z;
         public CPUFlags Flags;
 
         public ushort AF
@@ -114,10 +113,6 @@ namespace Atem.Core.Processing
                         value = H; break;
                     case "L":
                         value = L; break;
-                    case "W":
-                        value = W; break;
-                    case "Z":
-                        value = Z; break;
                     case "AF":
                         value = AF; break;
                     case "BC":
@@ -156,10 +151,6 @@ namespace Atem.Core.Processing
                         L = (byte)value; break;
                     case "F":
                         Flags.F = (byte)value; break;
-                    case "W":
-                        W = (byte)value; break;
-                    case "Z":
-                        Z = (byte)value; break;
                     case "AF":
                         AF = value; break;
                     case "BC":
