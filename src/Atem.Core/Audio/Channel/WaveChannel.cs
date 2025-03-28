@@ -9,18 +9,17 @@ namespace Atem.Core.Audio.Channel
 
         private byte[] _ram = new byte[RAM_SIZE];
         private int _sampleIndex = 0;
-
-        protected override int ChannelLength { get { return 256; } }
-        protected override int PeriodUpdatesPerClock { get { return 2; } }
-
         private byte _outputLevel = 0;
         private bool _isOutputting = false;
 
-        public byte OutputLevel { get { return _outputLevel; } set { _outputLevel = value; } }
+        protected override int ChannelLength { get => 256; }
+        protected override int PeriodUpdatesPerClock { get => 2; }
+
+        public byte OutputLevel { get => _outputLevel; set => _outputLevel = value; }
 
         public override bool IsOutputting
         {
-            get { return _isOutputting; }
+            get => _isOutputting;
             set
             {
                 _isOutputting = value;

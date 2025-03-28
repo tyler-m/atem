@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 
 namespace Atem.Core.Audio.Channel
@@ -8,21 +7,20 @@ namespace Atem.Core.Audio.Channel
     {
         private const int PERIOD_SWEEP_UPDATE_PERIOD = 8192; // 128 Hz
 
-        private byte[] _dutyCycles = new byte[] { 0b11111110, 0b01111110, 0b01111000, 0b10000001 };
+        private byte[] _dutyCycles = [0b11111110, 0b01111110, 0b01111000, 0b10000001];
         private byte _sampleIndex = 0;
         private int _periodSweepTimer = 0;
         private byte _periodSweepPeriod = 0;
-
         private byte _duty = 0;
         private byte _initialPeriodSweepPeriod = 0;
         private bool _periodSweepEnabled = false;
         private byte _periodSweepDirection = 0;
         private byte _periodSweepStep = 0;
 
-        public byte InitialPeriodSweepPeriod { get { return _initialPeriodSweepPeriod; } set { _initialPeriodSweepPeriod = value; } }
-        public byte PeriodSweepDirection { get { return _periodSweepDirection; } set { _periodSweepDirection = value; } }
-        public byte PeriodSweepStep { get { return _periodSweepStep; } set { _periodSweepStep = value; } }
-        public byte Duty { get { return _duty; } set { _duty = value; } }
+        public byte InitialPeriodSweepPeriod { get => _initialPeriodSweepPeriod; set => _initialPeriodSweepPeriod = value; }
+        public byte PeriodSweepDirection { get => _periodSweepDirection; set => _periodSweepDirection = value; }
+        public byte PeriodSweepStep { get => _periodSweepStep; set => _periodSweepStep = value; }
+        public byte Duty { get => _duty; set => _duty = value; }
 
         public PulseChannel(bool periodSweepEnabled = false)
         {

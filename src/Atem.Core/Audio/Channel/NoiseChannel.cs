@@ -9,14 +9,13 @@ namespace Atem.Core.Audio.Channel
 
         private int _shiftTimer = 0;
         private ushort _shiftRegister = 0;
-
         private byte _clockShift = 0;
         private byte _shiftRegisterMode = 0;
         private byte _clockDivider = 0;
 
-        public byte ClockShift { get { return _clockShift; } set { _clockShift = value; } }
-        public byte ShiftRegisterMode { get { return _shiftRegisterMode; } set { _shiftRegisterMode = value; } }
-        public byte ClockDivider { get { return _clockDivider; } set { _clockDivider = value; } }
+        public byte ClockShift { get => _clockShift; set => _clockShift = value; }
+        public byte ShiftRegisterMode { get => _shiftRegisterMode; set => _shiftRegisterMode = value; }
+        public byte ClockDivider { get => _clockDivider; set => _clockDivider = value; }
 
         public int ShiftPeriod
         {
