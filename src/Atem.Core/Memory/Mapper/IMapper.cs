@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Core.Memory.Mapper
 {
-    internal interface IMapper
+    public interface IMapper
     {
         public byte[] RAM { get; set; }
         public void Init(byte type, byte[] rom, int ramSize);
