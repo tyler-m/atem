@@ -5,8 +5,8 @@ namespace Atem.Core.Audio.Channel
 {
     internal class AudioChannelMixer
     {
-        private List<AudioChannel> _channels = new List<AudioChannel>();
-        private List<IAudioFilter> _mixerFilters = new List<IAudioFilter>();
+        private readonly List<AudioChannel> _channels = [];
+        private readonly List<IAudioFilter> _mixerFilters = [];
 
         public void AddChannel(AudioChannel channel)
         {
