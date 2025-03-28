@@ -86,14 +86,16 @@ namespace Atem.Views.MonoGame
             {
                 _graphics.PreferredBackBufferWidth = 960;
                 _graphics.PreferredBackBufferHeight = 720;
-                _graphics.ApplyChanges();
             }
             else
             {
                 _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
                 _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor) + _menuBar.Height;
-                _graphics.ApplyChanges();
             }
+
+            _fileExplorerWindow.Width = _graphics.PreferredBackBufferWidth;
+            _fileExplorerWindow.Height = _graphics.PreferredBackBufferHeight;
+            _graphics.ApplyChanges();
         }
 
         private void ToggleDebug()
