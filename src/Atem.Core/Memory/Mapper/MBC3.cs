@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 
 namespace Atem.Core.Memory.Mapper
 {
@@ -214,6 +215,28 @@ namespace Atem.Core.Memory.Mapper
             Array.Copy(RAM, saveFile, RAM.Length);
             Array.Copy(rtcData, 0, saveFile, RAM.Length, rtcData.Length);
             return saveFile;
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_ram);
+            writer.Write(_ramEnable);
+            writer.Write(_romBank);
+            writer.Write(_ramBank);
+            _rtc.GetState(writer);
+            _rtcLatched.GetState(writer);
+            writer.Write(_latch);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _ram = reader.ReadBytes(_ram.Length);
+            _ramEnable = reader.ReadBoolean();
+            _romBank = reader.ReadInt32();
+            _ramBank = reader.ReadInt32();
+            _rtc.SetState(reader);
+            _rtcLatched.SetState(reader);
+            _latch = reader.ReadByte();
         }
     }
 }

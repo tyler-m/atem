@@ -1,7 +1,10 @@
 ﻿
+using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Graphics
 {
-    public class PaletteGroup
+    public class PaletteGroup : IStateful
     {
         private Palette[] _palettes = new Palette[8];
 
@@ -71,6 +74,28 @@ namespace Atem.Core.Graphics
             {
                 Address = (Address + 1) % 0x40;
             }
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            foreach (Palette palette in _palettes)
+            {
+                palette.GetState(writer);
+            }
+
+            writer.Write(Increment);
+            writer.Write(Address);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            foreach (Palette palette in _palettes)
+            {
+                palette.SetState(reader);
+            }
+
+            Increment = reader.ReadBoolean();
+            Address = reader.ReadInt32();
         }
     }
 }

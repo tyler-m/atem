@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System;
 using System.Numerics;
+using System.IO;
+using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public class Processor
+    public class Processor : IStateful
     {
         public static int Frequency = 4194304;
 
@@ -188,6 +190,56 @@ namespace Atem.Core.Processing
         internal void RequestUnhalt()
         {
             _busHalted = false;
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(Registers.A);
+            writer.Write(Registers.B);
+            writer.Write(Registers.C);
+            writer.Write(Registers.D);
+            writer.Write(Registers.E);
+            writer.Write(Registers.H);
+            writer.Write(Registers.L);
+            writer.Write(Registers.SP);
+            writer.Write(Registers.PC);
+            writer.Write(Registers.Flags.F);
+            writer.Write(IR);
+            writer.Write(Length);
+            writer.Write(CB);
+            writer.Write(IME);
+            writer.Write(DoubleSpeed);
+            writer.Write(SpeedSwitchFlag);
+            writer.Write(_halted);
+            writer.Write(_busHalted);
+            writer.Write(_instructionFinished);
+            writer.Write(_tick);
+            writer.Write(_interruptType);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            Registers.A = reader.ReadByte();
+            Registers.B = reader.ReadByte();
+            Registers.C = reader.ReadByte();
+            Registers.D = reader.ReadByte();
+            Registers.E = reader.ReadByte();
+            Registers.H = reader.ReadByte();
+            Registers.L = reader.ReadByte();
+            Registers.SP = reader.ReadUInt16();
+            Registers.PC = reader.ReadUInt16();
+            Registers.Flags.F = reader.ReadByte();
+            IR = reader.ReadByte();
+            Length = reader.ReadInt32();
+            CB = reader.ReadBoolean();
+            IME = reader.ReadBoolean();
+            DoubleSpeed = reader.ReadBoolean();
+            SpeedSwitchFlag = reader.ReadBoolean();
+            _halted = reader.ReadBoolean();
+            _busHalted = reader.ReadBoolean();
+            _instructionFinished = reader.ReadBoolean();
+            _tick = reader.ReadInt32();
+            _interruptType = reader.ReadInt32();
         }
     }
 }

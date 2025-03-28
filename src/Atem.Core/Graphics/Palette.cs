@@ -1,7 +1,10 @@
 ﻿
+using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Graphics
 {
-    public class Palette
+    public class Palette : IStateful
     {
         private GBColor[] _colors = new GBColor[4];
 
@@ -61,6 +64,22 @@ namespace Atem.Core.Graphics
             color <<= 2;
             color |= (byte)(3 - (_colors[0].Red / 31.0f * 3));
             return color;
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            foreach (GBColor color in _colors)
+            {
+                color.GetState(writer);
+            }
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            foreach (GBColor color in _colors)
+            {
+                color.SetState(reader);
+            }
         }
     }
 }

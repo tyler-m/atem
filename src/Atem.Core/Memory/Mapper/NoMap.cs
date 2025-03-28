@@ -1,4 +1,6 @@
 ﻿
+using System.IO;
+
 namespace Atem.Core.Memory.Mapper
 {
     internal class NoMap : IMapper
@@ -47,6 +49,16 @@ namespace Atem.Core.Memory.Mapper
         public byte[] ExportSave()
         {
             return RAM;
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

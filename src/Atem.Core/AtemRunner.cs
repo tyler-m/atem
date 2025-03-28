@@ -3,6 +3,8 @@ using Atem.Core.Processing;
 using Atem.Core.Audio;
 using Atem.Core.Input;
 using Atem.Core.Debugging;
+using System.IO;
+using System;
 
 namespace Atem.Core
 {
@@ -243,6 +245,44 @@ namespace Atem.Core
         public void OnExit()
         {
             _bus.SaveCartridgeRAM();
+        }
+
+        public byte[] GetState()
+        {
+            using MemoryStream stream = new();
+            using BinaryWriter writer = new(stream);
+
+            Processor.GetState(writer);
+            Timer.GetState(writer);
+            Bus.Interrupt.GetState(writer);
+            Bus.Joypad.GetState(writer);
+            Bus.Serial.GetState(writer);
+            Bus.Graphics.GetState(writer);
+            Bus.Audio.GetState(writer);
+            Bus.Cartridge.GetState(writer);
+
+            writer.Write(Bus.HRAM);
+            writer.Write(Bus.WRAM);
+
+            return stream.ToArray();
+        }
+
+        public void SetState(byte[] saveStateData)
+        {
+            using MemoryStream stream = new(saveStateData);
+            using BinaryReader reader = new(stream);
+
+            Processor.SetState(reader);
+            Timer.SetState(reader);
+            Bus.Interrupt.SetState(reader);
+            Bus.Joypad.SetState(reader);
+            Bus.Serial.SetState(reader);
+            Bus.Graphics.SetState(reader);
+            Bus.Audio.SetState(reader);
+            Bus.Cartridge.SetState(reader);
+
+            Array.Copy(reader.ReadBytes(Bus.HRAM.Length), Bus.HRAM, Bus.HRAM.Length);
+            Array.Copy(reader.ReadBytes(Bus.WRAM.Length), Bus.WRAM, Bus.WRAM.Length);
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿
+﻿using Atem.Core.Processing;
+using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Input
 {
     public enum JoypadButton
@@ -13,20 +16,20 @@ namespace Atem.Core.Input
         Start
     }
 
-    public class Joypad
+    public class Joypad : IStateful
     {
-        private bool[] _joypad = new bool[8];
+        private byte _joypad;
         private byte _joyp;
         private Bus _bus;
 
-        private bool Up => _joypad[(int)JoypadButton.Up];
-        private bool Down => _joypad[(int)JoypadButton.Down];
-        private bool Left => _joypad[(int)JoypadButton.Left];
-        private bool Right => _joypad[(int)JoypadButton.Right];
-        private bool A => _joypad[(int)JoypadButton.A];
-        private bool B => _joypad[(int)JoypadButton.B];
-        private bool Select => _joypad[(int)JoypadButton.Select];
-        private bool Start => _joypad[(int)JoypadButton.Start];
+        private bool Up => _joypad.GetBit((int)JoypadButton.Up);
+        private bool Down => _joypad.GetBit((int)JoypadButton.Down);
+        private bool Left => _joypad.GetBit((int)JoypadButton.Left);
+        private bool Right => _joypad.GetBit((int)JoypadButton.Right);
+        private bool A => _joypad.GetBit((int)JoypadButton.A);
+        private bool B => _joypad.GetBit((int)JoypadButton.B);
+        private bool Select => _joypad.GetBit((int)JoypadButton.Select);
+        private bool Start => _joypad.GetBit((int)JoypadButton.Start);
 
         public Joypad(Bus bus)
         {
@@ -43,7 +46,7 @@ namespace Atem.Core.Input
                 }
                 else if (!_joyp.GetBit(4))
                 {
-                    return _joyp.SetBit(0, !Right).SetBit(1, !Left).SetBit(2, !Up).SetBit(3, !Down); ;
+                    return _joyp.SetBit(0, !Right).SetBit(1, !Left).SetBit(2, !Up).SetBit(3, !Down);
                 }
                 else
                 {
@@ -58,8 +61,20 @@ namespace Atem.Core.Input
 
         public void OnJoypadChange(JoypadButton button, bool down)
         {
-            _joypad[(int)button] = down;
+            _joypad = _joypad.SetBit((int)button, down);
             _bus.RequestInterrupt(InterruptType.Joypad);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_joypad);
+            writer.Write(_joyp);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _joypad = reader.ReadByte();
+            _joyp = reader.ReadByte();
         }
     }
 }

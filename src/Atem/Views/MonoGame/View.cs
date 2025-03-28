@@ -8,6 +8,7 @@ using Atem.Core;
 using System;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.UI;
+using System.IO;
 
 namespace Atem.Views.MonoGame
 {
@@ -26,6 +27,7 @@ namespace Atem.Views.MonoGame
         private DynamicSoundEffectInstance _soundInstance;
 
         private Config _config;
+        private static string _saveStateFilePath = "save.state";
 
         private bool _debug = false;
         private ImGuiRenderer _imGui;
@@ -59,10 +61,23 @@ namespace Atem.Views.MonoGame
             _menuBar = new MenuBar();
             _menuBar.OnExit += Exit;
             _menuBar.OnDebug += ToggleDebug;
+            _menuBar.OnLoadState += LoadStateData;
+            _menuBar.OnSaveState += SaveStateData;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Processor);
 
             UpdateWindowSize();
+        }
+
+        private void SaveStateData()
+        {
+            File.WriteAllBytes(_saveStateFilePath, _atem.GetState());
+        }
+
+        private void LoadStateData()
+        {
+            byte[] saveStateData = File.ReadAllBytes(_saveStateFilePath);
+            _atem.SetState(saveStateData);
         }
 
         private void UpdateWindowSize()

@@ -10,6 +10,10 @@ namespace Atem.Views.MonoGame.UI
         public event ExitEvent OnExit;
         public delegate void DebugEvent();
         public event DebugEvent OnDebug;
+        public delegate void SaveStateEvent();
+        public event SaveStateEvent OnSaveState;
+        public delegate void LoadStateEvent();
+        public event LoadStateEvent OnLoadState;
 
         public int Height { get => _height; }
 
@@ -22,6 +26,16 @@ namespace Atem.Views.MonoGame.UI
                     if (ImGui.MenuItem("Debug"))
                     {
                         OnDebug?.Invoke();
+                    }
+
+                    if (ImGui.MenuItem("Save State"))
+                    {
+                        OnSaveState?.Invoke();
+                    }
+
+                    if (ImGui.MenuItem("Load State"))
+                    {
+                        OnLoadState?.Invoke();
                     }
 
                     ImGui.Separator();

@@ -1,4 +1,6 @@
 ﻿
+using System.IO;
+
 namespace Atem.Core.Audio.Channel
 {
     public class WaveChannel : AudioChannel
@@ -74,6 +76,26 @@ namespace Atem.Core.Audio.Channel
             }
 
             return 0xFF;
+        }
+
+        public override void GetState(BinaryWriter writer)
+        {
+            writer.Write(_ram);
+            writer.Write(_sampleIndex);
+            writer.Write(_outputLevel);
+            writer.Write(_isOutputting);
+
+            base.GetState(writer);
+        }
+
+        public override void SetState(BinaryReader reader)
+        {
+            _ram = reader.ReadBytes(_ram.Length);
+            _sampleIndex = reader.ReadInt32();
+            _outputLevel = reader.ReadByte();
+            _isOutputting = reader.ReadBoolean();
+
+            base.SetState(reader);
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Atem.Core.State;
+using System;
+using System.IO;
 
 namespace Atem.Core.Audio.Channel
 {
-    public abstract class AudioChannel : IAudioChannel
+    public abstract class AudioChannel : IAudioChannel, IStateful
     {
         private const int PERIOD_UPDATE_PERIOD = 2048; // 512 Hz
         private const int LENGTH_UPDATE_PERIOD = 4096; // 256 Hz
@@ -165,6 +167,43 @@ namespace Atem.Core.Audio.Channel
 
                 OnClock();
             }
+        }
+
+        public virtual void GetState(BinaryWriter writer)
+        {
+            writer.Write(_channelTimer);
+            writer.Write(_periodTimer);
+            writer.Write(_lengthTimer);
+            writer.Write(_volumeEnvelopeTimer);
+            writer.Write(_volume);
+            writer.Write(_channelOn);
+            writer.Write(_lengthEnabled);
+            writer.Write(_initialVolume);
+            writer.Write(_initialPeriod);
+            writer.Write(_volumeEnvelopeDirection);
+            writer.Write(_volumeEnvelopePeriod);
+            writer.Write(_initialLengthTimer);
+            writer.Write(_leftChannel);
+            writer.Write(_rightChannel);
+            writer.Write(_trigger);
+        }
+        public virtual void SetState(BinaryReader reader)
+        {
+            _channelTimer = reader.ReadInt32();
+            _periodTimer = reader.ReadInt32();
+            _lengthTimer = reader.ReadInt32();
+            _volumeEnvelopeTimer = reader.ReadInt32();
+            _volume = reader.ReadByte();
+            _channelOn = reader.ReadBoolean();
+            _lengthEnabled = reader.ReadBoolean();
+            _initialVolume = reader.ReadByte();
+            _initialPeriod = reader.ReadUInt16();
+            _volumeEnvelopeDirection = reader.ReadByte();
+            _volumeEnvelopePeriod = reader.ReadByte();
+            _initialLengthTimer = reader.ReadByte();
+            _leftChannel = reader.ReadBoolean();
+            _rightChannel = reader.ReadBoolean();
+            _trigger = reader.ReadBoolean();
         }
     }
 }

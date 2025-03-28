@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.IO;
 
 namespace Atem.Core.Audio.Channel
 {
@@ -85,6 +86,34 @@ namespace Atem.Core.Audio.Channel
                     _periodSweepTimer = 0;
                 }
             }
+        }
+
+        public override void GetState(BinaryWriter writer)
+        {
+            writer.Write(_sampleIndex);
+            writer.Write(_periodSweepTimer);
+            writer.Write(_periodSweepPeriod);
+            writer.Write(_duty);
+            writer.Write(_initialPeriodSweepPeriod);
+            writer.Write(_periodSweepEnabled);
+            writer.Write(_periodSweepDirection);
+            writer.Write(_periodSweepStep);
+
+            base.GetState(writer);
+        }
+
+        public override void SetState(BinaryReader reader)
+        {
+            _sampleIndex = reader.ReadByte();
+            _periodSweepTimer = reader.ReadInt32();
+            _periodSweepPeriod = reader.ReadByte();
+            _duty = reader.ReadByte();
+            _initialPeriodSweepPeriod = reader.ReadByte();
+            _periodSweepEnabled = reader.ReadBoolean();
+            _periodSweepDirection = reader.ReadByte();
+            _periodSweepStep = reader.ReadByte();
+
+            base.SetState(reader);
         }
     }
 }

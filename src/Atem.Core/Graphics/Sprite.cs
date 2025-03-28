@@ -1,7 +1,10 @@
 ﻿
+using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Graphics
 {
-    public class Sprite
+    public class Sprite : IStateful
     {
         public byte X;
         public byte Y;
@@ -21,6 +24,22 @@ namespace Atem.Core.Graphics
             X = x;
             Tile = tile;
             Flags = flags;
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(X);
+            writer.Write(Y);
+            writer.Write(Tile);
+            writer.Write(Flags);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            X = reader.ReadByte();
+            Y = reader.ReadByte();
+            Tile = reader.ReadByte();
+            Flags = reader.ReadByte();
         }
     }
 }

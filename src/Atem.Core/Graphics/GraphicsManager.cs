@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Atem.Core.Processing;
+using Atem.Core.State;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Atem.Core.Graphics
 {
@@ -12,7 +15,7 @@ namespace Atem.Core.Graphics
         Draw
     }
 
-    public class GraphicsManager
+    public class GraphicsManager : IStateful
     {
         public static float FrameRate = 59.73f;
 
@@ -23,44 +26,45 @@ namespace Atem.Core.Graphics
         private byte[] _vram = new byte[0x4000];
         private GBColor[] _screen = new GBColor[160 * 144];
         private Sprite[] _objects = new Sprite[40];
-        private int _objectIndex = 0;
-
+        private int _objectIndex;
         private bool _windowWasTriggeredThisFrame;
         private bool _justEnteredHorizontalBlank;
+        private bool _currentlyOnLineY;
+        private byte _odma;
+        RenderMode _mode;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
-
-        public bool Enabled = false;
-        public int WindowTileMapArea = 0;
-        public int BackgroundTileMapArea = 0;
-        public int TileDataArea = 0;
-        public bool WindowEnabled = false;
-        public bool LargeObjects = false;
-        public bool ObjectsEnabled = false;
-        public bool BackgroundAndWindowEnabledOrPriority = false;
-        public bool InterruptOnLineY = false;
-        public bool InterruptOnOAM = false;
-        public bool InterruptOnVerticalBlank = false;
-        public bool InterruptOnHorizontalBlank = false;
-        public int ScreenX = 0;
-        public int ScreenY = 0;
-        public int WindowX = 0;
-        public int WindowY = 0;
-        public byte CurrentLine = 0;
-        public byte CurrentWindowLine = 0;
-        public int LineYToCompare = 0;
+        public bool Enabled;
+        public int WindowTileMapArea;
+        public int BackgroundTileMapArea;
+        public int TileDataArea;
+        public bool WindowEnabled;
+        public bool LargeObjects;
+        public bool ObjectsEnabled;
+        public bool BackgroundAndWindowEnabledOrPriority;
+        public bool InterruptOnLineY;
+        public bool InterruptOnOAM;
+        public bool InterruptOnVerticalBlank;
+        public bool InterruptOnHorizontalBlank;
+        public int ScreenX;
+        public int ScreenY;
+        public int WindowX;
+        public int WindowY;
+        public byte CurrentLine;
+        public byte CurrentWindowLine;
+        public int LineYToCompare;
         public PaletteGroup TilePalettes = new PaletteGroup();
         public PaletteGroup ObjectPalettes = new PaletteGroup();
         public PaletteGroup DMGPalettes = new PaletteGroup();
-        public ushort SourceAddressDMA = 0;
-        public ushort DestAddressDMA = 0;
-        public byte TransferLengthRemaining = 0;
-        public bool TransferActive = false;
-        public bool HorizontalBlankTransferActive = false;
-        public bool HorizontalBlankTransfer = false;
+        public ushort SourceAddressDMA;
+        public ushort DestAddressDMA;
+        public byte TransferLengthRemaining;
+        public bool TransferActive;
+        public bool HorizontalBlankTransferActive;
+        public bool HorizontalBlankTransfer;
 
-        private bool _currentlyOnLineY;
+        public byte Bank { get; set; }
 
         public bool CurrentlyOnLineY
         {
@@ -78,8 +82,6 @@ namespace Atem.Core.Graphics
                 _currentlyOnLineY = value;
             }
         }
-
-        private byte _odma;
 
         public byte ODMA
         {
@@ -103,8 +105,6 @@ namespace Atem.Core.Graphics
                 _odma = value;
             }
         }
-
-        RenderMode _mode;
 
         public RenderMode Mode
         {
@@ -144,8 +144,6 @@ namespace Atem.Core.Graphics
                 _mode = value;
             }
         }
-
-        public byte Bank { get; set; }
 
         public GraphicsManager(Bus bus)
         {
@@ -629,6 +627,138 @@ namespace Atem.Core.Graphics
                     }
                 }
             }
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_spriteBuffer.Count);
+            foreach (Sprite sprite in _spriteBuffer)
+            {
+                writer.Write(sprite.X);
+                writer.Write(sprite.Y);
+                writer.Write(sprite.Tile);
+                writer.Write(sprite.Flags);
+            }
+
+            writer.Write(_lineDotCount);
+            writer.Write(_linePixel);
+            writer.Write(_vram);
+
+            foreach (GBColor pixel in _screen)
+            {
+                writer.Write(pixel.Color);
+            }
+
+            foreach (Sprite sprite in _objects)
+            {
+                sprite.GetState(writer);
+            }
+
+            writer.Write(_objectIndex);
+            writer.Write(_windowWasTriggeredThisFrame);
+            writer.Write(_justEnteredHorizontalBlank);
+
+            writer.Write(Enabled);
+            writer.Write(WindowTileMapArea);
+            writer.Write(BackgroundTileMapArea);
+            writer.Write(TileDataArea);
+            writer.Write(WindowEnabled);
+            writer.Write(LargeObjects);
+            writer.Write(ObjectsEnabled);
+            writer.Write(BackgroundAndWindowEnabledOrPriority);
+            writer.Write(InterruptOnLineY);
+            writer.Write(InterruptOnOAM);
+            writer.Write(InterruptOnVerticalBlank);
+            writer.Write(InterruptOnHorizontalBlank);
+            writer.Write(ScreenX);
+            writer.Write(ScreenY);
+            writer.Write(WindowX);
+            writer.Write(WindowY);
+            writer.Write(CurrentLine);
+            writer.Write(CurrentWindowLine);
+            writer.Write(LineYToCompare);
+
+            TilePalettes.GetState(writer);
+            ObjectPalettes.GetState(writer);
+            DMGPalettes.GetState(writer);
+
+            writer.Write(SourceAddressDMA);
+            writer.Write(DestAddressDMA);
+            writer.Write(TransferLengthRemaining);
+            writer.Write(TransferActive);
+            writer.Write(HorizontalBlankTransferActive);
+            writer.Write(HorizontalBlankTransfer);
+
+            writer.Write(_currentlyOnLineY);
+            writer.Write(_odma);
+            writer.Write((byte)_mode);
+            writer.Write(Bank);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _spriteBuffer.Clear();
+            int spriteBufferCount = reader.ReadInt32();
+            for (int i = 0; i < spriteBufferCount; i++)
+            {
+                Sprite sprite = new();
+                sprite.SetState(reader);
+                _spriteBuffer.Add(sprite);
+            }
+
+            _lineDotCount = reader.ReadInt32();
+            _linePixel = reader.ReadByte();
+            _vram = reader.ReadBytes(_vram.Length);
+
+            foreach (GBColor pixel in _screen)
+            {
+                pixel.Color = reader.ReadUInt16();
+            }
+
+            foreach (Sprite sprite in _objects)
+            {
+                sprite.SetState(reader);
+            }
+
+            _objectIndex = reader.ReadInt32();
+            _windowWasTriggeredThisFrame = reader.ReadBoolean();
+            _justEnteredHorizontalBlank = reader.ReadBoolean();
+
+            Enabled = reader.ReadBoolean();
+            WindowTileMapArea = reader.ReadInt32();
+            BackgroundTileMapArea = reader.ReadInt32();
+            TileDataArea = reader.ReadInt32();
+            WindowEnabled = reader.ReadBoolean();
+            LargeObjects = reader.ReadBoolean();
+            ObjectsEnabled = reader.ReadBoolean();
+            BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
+            InterruptOnLineY = reader.ReadBoolean();
+            InterruptOnOAM = reader.ReadBoolean();
+            InterruptOnVerticalBlank = reader.ReadBoolean();
+            InterruptOnHorizontalBlank = reader.ReadBoolean();
+            ScreenX = reader.ReadInt32();
+            ScreenY = reader.ReadInt32();
+            WindowX = reader.ReadInt32();
+            WindowY = reader.ReadInt32();
+            CurrentLine = reader.ReadByte();
+            CurrentWindowLine = reader.ReadByte();
+            LineYToCompare = reader.ReadInt32();
+
+            TilePalettes.SetState(reader);
+            ObjectPalettes.SetState(reader);
+            DMGPalettes.SetState(reader);
+
+            SourceAddressDMA = reader.ReadUInt16();
+            DestAddressDMA = reader.ReadUInt16();
+            TransferLengthRemaining = reader.ReadByte();
+            TransferActive = reader.ReadBoolean();
+            HorizontalBlankTransferActive = reader.ReadBoolean();
+            HorizontalBlankTransfer = reader.ReadBoolean();
+
+            _currentlyOnLineY = reader.ReadBoolean();
+            _odma = reader.ReadByte();
+            _mode = (RenderMode)reader.ReadByte();
+            Bank = reader.ReadByte();
         }
     }
 }

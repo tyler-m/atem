@@ -1,4 +1,6 @@
 ﻿
+using System.IO;
+
 namespace Atem.Core.Audio.Channel
 {
     internal class NoiseChannel : AudioChannel
@@ -67,6 +69,28 @@ namespace Atem.Core.Audio.Channel
                 _shiftRegister = _shiftRegister.SetBit(7, result);
             }
             _shiftRegister >>= 1;
+        }
+
+        public override void GetState(BinaryWriter writer)
+        {
+            writer.Write(_shiftTimer);
+            writer.Write(_shiftRegister);
+            writer.Write(_clockShift);
+            writer.Write(_shiftRegisterMode);
+            writer.Write(_clockDivider);
+
+            base.GetState(writer);
+        }
+
+        public override void SetState(BinaryReader reader)
+        {
+            _shiftTimer = reader.ReadInt32();
+            _shiftRegister = reader.ReadUInt16();
+            _clockShift = reader.ReadByte();
+            _shiftRegisterMode = reader.ReadByte();
+            _clockDivider = reader.ReadByte();
+
+            base.SetState(reader);
         }
     }
 }

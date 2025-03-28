@@ -2,10 +2,11 @@
 using System.IO;
 using System.Text;
 using Atem.Core.Memory.Mapper;
+using Atem.Core.State;
 
 namespace Atem.Core.Memory
 {
-    public class Cartridge
+    public class Cartridge : IStateful
     {
         private string _filepath;
         private byte _type;
@@ -162,6 +163,24 @@ namespace Atem.Core.Memory
         public void WriteRAM(ushort address, byte value)
         {
             _mbc.WriteRAM((ushort)(address - 0xA000), value);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_type);
+            writer.Write(_colorFlag);
+            writer.Write(Loaded);
+
+            _mbc.GetState(writer);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _type = reader.ReadByte();
+            _colorFlag = reader.ReadByte();
+            Loaded = reader.ReadBoolean();
+
+            _mbc.SetState(reader);
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿
+using Atem.Core.State;
+
 namespace Atem.Core.Memory.Mapper
 {
-    public interface IMapper
+    public interface IMapper : IStateful
     {
         public byte[] RAM { get; set; }
         public void Init(byte type, byte[] rom, int ramSize);

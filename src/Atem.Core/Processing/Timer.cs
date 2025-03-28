@@ -1,7 +1,9 @@
-﻿
+﻿using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Processing
 {
-    public class Timer
+    public class Timer : IStateful
     {
         // should probably be incrementing _div every clock
         // and bit shifting it on read instead of using the
@@ -134,6 +136,26 @@ namespace Atem.Core.Processing
                     _timaTick = 0;
                 }
             }
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_div);
+            writer.Write(_tima);
+            writer.Write(_tma);
+            writer.Write(_tac);
+            writer.Write(_divTick);
+            writer.Write(_timaTick);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _div = reader.ReadByte();
+            _tima = reader.ReadByte();
+            _tma = reader.ReadByte();
+            _tac = reader.ReadByte();
+            _divTick = reader.ReadInt32();
+            _timaTick = reader.ReadInt32();
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Atem.Core.State;
+using System;
+using System.IO;
 
 namespace Atem.Core.Memory.Mapper
 {
-    internal class RTC
+    internal class RTC : IStateful
     {
         private int _seconds, _minutes, _hours, _day;
         private bool _halt, _dayCarry;
@@ -151,6 +153,32 @@ namespace Atem.Core.Memory.Mapper
                     _day %= 512;
                 }
             }
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_seconds);
+            writer.Write(_minutes);
+            writer.Write(_hours);
+            writer.Write(_day);
+            writer.Write(_halt);
+            writer.Write(_dayCarry);
+            writer.Write(_secondsElapsed);
+            writer.Write(_lastUnixTimestamp);
+            writer.Write(Latched);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _seconds = reader.ReadInt32();
+            _minutes = reader.ReadInt32();
+            _hours = reader.ReadInt32();
+            _day = reader.ReadInt32();
+            _halt = reader.ReadBoolean();
+            _dayCarry = reader.ReadBoolean();
+            _secondsElapsed = reader.ReadDouble();
+            _lastUnixTimestamp = reader.ReadInt64();
+            Latched = reader.ReadBoolean();
         }
     }
 }

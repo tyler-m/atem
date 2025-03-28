@@ -1,7 +1,9 @@
-﻿
+﻿using Atem.Core.State;
+using System.IO;
+
 namespace Atem.Core.Graphics
 {
-    public class GBColor
+    public class GBColor : IStateful
     {
         private byte _red;
         private byte _green;
@@ -79,6 +81,16 @@ namespace Atem.Core.Graphics
         public void SetLowByte(byte value)
         {
             Color = Color.SetLowByte(value);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(Color);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            Color = reader.ReadUInt16();
         }
     }
 }

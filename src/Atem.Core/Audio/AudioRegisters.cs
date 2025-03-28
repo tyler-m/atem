@@ -59,8 +59,6 @@ namespace Atem.Core.Audio
             }
         }
 
-        private byte _nr52;
-
         public byte NR52
         {
             set
@@ -82,15 +80,15 @@ namespace Atem.Core.Audio
                     NR44 = 0;
                 }
 
-                _nr52 = _nr52.SetBit(7, value.GetBit(7));
+                _manager.On = value.GetBit(7);
             }
             get
             {
-                return (byte)((_nr52.GetBit(7) ? 1 : 0) << 7 | (Channel4.IsOn ? 1 : 0) << 3 | (Channel3.IsOn ? 1 : 0) << 2 | (Channel2.IsOn ? 1 : 0) << 1 | (Channel1.IsOn ? 1 : 0));
+                return (byte)((On ? 1 : 0) << 7 | (Channel4.IsOn ? 1 : 0) << 3 | (Channel3.IsOn ? 1 : 0) << 2 | (Channel2.IsOn ? 1 : 0) << 1 | (Channel1.IsOn ? 1 : 0));
             }
         }
 
-        private bool On { get { return NR52.GetBit(7); } }
+        private bool On { get => _manager.On; }
 
         public byte NR10
         {

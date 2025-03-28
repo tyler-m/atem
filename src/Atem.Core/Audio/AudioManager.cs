@@ -1,11 +1,13 @@
 ﻿using Atem.Core.Audio.Channel;
 using Atem.Core.Audio.Filter;
 using Atem.Core.Processing;
+using Atem.Core.State;
 using System;
+using System.IO;
 
 namespace Atem.Core.Audio
 {
-    public class AudioManager
+    public class AudioManager: IStateful
     {
         private const float MAX_VOLUME = 15.0f;
         private const int BUFFER_SIZE = 2048;
@@ -34,7 +36,7 @@ namespace Atem.Core.Audio
         public delegate void FullAudioBufferEvent(byte[] buffer);
         public event FullAudioBufferEvent OnFullBuffer;
 
-        private bool On { get { return Registers.NR52.GetBit(7); } }
+        public bool On { get; set; }
 
         public AudioManager()
         {
@@ -107,6 +109,40 @@ namespace Atem.Core.Audio
         public byte ReadWaveRAM(byte index)
         {
             return Channel3.ReadRAM(index);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_buffer);
+            writer.Write(_sampleTimer);
+            writer.Write(_bufferIndex);
+            writer.Write(_sampleTimerRemainder);
+            writer.Write(_leftChannelVolume);
+            writer.Write(_rightChannelVolume);
+
+            Channel1.GetState(writer);
+            Channel2.GetState(writer);
+            Channel3.GetState(writer);
+            Channel4.GetState(writer);
+
+            writer.Write(On);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _buffer = reader.ReadBytes(_buffer.Length);
+            _sampleTimer = reader.ReadInt32();
+            _bufferIndex = reader.ReadInt32();
+            _sampleTimerRemainder = reader.ReadSingle();
+            _leftChannelVolume = reader.ReadByte();
+            _rightChannelVolume = reader.ReadByte();
+
+            Channel1.SetState(reader);
+            Channel2.SetState(reader);
+            Channel3.SetState(reader);
+            Channel4.SetState(reader);
+
+            On = reader.ReadBoolean();
         }
     }
 }
