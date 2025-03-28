@@ -5,7 +5,7 @@ using Atem.Core.Memory.Mapper;
 
 namespace Atem.Core.Memory
 {
-    internal class Cartridge
+    public class Cartridge
     {
         private string _filepath;
         private byte _type;
