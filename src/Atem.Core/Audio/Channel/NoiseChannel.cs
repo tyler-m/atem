@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Atem.Core.Audio.Channel
 {
-    internal class NoiseChannel : AudioChannel
+    public class NoiseChannel : AudioChannel
     {
         private const int SHIFT_REGISTER_MODE_7BIT = 1;
 

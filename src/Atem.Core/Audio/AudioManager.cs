@@ -1,9 +1,9 @@
-﻿using Atem.Core.Audio.Channel;
+﻿using System;
+using System.IO;
+using Atem.Core.Audio.Channel;
 using Atem.Core.Audio.Filter;
 using Atem.Core.Processing;
 using Atem.Core.State;
-using System;
-using System.IO;
 
 namespace Atem.Core.Audio
 {
@@ -14,28 +14,26 @@ namespace Atem.Core.Audio
 
         public const int SAMPLE_RATE = 44100;
 
-        private AudioChannelMixer _mixer = new AudioChannelMixer();
+        private readonly AudioChannelMixer _mixer = new();
         private byte[] _buffer = new byte[BUFFER_SIZE];
         private int _sampleTimer = 0;
         private int _bufferIndex = 0;
         private float _sampleTimerRemainder = 0.0f;
-        private float _samplePeriod = Processor.Frequency / SAMPLE_RATE;
-
+        private readonly float _samplePeriod = Processor.Frequency / SAMPLE_RATE;
         private byte _leftChannelVolume = 0;
         private byte _rightChannelVolume = 0;
 
-        public byte LeftChannelVolume { get { return _leftChannelVolume; } set { _leftChannelVolume = value; } }
-        public byte RightChannelVolume { get { return _rightChannelVolume; } set { _rightChannelVolume = value; } }
-
-        internal PulseChannel Channel1 = new PulseChannel(true);
-        internal PulseChannel Channel2 = new PulseChannel();
-        internal WaveChannel Channel3 = new WaveChannel();
-        internal NoiseChannel Channel4 = new NoiseChannel();
+        public readonly PulseChannel Channel1 = new(true);
+        public readonly PulseChannel Channel2 = new();
+        public readonly WaveChannel Channel3 = new();
+        public readonly NoiseChannel Channel4 = new();
 
         public AudioRegisters Registers;
         public delegate void FullAudioBufferEvent(byte[] buffer);
         public event FullAudioBufferEvent OnFullBuffer;
 
+        public byte LeftChannelVolume { get => _leftChannelVolume; set => _leftChannelVolume = value; }
+        public byte RightChannelVolume { get => _rightChannelVolume; set => _rightChannelVolume = value; }
         public bool On { get; set; }
 
         public AudioManager()

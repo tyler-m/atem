@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Atem.Core.Audio.Channel
 {
-    internal class PulseChannel : AudioChannel
+    public class PulseChannel : AudioChannel
     {
         private const int PERIOD_SWEEP_UPDATE_PERIOD = 8192; // 128 Hz
 
