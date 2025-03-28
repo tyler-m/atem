@@ -3,9 +3,9 @@ namespace Atem.Core.Audio.Filter
 {
     internal class LowPassFilter : IAudioFilter
     {
-        private float _prevLeftChannelOut = 0.0f;
-        private float _prevRightChannelOut = 0.0f;
-        private float _factor = 0.0f;
+        private float _prevLeftChannelOut;
+        private float _prevRightChannelOut;
+        private readonly float _factor;
 
         public LowPassFilter(float factor)
         {

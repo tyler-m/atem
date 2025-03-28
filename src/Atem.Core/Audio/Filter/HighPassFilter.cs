@@ -2,15 +2,15 @@
 namespace Atem.Core.Audio.Filter
 {
     /// <summary>
-    /// Useful for centering waveform to 0.0
+    /// Filters out lower frequencies from an audio channel. Has the side-effect of centering a waveform about 0.0f
     /// </summary>
     internal class HighPassFilter : IAudioFilter
     {
-        float _prevLeftChannelIn = 0.0f;
-        float _prevLeftChannelOut = 0.0f;
-        float _prevRightChannelIn = 0.0f;
-        float _prevRightChannelOut = 0.0f;
-        float _factor = 1.0f;
+        private float _prevLeftChannelIn;
+        private float _prevLeftChannelOut;
+        private float _prevRightChannelIn;
+        private float _prevRightChannelOut;
+        private readonly float _factor = 1.0f;
 
         public HighPassFilter(float factor)
         {
