@@ -4,9 +4,14 @@ namespace Atem.Core.Debugging
 {
     public class Breakpoint : IComparable<Breakpoint>
     {
-        public ushort Address;
-        public bool Enabled;
-        public int HitCount;
+        private ushort _address;
+        private bool _enabled;
+        private int _hitCount;
+
+        public ushort Address { get => _address; set => _address = value; }
+        public bool Enabled { get => _enabled; set => _enabled = value; }
+        public ref bool EnabledRef { get => ref _enabled; }
+        public int HitCount { get => _hitCount; set => _hitCount = value; }
 
         public Breakpoint(ushort address, bool enabled = true)
         {

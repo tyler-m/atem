@@ -1,14 +1,17 @@
-﻿using Atem.Core.Debugging;
-using ImGuiNET;
+﻿using System;
+using System.Text;
+using System.Globalization;
 using System.Collections.Generic;
+using ImGuiNET;
+using Atem.Core.Debugging;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
-    internal class BreakpointWindow
+    public class BreakpointWindow
     {
-        private byte[] _inputAddressText = new byte[5];
-        private Debugger _debugger;
-        private Dictionary<Breakpoint, bool> _selected = [];
+        private readonly byte[] _inputAddressText = new byte[5];
+        private readonly Debugger _debugger;
+        private readonly Dictionary<Breakpoint, bool> _selected = [];
 
         public BreakpointWindow(Debugger debugger)
         {
@@ -25,8 +28,8 @@ namespace Atem.Views.MonoGame.UI.Window
 
             if (ImGui.Button("Add"))
             {
-                int nullTerminatorIndex = System.Array.IndexOf(_inputAddressText, (byte)0);
-                ushort value = ushort.Parse(System.Text.Encoding.ASCII.GetString(_inputAddressText, 0, nullTerminatorIndex), System.Globalization.NumberStyles.HexNumber);
+                int nullTerminatorIndex = Array.IndexOf(_inputAddressText, (byte)0);
+                ushort value = ushort.Parse(Encoding.ASCII.GetString(_inputAddressText, 0, nullTerminatorIndex), NumberStyles.HexNumber);
                 Breakpoint breakpoint = _debugger.AddBreakpoint(value);
 
                 if (breakpoint != null)
@@ -51,7 +54,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Checkbox("##Breakpoint" + i, ref breakpoint.Enabled);
+                    ImGui.Checkbox("##Breakpoint" + i, ref breakpoint.EnabledRef);
                     ImGui.SameLine();
                     if (ImGui.Selectable(address.ToString($"X{4}"), _selected[breakpoint], ImGuiSelectableFlags.SpanAllColumns))
                     {
