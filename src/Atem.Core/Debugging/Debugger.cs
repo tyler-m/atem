@@ -1,23 +1,22 @@
-﻿using Atem.Core.Processing;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Atem.Core.Debugging
 {
     public class Debugger
     {
-        Dictionary<ushort, Breakpoint> _breakpointAddressHashset = [];
-        List<Breakpoint> _breakpoints = [];
+        private readonly Dictionary<ushort, Breakpoint> _breakpointAddressHashset = [];
+        private readonly List<Breakpoint> _breakpoints = [];
+        private bool _active;
 
-        public bool Active { get; set; }
+        public bool Active { get => _active; set => _active = value; }
+        public int BreakpointCount { get => _breakpoints.Count; }
 
         public delegate void OnBreakpointEvent(ushort address);
         public OnBreakpointEvent OnBreakpoint;
 
-        public int BreakpointCount { get => _breakpoints.Count; }
-
         public Breakpoint AddBreakpoint(ushort address)
         {
-            Breakpoint breakpoint = new Breakpoint(address);
+            Breakpoint breakpoint = new(address);
 
             if (_breakpointAddressHashset.ContainsKey(address))
             {
