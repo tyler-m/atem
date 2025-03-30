@@ -29,11 +29,12 @@ Progress
 - [X] Save
   - [X] Save and load emulator states
   - [X] Battery saves
-- [X] Debug
+- [ ] Debug
   - [X] Step-through debugging
   - [X] Memory view
   - [X] CPU register view
   - [X] Address based breakpoints
+  - [ ] Conditional breakpoints
 
 Notes
 ---
