@@ -17,27 +17,27 @@ namespace Atem.Views.MonoGame
     {
         private const float ScreenRefreshRate = 59.73f;
 
-        private GraphicsDeviceManager _graphics;
+        private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
 
-        private AtemRunner _atem;
-        private Color[] _screenData;
+        private readonly AtemRunner _atem;
+        private readonly Color[] _screenData;
         private Texture2D _screenTexture;
         private DynamicSoundEffectInstance _soundInstance;
 
-        private Config _config;
-        private static string _saveStateFilePath = "save.state";
+        private readonly Config _config;
+        private string _loadedFilePath;
 
         private bool _debug = false;
         private ImGuiRenderer _imGui;
-        private FileExplorerWindow _fileExplorerWindow;
+        private readonly FileExplorerWindow _fileExplorerWindow;
         private GameDisplayWindow _gameDisplayWindow;
-        private MemoryWindow _memoryWindow;
-        private BreakpointWindow _breakpointWindow;
-        private ProcessorRegistersWindow _processorRegistersWindow;
-        private MenuBar _menuBar;
+        private readonly MemoryWindow _memoryWindow;
+        private readonly BreakpointWindow _breakpointWindow;
+        private readonly ProcessorRegistersWindow _processorRegistersWindow;
+        private readonly MenuBar _menuBar;
 
         public View(AtemRunner atem, Config config)
         {
@@ -72,15 +72,20 @@ namespace Atem.Views.MonoGame
             UpdateWindowSize();
         }
 
-        private void SaveStateData()
+        private void SaveStateData(int slot)
         {
-            File.WriteAllBytes(_saveStateFilePath, _atem.GetState());
+            File.WriteAllBytes(_loadedFilePath + ".ss" + slot, _atem.GetState());
         }
 
-        private void LoadStateData()
+        private void LoadStateData(int slot)
         {
-            byte[] saveStateData = File.ReadAllBytes(_saveStateFilePath);
-            _atem.SetState(saveStateData);
+            string stateSavePath = _loadedFilePath + ".ss" + slot;
+            
+            if (File.Exists(stateSavePath))
+            {
+                byte[] saveStateData = File.ReadAllBytes(stateSavePath);
+                _atem.SetState(saveStateData);
+            }
         }
 
         private void UpdateWindowSize()
@@ -110,12 +115,14 @@ namespace Atem.Views.MonoGame
             UpdateWindowSize();
         }
 
-        public void LoadFile(string filePath)
+        public void LoadFile(FileInfo fileInfo)
         {
-            if (_atem.Load(filePath))
+            if (_atem.Load(fileInfo.FullName))
             {
                 _atem.Paused = false;
                 _fileExplorerWindow.Active = false;
+                _menuBar.EnableStates = true;
+                _loadedFilePath = fileInfo.FullName;
             }
         }
 
@@ -145,8 +152,8 @@ namespace Atem.Views.MonoGame
             _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
             _soundInstance.Play();
 
-            Texture2D highlightTexture = new Texture2D(GraphicsDevice, 1, 1);
-            highlightTexture.SetData(new[] { Color.White });
+            Texture2D highlightTexture = new(GraphicsDevice, 1, 1);
+            highlightTexture.SetData([Color.White]);
         }
 
         protected override void LoadContent()
@@ -249,6 +256,8 @@ namespace Atem.Views.MonoGame
 
             ImGui.DockSpaceOverViewport(ImGui.GetID("Root"), ImGui.GetWindowViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
 
+            _menuBar.Draw();
+
             if (!_debug)
             {
                 _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
@@ -270,14 +279,12 @@ namespace Atem.Views.MonoGame
                 _fileExplorerWindow.Draw();
             }
 
-            _menuBar.Draw();
-
             _imGui.EndDraw();
 
             base.Draw(gameTime);
         }
 
-        private Color GBColorToColor(GBColor gbColor)
+        private static Color GBColorToColor(GBColor gbColor)
         {
             float r = gbColor.Red / 31.0f;
             float g = gbColor.Green / 31.0f;

@@ -5,17 +5,20 @@ namespace Atem.Views.MonoGame.UI
     internal class MenuBar
     {
         private int _height = 19;
+        private bool _enableStates;
 
         public delegate void ExitEvent();
         public event ExitEvent OnExit;
         public delegate void DebugEvent();
         public event DebugEvent OnDebug;
-        public delegate void SaveStateEvent();
+        public delegate void SaveStateEvent(int slot);
         public event SaveStateEvent OnSaveState;
-        public delegate void LoadStateEvent();
+        public delegate void LoadStateEvent(int slot);
         public event LoadStateEvent OnLoadState;
 
         public int Height { get => _height; }
+
+        public bool EnableStates { get => _enableStates; set => _enableStates = value; }
 
         public void Draw()
         {
@@ -28,14 +31,28 @@ namespace Atem.Views.MonoGame.UI
                         OnDebug?.Invoke();
                     }
 
-                    if (ImGui.MenuItem("Save State"))
+                    if (ImGui.BeginMenu("Save State", _enableStates))
                     {
-                        OnSaveState?.Invoke();
+                        for (int i = 0; i < 10; i++)
+                        {
+                            if (ImGui.MenuItem("Slot " + i))
+                            {
+                                OnSaveState?.Invoke(i);
+                            }
+                        }
+                        ImGui.EndMenu();
                     }
 
-                    if (ImGui.MenuItem("Load State"))
+                    if (ImGui.BeginMenu("Load State", _enableStates))
                     {
-                        OnLoadState?.Invoke();
+                        for (int i = 0; i < 10; i++)
+                        {
+                            if (ImGui.MenuItem("Slot " + i))
+                            {
+                                OnLoadState?.Invoke(i);
+                            }
+                        }
+                        ImGui.EndMenu();
                     }
 
                     ImGui.Separator();

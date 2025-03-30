@@ -9,7 +9,7 @@ namespace Atem.Views.MonoGame.UI.Window
         private DirectoryInfo _cwd;
         private DirectoryInfo _directory;
 
-        public delegate void SelectFileEvent(string filePath);
+        public delegate void SelectFileEvent(FileInfo fileInfo);
         public event SelectFileEvent OnSelectFile;
 
         public bool Active { get; set; }
@@ -22,13 +22,13 @@ namespace Atem.Views.MonoGame.UI.Window
             Height = height;
             Active = active;
 
-            _cwd = new DirectoryInfo(Directory.GetCurrentDirectory());
+            _cwd = new DirectoryInfo(Directory.GetCurrentDirectory() + "/roms");
             _directory = new DirectoryInfo(_cwd.FullName);
         }
 
         private void SelectFile(FileInfo file)
         {
-            OnSelectFile?.Invoke(file.FullName);
+            OnSelectFile?.Invoke(file);
         }
 
         private void SelectDirectory(DirectoryInfo directory)
@@ -38,11 +38,9 @@ namespace Atem.Views.MonoGame.UI.Window
 
         public void Draw()
         {
-            ImGui.SetNextWindowSize(new Vector2(Width, Height), ImGuiCond.Always);
-            ImGui.SetNextWindowPos(new Vector2(0, 0), ImGuiCond.Always);
+            ImGui.SetNextWindowDockID(ImGui.GetID("Root"));
 
             ImGui.Begin("File Explorer", ImGuiWindowFlags.NoMove
-                | ImGuiWindowFlags.NoDocking
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoSavedSettings
                 | ImGuiWindowFlags.NoCollapse);
