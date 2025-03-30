@@ -67,6 +67,8 @@ namespace Atem.Views.MonoGame
             };
 
             PrepareFont();
+
+            ImGui.GetIO().ConfigFlags |= ImGuiConfigFlags.DockingEnable;
         }
 
         private void PrepareFont()

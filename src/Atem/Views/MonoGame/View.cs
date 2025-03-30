@@ -1,14 +1,15 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ImGuiNET;
 using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core;
-using System;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.UI;
-using System.IO;
 
 namespace Atem.Views.MonoGame
 {
@@ -40,6 +41,8 @@ namespace Atem.Views.MonoGame
 
         public View(AtemRunner atem, Config config)
         {
+            Window.AllowUserResizing = false;
+
             _atem = atem;
             _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
@@ -86,11 +89,13 @@ namespace Atem.Views.MonoGame
             {
                 _graphics.PreferredBackBufferWidth = 960;
                 _graphics.PreferredBackBufferHeight = 720;
+                Window.AllowUserResizing = true;
             }
             else
             {
                 _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
                 _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor) + _menuBar.Height;
+                Window.AllowUserResizing = false;
             }
 
             _fileExplorerWindow.Width = _graphics.PreferredBackBufferWidth;
@@ -241,6 +246,8 @@ namespace Atem.Views.MonoGame
             GraphicsDevice.Clear(Color.Black);
 
             _imGui.BeginDraw(gameTime);
+
+            ImGui.DockSpaceOverViewport(ImGui.GetID("Root"), ImGui.GetWindowViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
 
             if (!_debug)
             {
