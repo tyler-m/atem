@@ -11,16 +11,13 @@ namespace Atem.Core.Memory
         private string _filepath;
         private byte _type;
         private byte _colorFlag;
+        private bool _loaded;
+        private string _title;
+        private IMapper _mbc;
 
-        public bool Loaded;
-        public string Title;
-
-        public IMapper _mbc;
-
-        public bool SupportsColor
-        {
-            get => _colorFlag == 0x80 || _colorFlag == 0xC0;
-        }
+        public bool Loaded { get => _loaded; set => _loaded = value; }
+        public string Title { get => _title; set => _title = value; }
+        public bool SupportsColor { get => _colorFlag == 0x80 || _colorFlag == 0xC0; }
 
         public void SaveRAM()
         {
@@ -29,7 +26,7 @@ namespace Atem.Core.Memory
 
         public bool Load(string filepath)
         {
-            Loaded = false;
+            _loaded = false;
 
             if (!File.Exists(filepath))
             {
@@ -49,13 +46,13 @@ namespace Atem.Core.Memory
                 return false;
             }
 
-            Title = string.Empty;
+            _title = string.Empty;
             for (ushort address = 0x0134; address <= 0x0143; address++)
             {
                 byte c = rom[address];
                 if (c != 0)
                 {
-                    Title += Encoding.UTF8.GetString(new byte[] { c });
+                    _title += Encoding.UTF8.GetString([c]);
                 }
                 else
                 {
@@ -101,7 +98,7 @@ namespace Atem.Core.Memory
                 _mbc = new MBC3();
                 _mbc.Init(_type, rom, ramSizeInBytes);
             }
-            else if (_type >= 0x19 && _type <= 0x1E)
+            else if (_type >= 0x19 && _type <= 0x1E) // MBC5
             {
                 _mbc = new MBC5();
                 _mbc.Init(_type, rom, ramSizeInBytes);
@@ -130,8 +127,8 @@ namespace Atem.Core.Memory
             }
 
             _filepath = filepath;
-            Loaded = true;
-            return Loaded;
+            _loaded = true;
+            return _loaded;
         }
 
         public byte ReadROM(ushort address)
@@ -169,7 +166,7 @@ namespace Atem.Core.Memory
         {
             writer.Write(_type);
             writer.Write(_colorFlag);
-            writer.Write(Loaded);
+            writer.Write(_loaded);
 
             _mbc.GetState(writer);
         }
@@ -178,7 +175,7 @@ namespace Atem.Core.Memory
         {
             _type = reader.ReadByte();
             _colorFlag = reader.ReadByte();
-            Loaded = reader.ReadBoolean();
+            _loaded = reader.ReadBoolean();
 
             _mbc.SetState(reader);
         }

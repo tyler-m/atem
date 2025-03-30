@@ -1,19 +1,18 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 
 namespace Atem.Core.Memory.Mapper
 {
     internal class MBC3 : IMapper
     {
-        private byte _type = 0;
+        private byte _type;
         private byte[] _rom;
         private byte[] _ram;
         private bool _ramEnable = false;
         private int _romBank = 1;
         private int _ramBank = 0;
-        private RTC _rtc = new RTC();
-        private RTC _rtcLatched = new RTC();
+        private RTC _rtc = new();
+        private RTC _rtcLatched = new();
         private byte _latch = 0;
 
         public byte[] RAM { get => _ram; set => _ram = value; }

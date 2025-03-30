@@ -5,7 +5,7 @@ namespace Atem.Core.Memory.Mapper
 {
     internal class MBC1 : IMapper
     {
-        private byte _type = 0;
+        private byte _type;
         private byte[] _rom;
         private byte[] _ram;
         private bool _ramEnable = false;
