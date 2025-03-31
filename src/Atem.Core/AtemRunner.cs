@@ -22,10 +22,6 @@ namespace Atem.Core
 
         public Bus Bus { get =>  _bus; }
 
-        public Processor Processor { get => _bus.Processor; }
-
-        public Timer Timer { get => _bus.Timer; }
-
         public bool Paused { get; set; }
 
         public ViewHelper ViewHelper { get; private set; }
@@ -247,8 +243,8 @@ namespace Atem.Core
             using MemoryStream stream = new();
             using BinaryWriter writer = new(stream);
 
-            Processor.GetState(writer);
-            Timer.GetState(writer);
+            Bus.Processor.GetState(writer);
+            Bus.Timer.GetState(writer);
             Bus.Interrupt.GetState(writer);
             Bus.Joypad.GetState(writer);
             Bus.Serial.GetState(writer);
@@ -267,8 +263,8 @@ namespace Atem.Core
             using MemoryStream stream = new(saveStateData);
             using BinaryReader reader = new(stream);
 
-            Processor.SetState(reader);
-            Timer.SetState(reader);
+            Bus.Processor.SetState(reader);
+            Bus.Timer.SetState(reader);
             Bus.Interrupt.SetState(reader);
             Bus.Joypad.SetState(reader);
             Bus.Serial.SetState(reader);
