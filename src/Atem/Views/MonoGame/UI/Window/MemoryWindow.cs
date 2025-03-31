@@ -44,7 +44,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                         for (int column = 0; column < _bytesPerRow; column++)
                         {
-                            int value = _atem.ViewHelper.PeekAt(baseAddress + column);
+                            int value = _atem.Bus.Read((ushort)(baseAddress + column));
                             ImGui.SameLine();
                             if (value != 0)
                             {
@@ -61,7 +61,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                         for (int column = 0; column < _bytesPerRow; column++)
                         {
-                            int value = _atem.ViewHelper.PeekAt(baseAddress + column);
+                            int value = _atem.Bus.Read((ushort)(baseAddress + column));
                             ImGui.SameLine();
                             if (value >= 32 && value <= 126)
                             {
