@@ -182,7 +182,7 @@ namespace Atem.Core.Memory.Mapper
             }
         }
 
-        public byte[] ExportSave()
+        public byte[] GetBatterySave()
         {
             byte[] saveFile = new byte[RAM.Length + 48];
             byte[] rtcData = new byte[48];
@@ -214,6 +214,19 @@ namespace Atem.Core.Memory.Mapper
             Array.Copy(RAM, saveFile, RAM.Length);
             Array.Copy(rtcData, 0, saveFile, RAM.Length, rtcData.Length);
             return saveFile;
+        }
+
+        public void LoadBatterySave(byte[] saveData)
+        {
+            Array.Copy(saveData, _ram, _ram.Length);
+
+            // RTC data is appended at the end of a save file and is 48 bytes long
+            if (saveData.Length - _ram.Length == 48)
+            {
+                byte[] rtcData = new byte[48];
+                Array.Copy(saveData, saveData.Length - 48, rtcData, 0, 48);
+                LoadRTCFromSaveData(rtcData);
+            }
         }
 
         public void GetState(BinaryWriter writer)

@@ -242,11 +242,6 @@ namespace Atem.Core
             _bus.Joypad.OnJoypadChange(button, down);
         }
 
-        public void OnExit()
-        {
-            _bus.SaveCartridgeRAM();
-        }
-
         public byte[] GetState()
         {
             using MemoryStream stream = new();

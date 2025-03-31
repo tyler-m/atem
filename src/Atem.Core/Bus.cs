@@ -80,14 +80,6 @@ namespace Atem.Core
             return _cartridge.Load(filepath);
         }
 
-        public void SaveCartridgeRAM()
-        {
-            if (_cartridge != null && _cartridge.Loaded)
-            {
-                _cartridge.SaveRAM();
-            }
-        }
-
         public byte Read(ushort address)
         {
             byte block = address.GetHighByte();

@@ -96,9 +96,14 @@ namespace Atem.Core.Memory.Mapper
             }
         }
 
-        public byte[] ExportSave()
+        public byte[] GetBatterySave()
         {
-            return RAM;
+            return _ram;
+        }
+
+        public void LoadBatterySave(byte[] saveData)
+        {
+            _ram = saveData;
         }
 
         public void GetState(BinaryWriter writer)

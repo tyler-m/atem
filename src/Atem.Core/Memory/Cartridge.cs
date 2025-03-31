@@ -15,13 +15,18 @@ namespace Atem.Core.Memory
         private string _title;
         private IMapper _mbc;
 
-        public bool Loaded { get => _loaded; set => _loaded = value; }
-        public string Title { get => _title; set => _title = value; }
+        public bool Loaded { get => _loaded; }
+        public string Title { get => _title; }
         public bool SupportsColor { get => _colorFlag == 0x80 || _colorFlag == 0xC0; }
 
-        public void SaveRAM()
+        public byte[] GetBatterySave()
         {
-            File.WriteAllBytes(_filepath + ".sav", _mbc.ExportSave());
+            return _mbc.GetBatterySave();
+        }
+
+        public void LoadBatterySave(byte[] saveData)
+        {
+            _mbc.LoadBatterySave(saveData);
         }
 
         public bool Load(string filepath)
@@ -106,24 +111,6 @@ namespace Atem.Core.Memory
             else
             {
                 return false;
-            }
-
-            // check if cartridge RAM has been saved for this game
-            if (File.Exists(filepath + ".sav"))
-            {
-                byte[] saveFile = File.ReadAllBytes(filepath + ".sav");
-                Array.Copy(saveFile, _mbc.RAM, _mbc.RAM.Length);
-
-                // RTC data is appended at the end of a save file and is 48 bytes long
-                if (saveFile.Length - ramSizeInBytes == 48)
-                {
-                    if (_mbc is MBC3 c)
-                    {
-                        byte[] rtcData = new byte[48];
-                        Array.Copy(saveFile, saveFile.Length - 48, rtcData, 0, 48);
-                        c.LoadRTCFromSaveData(rtcData);
-                    }
-                }
             }
 
             _filepath = filepath;

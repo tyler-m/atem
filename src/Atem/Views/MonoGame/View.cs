@@ -117,8 +117,18 @@ namespace Atem.Views.MonoGame
 
         public void LoadFile(FileInfo fileInfo)
         {
-            if (_atem.Load(fileInfo.FullName))
+            string filePath = fileInfo.FullName;
+
+            if (_atem.Load(filePath))
             {
+                string savePath = filePath + ".sav";
+
+                if (File.Exists(savePath))
+                {
+                    byte[] saveData = File.ReadAllBytes(savePath);
+                    _atem.Bus.Cartridge.LoadBatterySave(saveData);
+                }
+
                 _atem.Paused = false;
                 _fileExplorerWindow.Active = false;
                 _menuBar.EnableStates = true;
@@ -128,7 +138,7 @@ namespace Atem.Views.MonoGame
 
         private void OnExit(object sender, EventArgs e)
         {
-            _atem.OnExit();
+            File.WriteAllBytes(_loadedFilePath + ".sav", _atem.Bus.Cartridge.GetBatterySave());
         }
 
         private void OnFullAudioBuffer(byte[] buffer)

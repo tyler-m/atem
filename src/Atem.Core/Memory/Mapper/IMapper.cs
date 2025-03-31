@@ -12,6 +12,7 @@ namespace Atem.Core.Memory.Mapper
         public byte ReadRAM(ushort address);
         public void WriteRAM(ushort address, byte value);
         public void WriteRegister(ushort address, byte value);
-        public byte[] ExportSave();
+        public byte[] GetBatterySave();
+        public void LoadBatterySave(byte[] saveData);
     }
 }
