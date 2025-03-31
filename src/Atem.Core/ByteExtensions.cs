@@ -1,5 +1,5 @@
 ﻿
-namespace Atem
+namespace Atem.Core
 {
     internal static class ByteExtensions
     {
