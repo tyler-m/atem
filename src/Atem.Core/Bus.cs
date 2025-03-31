@@ -20,28 +20,17 @@ namespace Atem.Core
         private byte[] _hram = new byte[0x7F];
         private byte[] _wram = new byte[0x2000 * 4];
 
-        public byte[] HRAM { get => _hram; }
-        
-        public byte[] WRAM { get => _wram; }
-
         public byte SVBK = 0;
-
+        public byte[] HRAM { get => _hram; }
+        public byte[] WRAM { get => _wram; }
         public Processor Processor { get => _processor; }
-
         public Timer Timer { get => _timer; }
-
         public AudioManager Audio { get => _audio; }
-
         public GraphicsManager Graphics { get => _graphics; }
-
         public Joypad Joypad { get => _joypad; }
-
         public Serial Serial { get => _serial; }
-
         public Interrupt Interrupt { get => _interrupt; }
-
         public Cartridge Cartridge { get => _cartridge; }
-
         public Bus()
         {
             _processor = new Processor(this);
@@ -56,17 +45,6 @@ namespace Atem.Core
         public bool ColorMode
         {
             get => _cartridge.SupportsColor;
-        }
-
-        public void SetComponents(Processor processor, GraphicsManager graphics, Timer timer, Interrupt interrupt, Joypad joypad, Serial serial, AudioManager audio)
-        {
-            _processor = processor;
-            _graphics = graphics;
-            _timer = timer;
-            _interrupt = interrupt;
-            _joypad = joypad;
-            _serial = serial;
-            _audio = audio;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
@@ -682,16 +660,6 @@ namespace Atem.Core
         internal void RequestInterrupt(InterruptType interruptType)
         {
             _interrupt.SetInterrupt(interruptType);
-        }
-
-        internal void Halt()
-        {
-            _processor.RequestHalt();
-        }
-
-        internal void Unhalt()
-        {
-            _processor.RequestUnhalt();
         }
     }
 }
