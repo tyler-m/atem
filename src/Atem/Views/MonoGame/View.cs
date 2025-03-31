@@ -66,10 +66,16 @@ namespace Atem.Views.MonoGame
             _menuBar.OnDebug += ToggleDebug;
             _menuBar.OnLoadState += LoadStateData;
             _menuBar.OnSaveState += SaveStateData;
+            _menuBar.OnOpen += OnOpen;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
 
             UpdateWindowSize();
+        }
+
+        private void OnOpen()
+        {
+            _fileExplorerWindow.Active = true;
         }
 
         private void SaveStateData(int slot)

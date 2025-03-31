@@ -16,7 +16,7 @@ namespace Atem.Views.MonoGame.UI.Window
         public int Width { get; set; }
         public int Height { get; set; }
 
-        public FileExplorerWindow( int width, int height, bool active = true)
+        public FileExplorerWindow( int width, int height, bool active = false)
         {
             Width = width;
             Height = height;
@@ -66,9 +66,12 @@ namespace Atem.Views.MonoGame.UI.Window
 
             foreach (FileInfo file in _directory.EnumerateFiles())
             {
-                if (ImGui.Selectable(file.Name))
+                if (file.Name.ToLower().EndsWith(".gb") || file.Name.ToLower().EndsWith(".gbc"))
                 {
-                    SelectFile(file);
+                    if (ImGui.Selectable(file.Name))
+                    {
+                        SelectFile(file);
+                    }
                 }
             }
 

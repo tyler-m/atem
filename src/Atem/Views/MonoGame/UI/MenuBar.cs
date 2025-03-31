@@ -15,6 +15,8 @@ namespace Atem.Views.MonoGame.UI
         public event SaveStateEvent OnSaveState;
         public delegate void LoadStateEvent(int slot);
         public event LoadStateEvent OnLoadState;
+        public delegate void OnOpenEvent();
+        public event OnOpenEvent OnOpen;
 
         public int Height { get => _height; }
 
@@ -26,6 +28,11 @@ namespace Atem.Views.MonoGame.UI
             {
                 if (ImGui.BeginMenu("File"))
                 {
+                    if (ImGui.MenuItem("Open"))
+                    {
+                        OnOpen?.Invoke();
+                    }
+
                     if (ImGui.MenuItem("Debug"))
                     {
                         OnDebug?.Invoke();
