@@ -40,6 +40,7 @@ namespace Atem.Core
             _joypad = new Joypad(this);
             _serial = new Serial();
             _interrupt = new Interrupt();
+            _cartridge = new Cartridge();
         }
 
         public bool ColorMode

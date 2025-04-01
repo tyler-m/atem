@@ -3,24 +3,21 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using ImGuiNET;
 using Atem.Core.Graphics;
-using Atem.Core.Input;
 using Atem.Core;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.UI;
+using Atem.Views.MonoGame.Input;
 
 namespace Atem.Views.MonoGame
 {
-    internal class View : Game
+    public class View : Game
     {
         private const float ScreenRefreshRate = 59.73f;
 
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private KeyboardState _currentKeyboardState;
-        private KeyboardState _previousKeyboardState;
 
         private readonly AtemRunner _atem;
         private readonly Color[] _screenData;
@@ -38,6 +35,9 @@ namespace Atem.Views.MonoGame
         private readonly BreakpointWindow _breakpointWindow;
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
+        private readonly InputManager _inputManager;
+
+        public AtemRunner Atem { get => _atem; }
 
         public View(AtemRunner atem, Config config)
         {
@@ -69,6 +69,7 @@ namespace Atem.Views.MonoGame
             _menuBar.OnOpen += OnOpen;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
+            _inputManager = new InputManager();
 
             UpdateWindowSize();
         }
@@ -144,7 +145,10 @@ namespace Atem.Views.MonoGame
 
         private void OnExit(object sender, EventArgs e)
         {
-            File.WriteAllBytes(_loadedFilePath + ".sav", _atem.Bus.Cartridge.GetBatterySave());
+            if (_atem.Bus.Cartridge.Loaded)
+            {
+                File.WriteAllBytes(_loadedFilePath + ".sav", _atem.Bus.Cartridge.GetBatterySave());
+            }
         }
 
         private void OnFullAudioBuffer(byte[] buffer)
@@ -182,83 +186,7 @@ namespace Atem.Views.MonoGame
 
         protected override void Update(GameTime gameTime)
         {
-            _previousKeyboardState = _currentKeyboardState;
-            _currentKeyboardState = Keyboard.GetState();
-
-            if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
-            {
-                _atem.Paused = !_atem.Paused;
-            }
-
-            if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up))
-            {
-                _atem.OnJoypadChange(JoypadButton.Up, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Up) && _previousKeyboardState.IsKeyDown(Keys.Up))
-            {
-                _atem.OnJoypadChange(JoypadButton.Up, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down))
-            {
-                _atem.OnJoypadChange(JoypadButton.Down, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Down) && _previousKeyboardState.IsKeyDown(Keys.Down))
-            {
-                _atem.OnJoypadChange(JoypadButton.Down, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Left) && !_previousKeyboardState.IsKeyDown(Keys.Left))
-            {
-                _atem.OnJoypadChange(JoypadButton.Left, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Left) && _previousKeyboardState.IsKeyDown(Keys.Left))
-            {
-                _atem.OnJoypadChange(JoypadButton.Left, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Right) && !_previousKeyboardState.IsKeyDown(Keys.Right))
-            {
-                _atem.OnJoypadChange(JoypadButton.Right, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Right) && _previousKeyboardState.IsKeyDown(Keys.Right))
-            {
-                _atem.OnJoypadChange(JoypadButton.Right, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.X) && !_previousKeyboardState.IsKeyDown(Keys.X))
-            {
-                _atem.OnJoypadChange(JoypadButton.A, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.X) && _previousKeyboardState.IsKeyDown(Keys.X))
-            {
-                _atem.OnJoypadChange(JoypadButton.A, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Z) && !_previousKeyboardState.IsKeyDown(Keys.Z))
-            {
-                _atem.OnJoypadChange(JoypadButton.B, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Z) && _previousKeyboardState.IsKeyDown(Keys.Z))
-            {
-                _atem.OnJoypadChange(JoypadButton.B, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Back) && !_previousKeyboardState.IsKeyDown(Keys.Back))
-            {
-                _atem.OnJoypadChange(JoypadButton.Select, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Back) && _previousKeyboardState.IsKeyDown(Keys.Back))
-            {
-                _atem.OnJoypadChange(JoypadButton.Select, false);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
-            {
-                _atem.OnJoypadChange(JoypadButton.Start, true);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.Enter) && _previousKeyboardState.IsKeyDown(Keys.Enter))
-            {
-                _atem.OnJoypadChange(JoypadButton.Start, false);
-            }
-            if (!_currentKeyboardState.IsKeyDown(Keys.F5) && _previousKeyboardState.IsKeyDown(Keys.F5))
-            {
-                _atem.Continue();
-            }
-
+            _inputManager.Update(this);
             _atem.Update();
 
             base.Update(gameTime);
