@@ -28,9 +28,9 @@ namespace Atem.Views.MonoGame
             set
             {
                 _commands = InputManager.DefaultCommands();
-                foreach ((ICommand command, HashSet<Keys> keys) in _commands)
+                foreach ((ICommand command, HashSet<Keys> _) in _commands)
                 {
-                    if (value.TryGetValue(command.Name, out var test))
+                    if (value.TryGetValue(command.Name, out var keys))
                     {
                         _commands[command] = keys;
                     }
