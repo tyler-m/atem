@@ -70,7 +70,7 @@ namespace Atem.Core
             }
             else if (block <= 0x7F) // cartridge ROM
             {
-                if (_cartridge != null)
+                if (_cartridge.Loaded)
                 {
                     return _cartridge.ReadROM(address);
                 }
