@@ -1,19 +1,31 @@
-﻿using Atem.Views.MonoGame.Input;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
+using Atem.Views.MonoGame.Input;
 
 namespace Atem.Views.MonoGame
 {
     public class Config
     {
+        private string _filePath;
+        Dictionary<ICommand, HashSet<Keys>> _commands = [];
+
         public int ScreenWidth { get; set; }
         public int ScreenHeight { get; set; }
         public float ScreenSizeFactor { get; set; }
         public string RomsDirectory { get; set; }
 
-        Dictionary<ICommand, HashSet<Keys>> _commands = [];
+        public Dictionary<ICommand, HashSet<Keys>> GetCommands()
+        {
+            return _commands;
+        }
+
+        public void SetCommands(Dictionary<ICommand, HashSet<Keys>> commands)
+        {
+            _commands = commands;
+        }
+
         public Dictionary<string, HashSet<Keys>> Commands
         {
             get
@@ -38,9 +50,33 @@ namespace Atem.Views.MonoGame
             }
         }
 
-        public Config()
+        public Config() { }
+
+        public Config(string filePath)
         {
-            _commands = InputManager.DefaultCommands();
+            _filePath = filePath;
+            Load();
+        }
+
+        private void Load()
+        {
+            if (!File.Exists(_filePath))
+            {
+                throw new FileNotFoundException("Config file not found.");
+            }
+
+            Config config = JsonSerializer.Deserialize<Config>(File.ReadAllText(_filePath));
+            ScreenWidth = config.ScreenWidth;
+            ScreenHeight = config.ScreenHeight;
+            ScreenSizeFactor = config.ScreenSizeFactor;
+            RomsDirectory = config.RomsDirectory;
+            Commands = config.Commands;
+        }
+
+        public void Save()
+        {
+            JsonSerializerOptions options = new() { WriteIndented = true };
+            File.WriteAllText(_filePath, JsonSerializer.Serialize(this, options));
         }
 
         public static void CreateDefault(string configPath)
@@ -50,19 +86,10 @@ namespace Atem.Views.MonoGame
             config.ScreenHeight = 144;
             config.ScreenSizeFactor = 2.0f;
             config.RomsDirectory = "roms/";
+            config.Commands = [];
 
             JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
             File.WriteAllText(configPath, JsonSerializer.Serialize(config, options));
-        }
-
-        public static Config Load(string configPath)
-        {
-            if (!File.Exists(configPath))
-            {
-                throw new FileNotFoundException("Config file not found.");
-            }
-
-            return JsonSerializer.Deserialize<Config>(File.ReadAllText(configPath));
         }
     }
 }

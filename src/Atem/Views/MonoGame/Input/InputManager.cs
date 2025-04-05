@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using Atem.Views.MonoGame.Input.Command;
+using System.Linq;
 
 namespace Atem.Views.MonoGame.Input
 {
@@ -9,6 +10,11 @@ namespace Atem.Views.MonoGame.Input
         private KeyboardState _currentKeyboardState;
         private KeyboardState _previousKeyboardState;
         private Dictionary<ICommand, HashSet<Keys>> _commands = [];
+        private ICommand _rebinding;
+
+        public ICommand Rebinding { get => _rebinding; set => _rebinding = value; }
+
+        public Dictionary<ICommand, HashSet<Keys>> Commands { get => _commands; set => _commands = value; }
 
         public InputManager()
         {
@@ -37,17 +43,33 @@ namespace Atem.Views.MonoGame.Input
             _previousKeyboardState = _currentKeyboardState;
             _currentKeyboardState = Keyboard.GetState();
 
-            foreach ((ICommand command, HashSet<Keys> keys) in _commands)
+            if (_rebinding != null)
             {
-                foreach (Keys key in keys)
+                List<Keys> pressedKeys = _currentKeyboardState.GetPressedKeys()
+                    .Where(key => !_previousKeyboardState.IsKeyDown(key))
+                    .ToList();
+
+                if (pressedKeys.Count > 0)
                 {
-                    if (_currentKeyboardState.IsKeyDown(key) && !_previousKeyboardState.IsKeyDown(key))
+                    _commands[_rebinding].Clear();
+                    _commands[_rebinding].Add(pressedKeys.First());
+                    _rebinding = null;
+                }
+            }
+            else
+            {
+                foreach ((ICommand command, HashSet<Keys> keys) in _commands)
+                {
+                    foreach (Keys key in keys)
                     {
-                        command.Execute(view, true);
-                    }
-                    else if (!_currentKeyboardState.IsKeyDown(key) && _previousKeyboardState.IsKeyDown(key))
-                    {
-                        command.Execute(view, false);
+                        if (_currentKeyboardState.IsKeyDown(key) && !_previousKeyboardState.IsKeyDown(key))
+                        {
+                            command.Execute(view, true);
+                        }
+                        else if (!_currentKeyboardState.IsKeyDown(key) && _previousKeyboardState.IsKeyDown(key))
+                        {
+                            command.Execute(view, false);
+                        }
                     }
                 }
             }

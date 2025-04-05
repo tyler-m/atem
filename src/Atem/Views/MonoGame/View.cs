@@ -25,6 +25,11 @@ namespace Atem.Views.MonoGame
         private DynamicSoundEffectInstance _soundInstance;
 
         private readonly Config _config;
+        private int _screenWidth;
+        private int _screenHeight;
+        private float _screenSizeFactor;
+        private string _romsDirectory;
+
         private string _loadedFilePath;
 
         private bool _debug = false;
@@ -36,19 +41,28 @@ namespace Atem.Views.MonoGame
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
         private readonly InputManager _inputManager;
+        private readonly RebindWindow _rebindWindow;
 
         public AtemRunner Atem { get => _atem; }
 
         public View(AtemRunner atem, Config config)
         {
+            _inputManager = new InputManager();
+
+            _config = config;
+            _screenWidth = config.ScreenWidth;
+            _screenHeight = config.ScreenHeight;
+            _screenSizeFactor = config.ScreenSizeFactor;
+            _romsDirectory = config.RomsDirectory;
+            _inputManager.Commands = config.GetCommands();
+
             Window.AllowUserResizing = false;
 
             _atem = atem;
             _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
             _atem.OnFullAudioBuffer += OnFullAudioBuffer;
-            _config = config;
-            _screenData = new Color[config.ScreenWidth * _config.ScreenHeight];
+            _screenData = new Color[_screenWidth * _screenHeight];
 
             _graphics = new GraphicsDeviceManager(this);
 
@@ -69,7 +83,7 @@ namespace Atem.Views.MonoGame
             _menuBar.OnOpen += OnOpen;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
-            _inputManager = new InputManager();
+            _rebindWindow = new RebindWindow(_inputManager);
 
             UpdateWindowSize();
         }
@@ -147,6 +161,14 @@ namespace Atem.Views.MonoGame
             {
                 File.WriteAllBytes(_loadedFilePath + ".sav", _atem.Bus.Cartridge.GetBatterySave());
             }
+
+            // update config values before saving
+            _config.ScreenWidth = _screenWidth;
+            _config.ScreenHeight = _screenHeight;
+            _config.ScreenSizeFactor = _screenSizeFactor;
+            _config.RomsDirectory = _romsDirectory;
+            _config.SetCommands(_inputManager.Commands);
+            _config.Save();
         }
 
         private void OnFullAudioBuffer(byte[] buffer)
@@ -177,9 +199,9 @@ namespace Atem.Views.MonoGame
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _screenTexture = new Texture2D(GraphicsDevice, _config.ScreenWidth, _config.ScreenHeight);
+            _screenTexture = new Texture2D(GraphicsDevice, _screenWidth, _screenHeight);
             nint screenTextureId = _imGui.BindTexture(_screenTexture);
-            _gameDisplayWindow = new GameDisplayWindow(screenTextureId, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor));
+            _gameDisplayWindow = new GameDisplayWindow(screenTextureId, (int)(_screenWidth * _screenSizeFactor), (int)(_screenHeight * _screenSizeFactor));
         }
 
         protected override void Update(GameTime gameTime)
@@ -204,8 +226,8 @@ namespace Atem.Views.MonoGame
             {
                 _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
                 _spriteBatch.Draw(_screenTexture,
-                    new Rectangle(0, _menuBar.Height, (int)(_config.ScreenWidth * _config.ScreenSizeFactor), (int)(_config.ScreenHeight * _config.ScreenSizeFactor)),
-                    new Rectangle(0, 0, _config.ScreenWidth, _config.ScreenHeight), Color.White);
+                    new Rectangle(0, _menuBar.Height, (int)(_screenWidth * _screenSizeFactor), (int)(_screenHeight * _screenSizeFactor)),
+                    new Rectangle(0, 0, _screenWidth, _screenHeight), Color.White);
                 _spriteBatch.End();
             }
             else
@@ -214,6 +236,7 @@ namespace Atem.Views.MonoGame
                 _gameDisplayWindow.Draw();
                 _breakpointWindow.Draw();
                 _processorRegistersWindow.Draw();
+                _rebindWindow.Draw();
             }
 
             if (_fileExplorerWindow.Active)

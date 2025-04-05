@@ -20,7 +20,7 @@ namespace Atem.Views.MonoGame
             // load config. if it doesn't exist, create it using defaults
             try
             {
-                _config = Config.Load(Directory.GetCurrentDirectory() + "/config.json");
+                _config = new Config(Directory.GetCurrentDirectory() + "/config.json");
             }
             catch
             {
@@ -28,7 +28,7 @@ namespace Atem.Views.MonoGame
 
                 try
                 {
-                    _config = Config.Load(Directory.GetCurrentDirectory() + "/config.json");
+                    _config = new Config(Directory.GetCurrentDirectory() + "/config.json");
                 }
                 catch
                 {
