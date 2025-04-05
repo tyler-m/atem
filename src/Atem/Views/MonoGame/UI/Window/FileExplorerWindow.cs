@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using System.IO;
+﻿using System.IO;
 using ImGuiNET;
 
 namespace Atem.Views.MonoGame.UI.Window
@@ -13,13 +12,9 @@ namespace Atem.Views.MonoGame.UI.Window
         public event SelectFileEvent OnSelectFile;
 
         public bool Active { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
 
-        public FileExplorerWindow( int width, int height, bool active = false)
+        public FileExplorerWindow(bool active = false)
         {
-            Width = width;
-            Height = height;
             Active = active;
 
             _cwd = new DirectoryInfo(Directory.GetCurrentDirectory() + "/roms");

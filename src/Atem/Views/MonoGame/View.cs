@@ -58,7 +58,7 @@ namespace Atem.Views.MonoGame
 
             Exiting += OnExit;
 
-            _fileExplorerWindow = new FileExplorerWindow(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight);
+            _fileExplorerWindow = new FileExplorerWindow();
             _fileExplorerWindow.OnSelectFile += LoadFile;
             _memoryWindow = new MemoryWindow(_atem);
             _menuBar = new MenuBar();
@@ -105,13 +105,11 @@ namespace Atem.Views.MonoGame
             }
             else
             {
-                _graphics.PreferredBackBufferWidth = (int)(_config.ScreenWidth * _config.ScreenSizeFactor);
-                _graphics.PreferredBackBufferHeight = (int)(_config.ScreenHeight * _config.ScreenSizeFactor) + _menuBar.Height;
+                _graphics.PreferredBackBufferWidth = (int)(_screenWidth * _screenSizeFactor);
+                _graphics.PreferredBackBufferHeight = (int)(_screenHeight * _screenSizeFactor) + _menuBar.Height;
                 Window.AllowUserResizing = false;
             }
 
-            _fileExplorerWindow.Width = _graphics.PreferredBackBufferWidth;
-            _fileExplorerWindow.Height = _graphics.PreferredBackBufferHeight;
             _graphics.ApplyChanges();
         }
 
