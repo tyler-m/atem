@@ -9,6 +9,7 @@ using Atem.Core;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.Input;
+using Atem.Views.Audio;
 
 namespace Atem.Views.MonoGame
 {
@@ -22,7 +23,7 @@ namespace Atem.Views.MonoGame
         private readonly AtemRunner _atem;
         private readonly Color[] _screenData;
         private Texture2D _screenTexture;
-        private DynamicSoundEffectInstance _soundInstance;
+        private readonly ISoundService _soundService;
 
         private readonly Config _config;
         private int _screenWidth;
@@ -47,9 +48,10 @@ namespace Atem.Views.MonoGame
         public InputManager InputManager { get => _inputManager; }
         public float ScreenSizeFactor { get => _screenSizeFactor; set => _screenSizeFactor = value; }
 
-        public View(AtemRunner atem, Config config)
+        public View(AtemRunner atem, Config config, ISoundService soundService)
         {
             _atem = atem;
+            _soundService = soundService;
 
             _inputManager = new InputManager();
 
@@ -60,7 +62,7 @@ namespace Atem.Views.MonoGame
 
             _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
-            _atem.OnFullAudioBuffer += OnFullAudioBuffer;
+            _atem.OnFullAudioBuffer += _soundService.SubmitBuffer;
             _screenData = new Color[_screenWidth * _screenHeight];
 
             _graphics = new GraphicsDeviceManager(this);
@@ -210,8 +212,7 @@ namespace Atem.Views.MonoGame
 
             base.Initialize();
 
-            _soundInstance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
-            _soundInstance.Play();
+            _soundService.Play();
 
             Texture2D highlightTexture = new(GraphicsDevice, 1, 1);
             highlightTexture.SetData([Color.White]);

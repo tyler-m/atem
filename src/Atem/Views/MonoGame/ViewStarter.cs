@@ -1,4 +1,6 @@
 ﻿using Atem.Core;
+using Atem.Views.Audio;
+using Atem.Views.MonoGame.Audio;
 using System;
 using System.IO;
 
@@ -49,7 +51,8 @@ namespace Atem.Views.MonoGame
                 }
             }
 
-            _view = new View(_atem, _config);
+            ISoundService soundService = new SoundService();
+            _view = new View(_atem, _config, soundService);
             _view.Run();
         }
     }
