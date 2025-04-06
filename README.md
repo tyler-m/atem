@@ -24,7 +24,7 @@ Progress
   - [X] Real-time Clock support for MBC3 cartridges
 - [ ] Input
   - [ ] Serial communication
-  - [ ] Control rebinding
+  - [X] Control rebinding
   - [ ] Gamepad support
 - [X] Save
   - [X] Save and load emulator states
