@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework.Input;
 using ImGuiNET;
 using Atem.Views.MonoGame.Input;
@@ -10,6 +11,7 @@ namespace Atem.Views.MonoGame.UI.Window
         private readonly View _view;
         private bool _active;
         private float _volume;
+        private int _selectedScreenSizeFactor;
 
         public bool Active { get => _active; set => _active = value; }
 
@@ -20,6 +22,7 @@ namespace Atem.Views.MonoGame.UI.Window
         {
             _view = view;
             _volume = view.Atem.Bus.Audio.UserVolumeFactor * 100;
+            _selectedScreenSizeFactor = Math.Clamp((int)_view.ScreenSizeFactor - 1, 0, 5);
         }
 
         public void Draw()
@@ -76,6 +79,22 @@ namespace Atem.Views.MonoGame.UI.Window
                 {
                     _view.Atem.Bus.Audio.UserVolumeFactor = _volume / 100;
                     _volume = _view.Atem.Bus.Audio.UserVolumeFactor * 100;
+                }
+
+                ImGui.EndChild();
+                ImGui.EndTabItem();
+            }
+
+            if (ImGui.BeginTabItem("Video"))
+            {
+                ImGui.BeginChild("VideoChild");
+
+                ImGui.Text("Screen Size");
+                ImGui.SameLine();
+                if (ImGui.Combo("##ScreenSizeFactor", ref _selectedScreenSizeFactor, "1x\02x\03x\04x\05x\06x"))
+                {
+                    _view.ScreenSizeFactor = _selectedScreenSizeFactor + 1;
+                    _view.UpdateWindowSize();
                 }
 
                 ImGui.EndChild();

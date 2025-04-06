@@ -45,6 +45,7 @@ namespace Atem.Views.MonoGame
 
         public AtemRunner Atem { get => _atem; }
         public InputManager InputManager { get => _inputManager; }
+        public float ScreenSizeFactor { get => _screenSizeFactor; set => _screenSizeFactor = value; }
 
         public View(AtemRunner atem, Config config)
         {
@@ -133,7 +134,7 @@ namespace Atem.Views.MonoGame
             }
         }
 
-        private void UpdateWindowSize()
+        public void UpdateWindowSize()
         {
             if (_debug)
             {
@@ -221,7 +222,7 @@ namespace Atem.Views.MonoGame
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _screenTexture = new Texture2D(GraphicsDevice, _screenWidth, _screenHeight);
             nint screenTextureId = _imGui.BindTexture(_screenTexture);
-            _gameDisplayWindow = new GameDisplayWindow(screenTextureId, (int)(_screenWidth * _screenSizeFactor), (int)(_screenHeight * _screenSizeFactor));
+            _gameDisplayWindow = new GameDisplayWindow(this, screenTextureId, (int)(_screenWidth), (int)(_screenHeight));
         }
 
         protected override void Update(GameTime gameTime)
