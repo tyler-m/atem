@@ -7,11 +7,12 @@ namespace Atem.Views.MonoGame.UI.Window
     {
         private DirectoryInfo _cwd;
         private DirectoryInfo _directory;
+        private bool _active;
 
         public delegate void SelectFileEvent(FileInfo fileInfo);
         public event SelectFileEvent OnSelectFile;
 
-        public bool Active { get; set; }
+        public bool Active { get => _active; set => _active = value; }
 
         public FileExplorerWindow(bool active = false)
         {
@@ -35,7 +36,7 @@ namespace Atem.Views.MonoGame.UI.Window
         {
             ImGui.SetNextWindowDockID(ImGui.GetID("Root"));
 
-            ImGui.Begin("File Explorer", ImGuiWindowFlags.NoMove
+            ImGui.Begin("File Explorer", ref _active, ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoSavedSettings
                 | ImGuiWindowFlags.NoCollapse);

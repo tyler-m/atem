@@ -41,24 +41,22 @@ namespace Atem.Views.MonoGame
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
         private readonly InputManager _inputManager;
-        private readonly RebindWindow _rebindWindow;
+        private readonly OptionsWindow _optionsWindow;
 
         public AtemRunner Atem { get => _atem; }
+        public InputManager InputManager { get => _inputManager; }
 
         public View(AtemRunner atem, Config config)
         {
+            _atem = atem;
+
             _inputManager = new InputManager();
 
             _config = config;
-            _screenWidth = config.ScreenWidth;
-            _screenHeight = config.ScreenHeight;
-            _screenSizeFactor = config.ScreenSizeFactor;
-            _romsDirectory = config.RomsDirectory;
-            _inputManager.Commands = config.GetCommands();
+            LoadConfigValues();
 
             Window.AllowUserResizing = false;
 
-            _atem = atem;
             _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
             _atem.OnFullAudioBuffer += OnFullAudioBuffer;
@@ -81,11 +79,37 @@ namespace Atem.Views.MonoGame
             _menuBar.OnLoadState += LoadStateData;
             _menuBar.OnSaveState += SaveStateData;
             _menuBar.OnOpen += OnOpen;
+            _menuBar.OnOptions += OnOptions;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
-            _rebindWindow = new RebindWindow(_inputManager);
+            _optionsWindow = new OptionsWindow(this);
 
             UpdateWindowSize();
+        }
+
+        private void LoadConfigValues()
+        {
+            _screenWidth = _config.ScreenWidth;
+            _screenHeight = _config.ScreenHeight;
+            _screenSizeFactor = _config.ScreenSizeFactor;
+            _romsDirectory = _config.RomsDirectory;
+            _inputManager.Commands = _config.GetCommands();
+            _atem.Bus.Audio.UserVolumeFactor = _config.UserVolumeFactor;
+        }
+
+        private void SetConfigValues()
+        {
+            _config.ScreenWidth = _screenWidth;
+            _config.ScreenHeight = _screenHeight;
+            _config.ScreenSizeFactor = _screenSizeFactor;
+            _config.RomsDirectory = _romsDirectory;
+            _config.SetCommands(_inputManager.Commands);
+            _config.UserVolumeFactor = _atem.Bus.Audio.UserVolumeFactor;
+        }
+
+        private void OnOptions()
+        {
+            _optionsWindow.Active = true;
         }
 
         private void OnOpen()
@@ -163,11 +187,7 @@ namespace Atem.Views.MonoGame
             }
 
             // update config values before saving
-            _config.ScreenWidth = _screenWidth;
-            _config.ScreenHeight = _screenHeight;
-            _config.ScreenSizeFactor = _screenSizeFactor;
-            _config.RomsDirectory = _romsDirectory;
-            _config.SetCommands(_inputManager.Commands);
+            SetConfigValues();
             _config.Save();
         }
 
@@ -236,12 +256,16 @@ namespace Atem.Views.MonoGame
                 _gameDisplayWindow.Draw();
                 _breakpointWindow.Draw();
                 _processorRegistersWindow.Draw();
-                _rebindWindow.Draw();
             }
 
             if (_fileExplorerWindow.Active)
             {
                 _fileExplorerWindow.Draw();
+            }
+
+            if (_optionsWindow.Active)
+            {
+                _optionsWindow.Draw();
             }
 
             _imGui.EndDraw();

@@ -22,6 +22,16 @@ namespace Atem.Core.Audio
         private readonly float _samplePeriod = Processor.Frequency / SAMPLE_RATE;
         private byte _leftChannelVolume = 0;
         private byte _rightChannelVolume = 0;
+        private float _userVolumeFactor = 1.0f; // user-controlled volume
+
+        public float UserVolumeFactor
+        {
+            get => _userVolumeFactor;
+            set
+            {
+                _userVolumeFactor = Math.Clamp(value, 0.0f, 1.0f);
+            }
+        }
 
         public readonly PulseChannel Channel1 = new(true);
         public readonly PulseChannel Channel2 = new();
@@ -53,8 +63,8 @@ namespace Atem.Core.Audio
             leftMix *= (LeftChannelVolume / MAX_VOLUME);
             rightMix *= (RightChannelVolume / 15.0f);
 
-            leftMix = Math.Clamp(leftMix, -1.0f, 1.0f);
-            rightMix = Math.Clamp(rightMix, -1.0f, 1.0f);
+            leftMix = Math.Clamp(leftMix, -1.0f, 1.0f) * _userVolumeFactor;
+            rightMix = Math.Clamp(rightMix, -1.0f, 1.0f) * _userVolumeFactor;
 
             short leftMixShort = (short)(leftMix * short.MaxValue);
             short rightMixShort = (short)(rightMix  * short.MaxValue);

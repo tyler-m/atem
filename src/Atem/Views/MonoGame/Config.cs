@@ -16,6 +16,8 @@ namespace Atem.Views.MonoGame
         public float ScreenSizeFactor { get; set; }
         public string RomsDirectory { get; set; }
 
+        public float UserVolumeFactor { get; set; }
+
         public Dictionary<ICommand, HashSet<Keys>> GetCommands()
         {
             return _commands;
@@ -71,6 +73,7 @@ namespace Atem.Views.MonoGame
             ScreenSizeFactor = config.ScreenSizeFactor;
             RomsDirectory = config.RomsDirectory;
             Commands = config.Commands;
+            UserVolumeFactor = config.UserVolumeFactor;
         }
 
         public void Save()
@@ -87,8 +90,9 @@ namespace Atem.Views.MonoGame
             config.ScreenSizeFactor = 2.0f;
             config.RomsDirectory = "roms/";
             config.Commands = [];
+            config.UserVolumeFactor = 1.0f;
 
-            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+            JsonSerializerOptions options = new() { WriteIndented = true };
             File.WriteAllText(configPath, JsonSerializer.Serialize(config, options));
         }
     }
