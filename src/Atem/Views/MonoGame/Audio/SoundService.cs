@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Audio;
+using Atem.Core;
 using Atem.Views.Audio;
 
 namespace Atem.Views.MonoGame.Audio
@@ -7,9 +8,10 @@ namespace Atem.Views.MonoGame.Audio
     {
         private readonly DynamicSoundEffectInstance _instance;
 
-        public SoundService()
+        public SoundService(AtemRunner atem)
         {
             _instance = new DynamicSoundEffectInstance(Core.Audio.AudioManager.SAMPLE_RATE, AudioChannels.Stereo);
+            atem.OnFullAudioBuffer += SubmitBuffer;
         }
 
         public void Play()

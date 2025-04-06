@@ -62,7 +62,6 @@ namespace Atem.Views.MonoGame
 
             _atem.Paused = true;
             _atem.OnVerticalBlank += OnVerticalBlank;
-            _atem.OnFullAudioBuffer += _soundService.SubmitBuffer;
             _screenData = new Color[_screenWidth * _screenHeight];
 
             _graphics = new GraphicsDeviceManager(this);
@@ -192,18 +191,6 @@ namespace Atem.Views.MonoGame
             // update config values before saving
             SetConfigValues();
             _config.Save();
-        }
-
-        private void OnFullAudioBuffer(byte[] buffer)
-        {
-            if (_soundInstance.PendingBufferCount > 10)
-            {
-                return;
-            }
-            else
-            {
-                _soundInstance.SubmitBuffer(buffer);
-            }
         }
 
         protected override void Initialize()
