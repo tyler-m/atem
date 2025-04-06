@@ -1,19 +1,18 @@
 ﻿using ImGuiNET;
 using System.Numerics;
-using Atem.Core;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
     internal class MemoryWindow
     {
-        private AtemRunner _atem;
+        private View _view;
         private int _bytesPerRow = 16;
         private int _memorySize = 65536; // maybe should be a const somewhere in Atem.Core
         private int _rowCount;
 
-        public MemoryWindow(AtemRunner atem)
+        public MemoryWindow(View view)
         {
-            _atem = atem;
+            _view = view;
             _rowCount = _memorySize / _bytesPerRow;
         }
 
@@ -44,7 +43,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                         for (int column = 0; column < _bytesPerRow; column++)
                         {
-                            int value = _atem.Bus.Read((ushort)(baseAddress + column));
+                            int value = _view.Atem.Bus.Read((ushort)(baseAddress + column));
                             ImGui.SameLine();
                             if (value != 0)
                             {
@@ -61,7 +60,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                         for (int column = 0; column < _bytesPerRow; column++)
                         {
-                            int value = _atem.Bus.Read((ushort)(baseAddress + column));
+                            int value = _view.Atem.Bus.Read((ushort)(baseAddress + column));
                             ImGui.SameLine();
                             if (value >= 32 && value <= 126)
                             {

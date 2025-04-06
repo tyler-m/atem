@@ -73,7 +73,7 @@ namespace Atem.Views.MonoGame
 
             _fileExplorerWindow = new FileExplorerWindow();
             _fileExplorerWindow.OnSelectFile += LoadFile;
-            _memoryWindow = new MemoryWindow(_atem);
+            _memoryWindow = new MemoryWindow(this);
             _menuBar = new MenuBar();
             _menuBar.OnExit += Exit;
             _menuBar.OnDebug += ToggleDebug;
@@ -81,8 +81,8 @@ namespace Atem.Views.MonoGame
             _menuBar.OnSaveState += SaveStateData;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
-            _breakpointWindow = new BreakpointWindow(_atem.Debugger);
-            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
+            _breakpointWindow = new BreakpointWindow(this);
+            _processorRegistersWindow = new ProcessorRegistersWindow(this);
             _optionsWindow = new OptionsWindow(this);
 
             UpdateWindowSize();

@@ -16,8 +16,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
         public FileExplorerWindow(bool active = false)
         {
-            Active = active;
-
+            _active = active;
             _cwd = new DirectoryInfo(Directory.GetCurrentDirectory() + "/roms");
             _directory = new DirectoryInfo(_cwd.FullName);
         }

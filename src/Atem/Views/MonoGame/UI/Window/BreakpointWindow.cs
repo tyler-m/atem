@@ -10,12 +10,12 @@ namespace Atem.Views.MonoGame.UI.Window
     public class BreakpointWindow
     {
         private readonly byte[] _inputAddressText = new byte[5];
-        private readonly Debugger _debugger;
+        private readonly View _view;
         private readonly Dictionary<Breakpoint, bool> _selected = [];
 
-        public BreakpointWindow(Debugger debugger)
+        public BreakpointWindow(View view)
         {
-            _debugger = debugger;
+            _view = view;
         }
 
         public void Draw()
@@ -30,7 +30,7 @@ namespace Atem.Views.MonoGame.UI.Window
             {
                 int nullTerminatorIndex = Array.IndexOf(_inputAddressText, (byte)0);
                 ushort value = ushort.Parse(Encoding.ASCII.GetString(_inputAddressText, 0, nullTerminatorIndex), NumberStyles.HexNumber);
-                Breakpoint breakpoint = _debugger.AddBreakpoint(value);
+                Breakpoint breakpoint = _view.Atem.Debugger.AddBreakpoint(value);
 
                 if (breakpoint != null)
                 {
@@ -47,9 +47,9 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.TableSetupColumn("Hit Count");
                 ImGui.TableHeadersRow();
 
-                for (int i = 0; i < _debugger.BreakpointCount; i++)
+                for (int i = 0; i < _view.Atem.Debugger.BreakpointCount; i++)
                 {
-                    Breakpoint breakpoint = _debugger.GetBreakpoint(i);
+                    Breakpoint breakpoint = _view.Atem.Debugger.GetBreakpoint(i);
                     ushort address = breakpoint.Address;
 
                     ImGui.TableNextRow();
@@ -72,7 +72,7 @@ namespace Atem.Views.MonoGame.UI.Window
                     {
                         foreach ((Breakpoint breakpoint, bool selected) in _selected)
                         {
-                            if (selected && _debugger.RemoveBreakpoint(breakpoint))
+                            if (selected && _view.Atem.Debugger.RemoveBreakpoint(breakpoint))
                             {
                                 _selected.Remove(breakpoint);
                             }
