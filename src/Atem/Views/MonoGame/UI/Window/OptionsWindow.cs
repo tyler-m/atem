@@ -22,7 +22,7 @@ namespace Atem.Views.MonoGame.UI.Window
         {
             _view = view;
             _volume = view.Atem.Bus.Audio.UserVolumeFactor * 100;
-            _selectedScreenSizeFactor = Math.Clamp((int)_view.ScreenSizeFactor - 1, 0, 5);
+            _selectedScreenSizeFactor = Math.Clamp((int)_view.Screen.SizeFactor - 1, 0, 5);
         }
 
         public void Draw()
@@ -93,7 +93,7 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.SameLine();
                 if (ImGui.Combo("##ScreenSizeFactor", ref _selectedScreenSizeFactor, "1x\02x\03x\04x\05x\06x"))
                 {
-                    _view.ScreenSizeFactor = _selectedScreenSizeFactor + 1;
+                    _view.Screen.SizeFactor = _selectedScreenSizeFactor + 1;
                     _view.UpdateWindowSize();
                 }
 

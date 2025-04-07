@@ -5,10 +5,10 @@ using System.IO;
 
 namespace Atem.Views.MonoGame
 {
-    internal class ViewStarter
+    public class ViewStarter
     {
         private View _view;
-        private AtemRunner _atem;
+        private readonly AtemRunner _atem;
         private Config _config;
 
         public ViewStarter(AtemRunner atem)
@@ -18,17 +18,24 @@ namespace Atem.Views.MonoGame
 
         public void Run()
         {
-            string filePath = Directory.GetCurrentDirectory() + "/config.json";
-
-            LoadConfig(filePath);
-            CheckRomsDirectory();
-            CreateView();
+            InitializeView();
 
             _view.Run();
         }
 
-        private void LoadConfig(string filePath)
+        public void InitializeView()
         {
+            LoadConfig();
+            CheckRomsDirectory();
+
+            ISoundService soundService = new SoundService(_atem.Bus.Audio);
+            _view = new View(_atem, _config, soundService);
+        }
+
+        private void LoadConfig()
+        {
+            string filePath = Directory.GetCurrentDirectory() + "/config.json";
+
             // load config. if it doesn't exist, create it using defaults
             if (!File.Exists(filePath))
             {
@@ -39,18 +46,12 @@ namespace Atem.Views.MonoGame
         }
 
         private void CheckRomsDirectory()
-        {   
+        {
             // ensure the roms directory exists. if it doesn't, create it
             if (!Directory.Exists(Path.GetFullPath(_config.RomsDirectory)))
             {
                 Directory.CreateDirectory(Path.GetFullPath(_config.RomsDirectory));
             }
-        }
-
-        public void CreateView()
-        {
-            ISoundService soundService = new SoundService(_atem.Bus.Audio);
-            _view = new View(_atem, _config, soundService);
         }
     }
 }

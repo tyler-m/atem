@@ -23,7 +23,7 @@ namespace Atem.Views.MonoGame.UI.Window
             ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(1, 1));
             ImGui.Begin("Game Display", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.AlwaysAutoResize);
             ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 1);
-            ImGui.Image(_texturePointer, new Vector2(_textureWidth * _view.ScreenSizeFactor, _textureHeight * _view.ScreenSizeFactor));
+            ImGui.Image(_texturePointer, new Vector2(_textureWidth * _view.Screen.SizeFactor, _textureHeight * _view.Screen.SizeFactor));
             ImGui.End();
             ImGui.PopStyleVar();
         }

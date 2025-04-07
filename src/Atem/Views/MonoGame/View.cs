@@ -3,11 +3,10 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
-using Atem.Core.Graphics;
 using Atem.Core;
-using Atem.Views.MonoGame.UI.Window;
-using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.Input;
+using Atem.Views.MonoGame.UI;
+using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.Audio;
 
 namespace Atem.Views.MonoGame
@@ -17,17 +16,13 @@ namespace Atem.Views.MonoGame
         private const float ScreenRefreshRate = 59.73f;
 
         private readonly GraphicsDeviceManager _graphics;
-        private SpriteBatch _spriteBatch;
 
         private readonly AtemRunner _atem;
-        private readonly Color[] _screenData;
-        private Texture2D _screenTexture;
         private readonly ISoundService _soundService;
+        private readonly Screen _screen;
+        private readonly InputManager _inputManager;
 
         private readonly Config _config;
-        private int _screenWidth;
-        private int _screenHeight;
-        private float _screenSizeFactor;
         private string _romsDirectory;
 
         private string _loadedFilePath;
@@ -40,17 +35,17 @@ namespace Atem.Views.MonoGame
         private readonly BreakpointWindow _breakpointWindow;
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
-        private readonly InputManager _inputManager;
         private readonly OptionsWindow _optionsWindow;
 
         public AtemRunner Atem { get => _atem; }
         public InputManager InputManager { get => _inputManager; }
-        public float ScreenSizeFactor { get => _screenSizeFactor; set => _screenSizeFactor = value; }
+        public Screen Screen { get => _screen; }
 
         public View(AtemRunner atem, Config config, ISoundService soundService)
         {
             _atem = atem;
             _soundService = soundService;
+            _screen = new Screen(_atem);
 
             _inputManager = new InputManager();
 
@@ -60,8 +55,6 @@ namespace Atem.Views.MonoGame
             Window.AllowUserResizing = false;
 
             _atem.Paused = true;
-            _atem.OnVerticalBlank += OnVerticalBlank;
-            _screenData = new Color[_screenWidth * _screenHeight];
 
             _graphics = new GraphicsDeviceManager(this);
 
@@ -90,9 +83,9 @@ namespace Atem.Views.MonoGame
 
         private void LoadConfigValues()
         {
-            _screenWidth = _config.ScreenWidth;
-            _screenHeight = _config.ScreenHeight;
-            _screenSizeFactor = _config.ScreenSizeFactor;
+            _screen.Width = _config.ScreenWidth;
+            _screen.Height = _config.ScreenHeight;
+            _screen.SizeFactor = _config.ScreenSizeFactor;
             _romsDirectory = _config.RomsDirectory;
             _inputManager.Commands = _config.GetCommands();
             _atem.Bus.Audio.UserVolumeFactor = _config.UserVolumeFactor;
@@ -100,9 +93,9 @@ namespace Atem.Views.MonoGame
 
         private void SetConfigValues()
         {
-            _config.ScreenWidth = _screenWidth;
-            _config.ScreenHeight = _screenHeight;
-            _config.ScreenSizeFactor = _screenSizeFactor;
+            _config.ScreenWidth = _screen.Width;
+            _config.ScreenHeight = _screen.Height;
+            _config.ScreenSizeFactor = _screen.SizeFactor;
             _config.RomsDirectory = _romsDirectory;
             _config.SetCommands(_inputManager.Commands);
             _config.UserVolumeFactor = _atem.Bus.Audio.UserVolumeFactor;
@@ -144,8 +137,8 @@ namespace Atem.Views.MonoGame
             }
             else
             {
-                _graphics.PreferredBackBufferWidth = (int)(_screenWidth * _screenSizeFactor);
-                _graphics.PreferredBackBufferHeight = (int)(_screenHeight * _screenSizeFactor) + _menuBar.Height;
+                _graphics.PreferredBackBufferWidth = (int)(_screen.Width * _screen.SizeFactor);
+                _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _menuBar.Height;
                 Window.AllowUserResizing = false;
             }
 
@@ -199,17 +192,13 @@ namespace Atem.Views.MonoGame
             base.Initialize();
 
             _soundService.Play();
-
-            Texture2D highlightTexture = new(GraphicsDevice, 1, 1);
-            highlightTexture.SetData([Color.White]);
         }
 
         protected override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _screenTexture = new Texture2D(GraphicsDevice, _screenWidth, _screenHeight);
-            nint screenTextureId = _imGui.BindTexture(_screenTexture);
-            _gameDisplayWindow = new GameDisplayWindow(this, screenTextureId, (int)(_screenWidth), (int)(_screenHeight));
+            _screen.LoadContent(GraphicsDevice);
+            nint screenTextureId = _imGui.BindTexture(_screen.Texture);
+            _gameDisplayWindow = new GameDisplayWindow(this, screenTextureId, _screen.Width, _screen.Height);
         }
 
         protected override void Update(GameTime gameTime)
@@ -232,11 +221,7 @@ namespace Atem.Views.MonoGame
 
             if (!_debug)
             {
-                _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
-                _spriteBatch.Draw(_screenTexture,
-                    new Rectangle(0, _menuBar.Height, (int)(_screenWidth * _screenSizeFactor), (int)(_screenHeight * _screenSizeFactor)),
-                    new Rectangle(0, 0, _screenWidth, _screenHeight), Color.White);
-                _spriteBatch.End();
+                _screen.Draw();
             }
             else
             {
@@ -259,24 +244,6 @@ namespace Atem.Views.MonoGame
             _imGui.EndDraw();
 
             base.Draw(gameTime);
-        }
-
-        private static Color GBColorToColor(GBColor gbColor)
-        {
-            float r = gbColor.Red / 31.0f;
-            float g = gbColor.Green / 31.0f;
-            float b = gbColor.Blue / 31.0f;
-            return new Color(r, g, b);
-        }
-
-        private void OnVerticalBlank(GBColor[] screen)
-        {
-            for (int i = 0; i < _screenData.Length; i++)
-            {
-                _screenData[i] = GBColorToColor(screen[i]);
-            }
-
-            _screenTexture.SetData(_screenData);
         }
     }
 }
