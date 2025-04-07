@@ -4,10 +4,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
+using Atem.Views.Audio;
+using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.UI.Window;
-using Atem.Views.Audio;
 
 namespace Atem.Views.MonoGame
 {
@@ -19,11 +20,9 @@ namespace Atem.Views.MonoGame
 
         private readonly AtemRunner _atem;
         private readonly ISoundService _soundService;
+        private readonly IViewConfigService _configService;
         private readonly Screen _screen;
         private readonly InputManager _inputManager;
-
-        private readonly Config _config;
-        private string _romsDirectory;
 
         private string _loadedFilePath;
 
@@ -41,16 +40,16 @@ namespace Atem.Views.MonoGame
         public InputManager InputManager { get => _inputManager; }
         public Screen Screen { get => _screen; }
 
-        public View(AtemRunner atem, Config config, ISoundService soundService)
+        public View(AtemRunner atem, IViewConfigService configService, ISoundService soundService)
         {
             _atem = atem;
             _soundService = soundService;
-            _screen = new Screen(_atem);
+            _configService = configService;
 
+            _screen = new Screen(_atem);
             _inputManager = new InputManager();
 
-            _config = config;
-            LoadConfigValues();
+            _configService.Load(this);
 
             Window.AllowUserResizing = false;
 
@@ -79,26 +78,6 @@ namespace Atem.Views.MonoGame
             _optionsWindow = new OptionsWindow(this);
 
             UpdateWindowSize();
-        }
-
-        private void LoadConfigValues()
-        {
-            _screen.Width = _config.ScreenWidth;
-            _screen.Height = _config.ScreenHeight;
-            _screen.SizeFactor = _config.ScreenSizeFactor;
-            _romsDirectory = _config.RomsDirectory;
-            _inputManager.Commands = _config.GetCommands();
-            _atem.Bus.Audio.UserVolumeFactor = _config.UserVolumeFactor;
-        }
-
-        private void SetConfigValues()
-        {
-            _config.ScreenWidth = _screen.Width;
-            _config.ScreenHeight = _screen.Height;
-            _config.ScreenSizeFactor = _screen.SizeFactor;
-            _config.RomsDirectory = _romsDirectory;
-            _config.SetCommands(_inputManager.Commands);
-            _config.UserVolumeFactor = _atem.Bus.Audio.UserVolumeFactor;
         }
 
         private void OnOptions()
@@ -180,9 +159,7 @@ namespace Atem.Views.MonoGame
                 File.WriteAllBytes(_loadedFilePath + ".sav", _atem.Bus.Cartridge.GetBatterySave());
             }
 
-            // update config values before saving
-            SetConfigValues();
-            _config.Save();
+            _configService.Save(this);
         }
 
         protected override void Initialize()

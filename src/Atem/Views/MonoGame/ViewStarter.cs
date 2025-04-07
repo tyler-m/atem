@@ -1,7 +1,7 @@
-﻿using Atem.Core;
-using Atem.Views.Audio;
+﻿using System.IO;
+using Atem.Core;
 using Atem.Views.MonoGame.Audio;
-using System.IO;
+using Atem.Views.MonoGame.Config;
 
 namespace Atem.Views.MonoGame
 {
@@ -9,7 +9,7 @@ namespace Atem.Views.MonoGame
     {
         private View _view;
         private readonly AtemRunner _atem;
-        private Config _config;
+        private ViewConfig _config;
 
         public ViewStarter(AtemRunner atem)
         {
@@ -25,24 +25,15 @@ namespace Atem.Views.MonoGame
 
         public void InitializeView()
         {
-            LoadConfig();
+            _config = new ViewConfig();
+            ViewConfigFileStore configStore = new(Directory.GetCurrentDirectory() + "/config.json");
+            ViewConfigService configService = new(_config, configStore);
+
+            SoundService soundService = new(_atem.Bus.Audio);
+
+            _view = new View(_atem, configService, soundService);
+
             CheckRomsDirectory();
-
-            ISoundService soundService = new SoundService(_atem.Bus.Audio);
-            _view = new View(_atem, _config, soundService);
-        }
-
-        private void LoadConfig()
-        {
-            string filePath = Directory.GetCurrentDirectory() + "/config.json";
-
-            // load config. if it doesn't exist, create it using defaults
-            if (!File.Exists(filePath))
-            {
-                Config.CreateDefault(filePath);
-            }
-
-            _config = new Config(filePath);
         }
 
         private void CheckRomsDirectory()
