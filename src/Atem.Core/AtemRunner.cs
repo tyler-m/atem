@@ -24,11 +24,6 @@ namespace Atem.Core
 
         public bool Paused { get => _paused; set => _paused = value; }
 
-        public event AudioManager.FullAudioBufferEvent OnFullAudioBuffer
-        {
-            add => _bus.Audio.OnFullBuffer += value;
-            remove => _bus.Audio.OnFullBuffer -= value;
-        }
 
         public event VerticalBlankEvent OnVerticalBlank
         {

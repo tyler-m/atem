@@ -7,7 +7,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Audio
 {
-    public class AudioManager: IStateful
+    public class AudioManager: IStateful, IAudioBufferProvider
     {
         private const float MAX_VOLUME = 15.0f;
         private const int BUFFER_SIZE = 2048;
@@ -39,8 +39,7 @@ namespace Atem.Core.Audio
         public readonly NoiseChannel Channel4 = new();
 
         public AudioRegisters Registers;
-        public delegate void FullAudioBufferEvent(byte[] buffer);
-        public event FullAudioBufferEvent OnFullBuffer;
+        public event Action<byte[]> OnFullAudioBuffer;
 
         public byte LeftChannelVolume { get => _leftChannelVolume; set => _leftChannelVolume = value; }
         public byte RightChannelVolume { get => _rightChannelVolume; set => _rightChannelVolume = value; }
@@ -83,7 +82,7 @@ namespace Atem.Core.Audio
         public void SendBuffer()
         {
             _bufferIndex = 0;
-            OnFullBuffer?.Invoke(_buffer);
+            OnFullAudioBuffer?.Invoke(_buffer);
         }
 
         private void ClockChannels()

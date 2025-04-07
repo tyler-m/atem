@@ -51,7 +51,7 @@ namespace Atem.Views.MonoGame
                 }
             }
 
-            ISoundService soundService = new SoundService(_atem);
+            ISoundService soundService = new SoundService(_atem.Bus.Audio);
             _view = new View(_atem, _config, soundService);
             _view.Run();
         }
