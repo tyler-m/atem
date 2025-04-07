@@ -1,7 +1,6 @@
 ﻿using Atem.Core;
 using Atem.Views.Audio;
 using Atem.Views.MonoGame.Audio;
-using System;
 using System.IO;
 
 namespace Atem.Views.MonoGame
@@ -19,41 +18,39 @@ namespace Atem.Views.MonoGame
 
         public void Run()
         {
+            string filePath = Directory.GetCurrentDirectory() + "/config.json";
+
+            LoadConfig(filePath);
+            CheckRomsDirectory();
+            CreateView();
+
+            _view.Run();
+        }
+
+        private void LoadConfig(string filePath)
+        {
             // load config. if it doesn't exist, create it using defaults
-            try
+            if (!File.Exists(filePath))
             {
-                _config = new Config(Directory.GetCurrentDirectory() + "/config.json");
-            }
-            catch
-            {
-                Config.CreateDefault(Directory.GetCurrentDirectory() + "/config.json");
-
-                try
-                {
-                    _config = new Config(Directory.GetCurrentDirectory() + "/config.json");
-                }
-                catch
-                {
-                    throw new Exception("Unable to create default config file.");
-                }
+                Config.CreateDefault(filePath);
             }
 
+            _config = new Config(filePath);
+        }
+
+        private void CheckRomsDirectory()
+        {   
             // ensure the roms directory exists. if it doesn't, create it
             if (!Directory.Exists(Path.GetFullPath(_config.RomsDirectory)))
             {
-                try
-                {
-                    Directory.CreateDirectory(Path.GetFullPath(_config.RomsDirectory));
-                }
-                catch
-                {
-                    throw new Exception("Unable to locate or create roms directory.");
-                }
+                Directory.CreateDirectory(Path.GetFullPath(_config.RomsDirectory));
             }
+        }
 
+        public void CreateView()
+        {
             ISoundService soundService = new SoundService(_atem.Bus.Audio);
             _view = new View(_atem, _config, soundService);
-            _view.Run();
         }
     }
 }
