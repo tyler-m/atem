@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Input;
 using ImGuiNET;
 using Atem.Views.MonoGame.Input;
+using Atem.Views.MonoGame.Input.Command;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
@@ -41,27 +41,50 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.BeginChild("ControlsChild");
                 ImGui.BeginTable("RebindTable", 2);
 
-                foreach (KeyValuePair<ICommand, HashSet<Keys>> command in _view.InputManager.Commands)
+                int buttonIndex = 0;
+                foreach ((CommandType type, List<Keybind> keybindList) in _view.InputManager.Keybinds)
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
-                    ImGui.Text(command.Key.Name);
+                    ImGui.Text(type.ToString());
+                    ImGui.TableNextColumn();
 
-                    foreach (Keys value in command.Value)
+                    if (keybindList.Count == 0)
                     {
-                        ImGui.TableNextColumn();
-                        if (command.Key == _view.InputManager.Rebinding)
+                        if (_view.InputManager.Binding && _view.InputManager.BindingType == type)
                         {
-                            ImGui.Button("~Press A Key~");
+                            ImGui.Button("~Press A Key~##" + buttonIndex);
                         }
                         else
                         {
-                            if (ImGui.Button(value.ToString()))
+                            if (ImGui.Button("Unbound##" + buttonIndex))
                             {
-                                _view.InputManager.Rebinding = command.Key;
+                                _view.InputManager.Binding = true;
+                                _view.InputManager.BindingType = type;
                             }
                         }
                     }
+                    else
+                    {
+                        foreach (Keybind keybind in keybindList)
+                        {
+                            if (keybind == _view.InputManager.Rebinding)
+                            {
+                                ImGui.Button("~Press A Key~##" + buttonIndex);
+                            }
+                            else
+                            {
+                                string label = (keybind.Shift ? "Shift+" : "") + keybind.Key.ToString() + "##" + buttonIndex;
+
+                                if (ImGui.Button(label))
+                                {
+                                    _view.InputManager.Rebinding = keybind;
+                                }
+                            }
+                        }
+                    }
+
+                    buttonIndex++;
                 }
 
                 ImGui.EndTable();

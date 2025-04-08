@@ -4,18 +4,22 @@ namespace Atem.Views.MonoGame.Input.Command
 {
     internal class JoypadCommand : ICommand
     {
-        private JoypadButton _button;
+        private View _view;
+        private JoypadButton _joypadButton;
+        private CommandType _commandType;
 
-        public string Name => _button.ToString();
+        public CommandType Type { get { return _commandType; } }
 
-        public void Execute(View view, bool press)
+        public JoypadCommand(View view, JoypadButton joypadButton, CommandType commandType)
         {
-            view.Atem.OnJoypadChange(_button, press);
+            _view = view;
+            _joypadButton = joypadButton;
+            _commandType = commandType;
         }
 
-        public JoypadCommand(JoypadButton button)
+        public void Execute(bool pressed)
         {
-            _button = button;
+            _view.Atem.OnJoypadChange(_joypadButton, pressed);
         }
     }
 }

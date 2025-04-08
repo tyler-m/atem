@@ -11,13 +11,14 @@ namespace Atem.Views.MonoGame.Config
         public ViewConfigFileStore(string configFilePath)
         {
             _configFilePath = configFilePath;
+            _serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
         }
 
         public ViewConfig Load()
         {
             if (!File.Exists(_configFilePath))
             {
-                throw new FileNotFoundException("Config file not found.");
+                Save(ViewConfigDefaults.Create());
             }
 
             return JsonSerializer.Deserialize<ViewConfig>(File.ReadAllText(_configFilePath));

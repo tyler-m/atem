@@ -3,13 +3,20 @@ namespace Atem.Views.MonoGame.Input.Command
 {
     internal class ExitCommand : ICommand
     {
-        public string Name => "Exit Program";
+        private readonly View _view;
 
-        public void Execute(View view, bool press)
+        public CommandType Type => CommandType.Exit;
+
+        public ExitCommand(View view)
         {
-            if (press)
+            _view = view;
+        }
+
+        public void Execute(bool pressed)
+        {
+            if (pressed)
             {
-                view.Exit();
+                _view.Exit();
             }
         }
     }

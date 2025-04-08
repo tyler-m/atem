@@ -4,11 +4,13 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
+using Atem.Core.Input;
 using Atem.Views.Audio;
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.UI.Window;
+using Atem.Views.MonoGame.Input.Command;
 
 namespace Atem.Views.MonoGame
 {
@@ -40,14 +42,16 @@ namespace Atem.Views.MonoGame
         public InputManager InputManager { get => _inputManager; }
         public Screen Screen { get => _screen; }
 
-        public View(AtemRunner atem, IViewConfigService configService, ISoundService soundService)
+        public View(AtemRunner atem, IViewConfigService configService, ISoundService soundService, InputManager inputManager)
         {
             _atem = atem;
             _soundService = soundService;
             _configService = configService;
+            _inputManager = inputManager;
+
+            AddInputCommands();
 
             _screen = new Screen(_atem);
-            _inputManager = new InputManager();
 
             _configService.Load(this);
 
@@ -78,6 +82,21 @@ namespace Atem.Views.MonoGame
             _optionsWindow = new OptionsWindow(this);
 
             UpdateWindowSize();
+        }
+
+        private void AddInputCommands()
+        {
+            _inputManager.AddCommand(new ExitCommand(this));
+            _inputManager.AddCommand(new ContinueCommand(this));
+            _inputManager.AddCommand(new PauseCommand(this));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Up, CommandType.Up));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Down, CommandType.Down));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Left, CommandType.Left));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Right, CommandType.Right));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.B, CommandType.B));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.A, CommandType.A));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Select, CommandType.Select));
+            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Start, CommandType.Start));
         }
 
         private void OnOptions()
@@ -180,7 +199,7 @@ namespace Atem.Views.MonoGame
 
         protected override void Update(GameTime gameTime)
         {
-            _inputManager.Update(this);
+            _inputManager.Update();
             _atem.Update();
 
             base.Update(gameTime);
