@@ -2,15 +2,13 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ImGuiNET;
 using Atem.Core;
 using Atem.Core.Input;
+using Atem.Views.MonoGame.Audio;
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
-using Atem.Views.MonoGame.UI;
-using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.Input.Command;
-using Atem.Views.MonoGame.Audio;
+using Atem.Views.MonoGame.UI;
 
 namespace Atem.Views.MonoGame
 {
@@ -25,22 +23,16 @@ namespace Atem.Views.MonoGame
         private readonly IViewConfigService _configService;
         private readonly Screen _screen;
         private readonly InputManager _inputManager;
+        private readonly ViewUIManager _viewUIManager;
 
         private string _loadedFilePath;
-
-        private bool _debug = false;
-        private ImGuiRenderer _imGui;
-        private readonly FileExplorerWindow _fileExplorerWindow;
-        private GameDisplayWindow _gameDisplayWindow;
-        private readonly MemoryWindow _memoryWindow;
-        private readonly BreakpointWindow _breakpointWindow;
-        private readonly ProcessorRegistersWindow _processorRegistersWindow;
-        private readonly MenuBar _menuBar;
-        private readonly OptionsWindow _optionsWindow;
 
         public AtemRunner Atem { get => _atem; }
         public InputManager InputManager { get => _inputManager; }
         public Screen Screen { get => _screen; }
+
+        public delegate void OnInitializeEvent();
+        public event OnInitializeEvent OnInitialize;
 
         public View(AtemRunner atem, IViewConfigService configService, ISoundService soundService, InputManager inputManager)
         {
@@ -67,19 +59,7 @@ namespace Atem.Views.MonoGame
 
             Exiting += OnExit;
 
-            _fileExplorerWindow = new FileExplorerWindow();
-            _fileExplorerWindow.OnSelectFile += LoadFile;
-            _memoryWindow = new MemoryWindow(this);
-            _menuBar = new MenuBar();
-            _menuBar.OnExit += Exit;
-            _menuBar.OnDebug += ToggleDebug;
-            _menuBar.OnLoadState += LoadStateData;
-            _menuBar.OnSaveState += SaveStateData;
-            _menuBar.OnOpen += OnOpen;
-            _menuBar.OnOptions += OnOptions;
-            _breakpointWindow = new BreakpointWindow(this);
-            _processorRegistersWindow = new ProcessorRegistersWindow(this);
-            _optionsWindow = new OptionsWindow(this);
+            _viewUIManager = new ViewUIManager(this);
 
             UpdateWindowSize();
         }
@@ -99,22 +79,12 @@ namespace Atem.Views.MonoGame
             _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Start, CommandType.Start));
         }
 
-        private void OnOptions()
-        {
-            _optionsWindow.Active = true;
-        }
-
-        private void OnOpen()
-        {
-            _fileExplorerWindow.Active = true;
-        }
-
-        private void SaveStateData(int slot)
+        public void SaveStateData(int slot)
         {
             File.WriteAllBytes(_loadedFilePath + ".ss" + slot, _atem.GetState());
         }
 
-        private void LoadStateData(int slot)
+        public void LoadStateData(int slot)
         {
             string stateSavePath = _loadedFilePath + ".ss" + slot;
             
@@ -127,7 +97,7 @@ namespace Atem.Views.MonoGame
 
         public void UpdateWindowSize()
         {
-            if (_debug)
+            if (_viewUIManager.Debug)
             {
                 _graphics.PreferredBackBufferWidth = 960;
                 _graphics.PreferredBackBufferHeight = 720;
@@ -136,19 +106,14 @@ namespace Atem.Views.MonoGame
             else
             {
                 _graphics.PreferredBackBufferWidth = (int)(_screen.Width * _screen.SizeFactor);
-                _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _menuBar.Height;
+                _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
                 Window.AllowUserResizing = false;
             }
 
             _graphics.ApplyChanges();
         }
 
-        private void ToggleDebug()
-        {
-            _debug = !_debug;
-            _atem.Debugger.Active = _debug;
-            UpdateWindowSize();
-        }
+
 
         public void LoadFile(FileInfo fileInfo)
         {
@@ -165,8 +130,6 @@ namespace Atem.Views.MonoGame
                 }
 
                 _atem.Paused = false;
-                _fileExplorerWindow.Active = false;
-                _menuBar.EnableStates = true;
                 _loadedFilePath = fileInfo.FullName;
             }
         }
@@ -183,18 +146,15 @@ namespace Atem.Views.MonoGame
 
         protected override void Initialize()
         {
-            _imGui = new ImGuiRenderer(this);
+            OnInitialize?.Invoke();
+            _soundService.Play();
 
             base.Initialize();
-
-            _soundService.Play();
         }
 
         protected override void LoadContent()
         {
             _screen.LoadContent(GraphicsDevice);
-            nint screenTextureId = _imGui.BindTexture(_screen.Texture);
-            _gameDisplayWindow = new GameDisplayWindow(this, screenTextureId, _screen.Width, _screen.Height);
         }
 
         protected override void Update(GameTime gameTime)
@@ -209,35 +169,12 @@ namespace Atem.Views.MonoGame
         {
             GraphicsDevice.Clear(Color.Black);
 
-            _imGui.BeginDraw(gameTime);
-
-            ImGui.DockSpaceOverViewport(ImGui.GetID("Root"), ImGui.GetWindowViewport(), ImGuiDockNodeFlags.PassthruCentralNode);
-
-            _menuBar.Draw();
-
-            if (!_debug)
+            if (!_viewUIManager.Debug)
             {
                 _screen.Draw();
             }
-            else
-            {
-                _memoryWindow.Draw();
-                _gameDisplayWindow.Draw();
-                _breakpointWindow.Draw();
-                _processorRegistersWindow.Draw();
-            }
 
-            if (_fileExplorerWindow.Active)
-            {
-                _fileExplorerWindow.Draw();
-            }
-
-            if (_optionsWindow.Active)
-            {
-                _optionsWindow.Draw();
-            }
-
-            _imGui.EndDraw();
+            _viewUIManager.Draw(gameTime);
 
             base.Draw(gameTime);
         }

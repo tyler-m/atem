@@ -1,15 +1,15 @@
 ﻿// This file contains modified sample code from the ImGui.NET project,
 // please see THIRD-PARTY-LICENSES for the relevant copyright notice.
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using ImGuiNET;
 
-namespace Atem.Views.MonoGame
+namespace Atem.Views.MonoGame.UI
 {
     public class ImGuiRenderer
     {

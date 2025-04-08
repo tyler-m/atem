@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Atem.Core.Graphics;
 using Atem.Core;
+using Atem.Core.Graphics;
 
 namespace Atem.Views.MonoGame
 {
@@ -18,6 +18,9 @@ namespace Atem.Views.MonoGame
         public float SizeFactor { get => _sizeFactor; set => _sizeFactor = value; }
         public Texture2D Texture { get => _texture; }
 
+        public delegate void OnScreenTextureCreatedEvent(Texture2D texture);
+        public event OnScreenTextureCreatedEvent OnScreenTextureCreated;
+
         public Screen(AtemRunner atem)
         {
             atem.OnVerticalBlank += OnVerticalBlank;
@@ -28,6 +31,7 @@ namespace Atem.Views.MonoGame
             _texture = new Texture2D(graphicsDevice, _width, _height);
             _spriteBatch = new SpriteBatch(graphicsDevice);
             _screenData = new Color[_width * _height];
+            OnScreenTextureCreated?.Invoke(_texture);
         }
 
         public void Draw()
