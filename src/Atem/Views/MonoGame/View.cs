@@ -60,7 +60,6 @@ namespace Atem.Views.MonoGame
             UpdateWindowSize();
         }
 
-
         public void SaveStateData(int slot)
         {
             File.WriteAllBytes(_loadedFilePath + ".ss" + slot, _atem.GetState());
@@ -94,8 +93,6 @@ namespace Atem.Views.MonoGame
 
             _graphics.ApplyChanges();
         }
-
-
 
         public void LoadFile(FileInfo fileInfo)
         {
