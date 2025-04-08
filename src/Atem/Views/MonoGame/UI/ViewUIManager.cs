@@ -34,8 +34,8 @@ namespace Atem.Views.MonoGame.UI
             _menuBar = new MenuBar();
             _menuBar.OnExit += _view.Exit;
             _menuBar.OnDebug += ToggleDebug;
-            _menuBar.OnLoadState += _view.LoadStateData;
-            _menuBar.OnSaveState += _view.SaveStateData;
+            _menuBar.OnLoadState += LoadStateData;
+            _menuBar.OnSaveState += SaveStateData;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
 
@@ -45,6 +45,16 @@ namespace Atem.Views.MonoGame.UI
 
             _view.OnInitialize += OnViewInitialize;
             _view.Screen.OnScreenTextureCreated += OnScreenTextureCreated;
+        }
+
+        private void LoadStateData(int slot)
+        {
+            _view.SaveStateService.Load(slot, _view.CartridgeLoader.Context);
+        }
+
+        private void SaveStateData(int slot)
+        {
+            _view.SaveStateService.Save(slot, _view.CartridgeLoader.Context);
         }
 
         private void OnViewInitialize()
@@ -65,10 +75,12 @@ namespace Atem.Views.MonoGame.UI
 
         private void LoadFile(FileInfo fileInfo)
         {
-            _view.LoadFile(fileInfo);
+            _view.CartridgeLoader.Context.Id = fileInfo.FullName;
 
-            if (_view.Atem.Bus.Cartridge.Loaded)
+            if (_view.CartridgeLoader.Load())
             {
+                _view.BatterySaveService.Load(_view.CartridgeLoader.Context);
+                _view.Atem.Paused = false;
                 _fileExplorerWindow.Active = false;
                 _menuBar.EnableStates = true;
             }

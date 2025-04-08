@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Atem.Core.Memory.Mapper;
 using Atem.Core.State;
@@ -8,7 +7,6 @@ namespace Atem.Core.Memory
 {
     public class Cartridge : IStateful
     {
-        private string _filepath;
         private byte _type;
         private byte _colorFlag;
         private bool _loaded;
@@ -29,16 +27,9 @@ namespace Atem.Core.Memory
             _mbc.LoadBatterySave(saveData);
         }
 
-        public bool Load(string filepath)
+        public bool Load(byte[] rom)
         {
             _loaded = false;
-
-            if (!File.Exists(filepath))
-            {
-                return false;
-            }
-
-            byte[] rom = File.ReadAllBytes(filepath);
 
             byte checksum = 0;
             for (ushort address = 0x0134; address <= 0x014C; address++)
@@ -113,7 +104,6 @@ namespace Atem.Core.Memory
                 return false;
             }
 
-            _filepath = filepath;
             _loaded = true;
             return _loaded;
         }

@@ -153,10 +153,9 @@ namespace Atem.Core
             }
         }
 
-        public bool Load(string path)
+        public bool LoadCartridge(byte[] data, bool color)
         {
-            bool color = path.ToLower().EndsWith(".gbc");
-            bool loaded = _bus.LoadCartridge(path);
+            bool loaded = _bus.LoadCartridge(data);
             if (loaded)
             {
                 PrepareForGameBoot(color);

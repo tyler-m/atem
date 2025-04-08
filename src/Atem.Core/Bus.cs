@@ -1,8 +1,8 @@
 ﻿using Atem.Core.Audio;
-using Atem.Core.Processing;
 using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core.Memory;
+using Atem.Core.Processing;
 
 namespace Atem.Core
 {
@@ -53,10 +53,10 @@ namespace Atem.Core
             _bootROM = new BootROM(filepath, enabled);
         }
 
-        public bool LoadCartridge(string filepath)
+        public bool LoadCartridge(byte[] data)
         {
             _cartridge = new Cartridge();
-            return _cartridge.Load(filepath);
+            return _cartridge.Load(data);
         }
 
         public byte Read(ushort address)
