@@ -12,7 +12,7 @@ namespace Atem.Core.Debugging
         public int BreakpointCount { get => _breakpoints.Count; }
 
         public delegate void OnBreakpointEvent(ushort address);
-        public OnBreakpointEvent OnBreakpoint;
+        public event OnBreakpointEvent OnBreakpoint;
 
         public Breakpoint AddBreakpoint(ushort address)
         {

@@ -16,7 +16,7 @@ namespace Atem.Views.MonoGame.UI.Window
         public bool Active { get => _active; set => _active = value; }
 
         public delegate void OnSetVolumeEvent(float volume);
-        public readonly OnSetVolumeEvent OnSetVolume;
+        public event OnSetVolumeEvent OnSetVolume;
 
         public OptionsWindow(View view)
         {
