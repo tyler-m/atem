@@ -3,11 +3,9 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Atem.Core;
-using Atem.Core.Input;
 using Atem.Views.MonoGame.Audio;
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
-using Atem.Views.MonoGame.Input.Command;
 using Atem.Views.MonoGame.UI;
 
 namespace Atem.Views.MonoGame
@@ -41,8 +39,6 @@ namespace Atem.Views.MonoGame
             _configService = configService;
             _inputManager = inputManager;
 
-            AddInputCommands();
-
             _screen = new Screen(_atem);
 
             _configService.Load(this);
@@ -64,20 +60,6 @@ namespace Atem.Views.MonoGame
             UpdateWindowSize();
         }
 
-        private void AddInputCommands()
-        {
-            _inputManager.AddCommand(new ExitCommand(this));
-            _inputManager.AddCommand(new ContinueCommand(this));
-            _inputManager.AddCommand(new PauseCommand(this));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Up, CommandType.Up));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Down, CommandType.Down));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Left, CommandType.Left));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Right, CommandType.Right));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.B, CommandType.B));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.A, CommandType.A));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Select, CommandType.Select));
-            _inputManager.AddCommand(new JoypadCommand(this, JoypadButton.Start, CommandType.Start));
-        }
 
         public void SaveStateData(int slot)
         {

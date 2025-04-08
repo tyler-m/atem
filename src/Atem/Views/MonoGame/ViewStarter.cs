@@ -27,9 +27,15 @@ namespace Atem.Views.MonoGame
         {
             ViewConfigFileStore configStore = new(Directory.GetCurrentDirectory() + "/config.json");
             ViewConfigService configService = new(configStore);
+            
             SoundService soundService = new(_atem.Bus.Audio);
+            
             InputManager inputManager = new();
+            
             _view = new View(_atem, configService, soundService, inputManager);
+
+            ViewCommandConfigurator viewCommandConfigurator = new(_view);
+            viewCommandConfigurator.Configure(inputManager);
         }
     }
 }
