@@ -1,10 +1,9 @@
-﻿using Atem.Core.Graphics;
-using Atem.Core.Processing;
-using Atem.Core.Audio;
-using Atem.Core.Input;
-using Atem.Core.Debugging;
+﻿using System;
 using System.IO;
-using System;
+using Atem.Core.Debugging;
+using Atem.Core.Graphics;
+using Atem.Core.Input;
+using Atem.Core.Processing;
 
 namespace Atem.Core
 {
