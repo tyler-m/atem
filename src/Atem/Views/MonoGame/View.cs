@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
 using Atem.Core.Input;
-using Atem.Views.Audio;
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Views.MonoGame.Input.Command;
+using Atem.Views.MonoGame.Audio;
 
 namespace Atem.Views.MonoGame
 {
