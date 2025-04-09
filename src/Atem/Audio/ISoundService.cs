@@ -1,4 +1,4 @@
-﻿namespace Atem.Views.MonoGame.Audio
+﻿namespace Atem.Audio
 {
     public interface ISoundService
     {

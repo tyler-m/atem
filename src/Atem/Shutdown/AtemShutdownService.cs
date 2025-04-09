@@ -2,7 +2,7 @@
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Saving;
 
-namespace Atem.Views.MonoGame
+namespace Atem.Shutdown
 {
     public class AtemShutdownService : IShutdownService
     {

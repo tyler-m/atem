@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Audio;
 using Atem.Core.Audio;
+using Atem.Audio;
 
 namespace Atem.Views.MonoGame.Audio
 {

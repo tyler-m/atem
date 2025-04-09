@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Atem.Core;
+using Atem.Shutdown;
 using Atem.Views.MonoGame.Audio;
 using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;

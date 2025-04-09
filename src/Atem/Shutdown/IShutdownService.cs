@@ -1,5 +1,4 @@
-﻿
-namespace Atem.Views.MonoGame
+﻿namespace Atem.Shutdown
 {
     public interface IShutdownService
     {
