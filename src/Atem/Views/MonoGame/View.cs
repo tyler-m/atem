@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Atem.Core;
 using Atem.Views.MonoGame.Audio;
-using Atem.Views.MonoGame.Config;
 using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
-using Atem.Views.MonoGame.Saving;
 
 namespace Atem.Views.MonoGame
 {
@@ -30,7 +28,7 @@ namespace Atem.Views.MonoGame
         public delegate void ViewInitializeEvent();
         public event ViewInitializeEvent OnInitialize;
 
-        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, IViewConfigService configService, ISoundService soundService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService, InputManager inputManager, IShutdownService shutdownService)
+        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, ISoundService soundService, InputManager inputManager, IShutdownService shutdownService)
         {
             _graphics = new GraphicsDeviceManager(this);
 
