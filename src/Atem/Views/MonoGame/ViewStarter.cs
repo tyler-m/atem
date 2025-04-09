@@ -42,8 +42,10 @@ namespace Atem.Views.MonoGame
             _view = new View(viewUIManager, _atem, screen, soundService, inputManager, shutdownService);
             _view.OnInitialize += () => imGui.Initialize(_view); // link ImGuiRenderer and View instances
 
-            // add view related commands to the input manager
+            // add commands to the input manager
+            AtemCommandConfigurator atemCommandConfigurator = new(_atem);
             ViewCommandConfigurator viewCommandConfigurator = new(_view);
+            atemCommandConfigurator.Configure(inputManager);
             viewCommandConfigurator.Configure(inputManager);
 
             configService.Load();

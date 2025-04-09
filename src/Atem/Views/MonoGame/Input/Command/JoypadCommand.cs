@@ -1,25 +1,26 @@
-﻿using Atem.Core.Input;
+﻿using Atem.Core;
+using Atem.Core.Input;
 
 namespace Atem.Views.MonoGame.Input.Command
 {
     internal class JoypadCommand : ICommand
     {
-        private View _view;
-        private JoypadButton _joypadButton;
-        private CommandType _commandType;
+        private readonly AtemRunner _atem;
+        private readonly JoypadButton _joypadButton;
+        private readonly CommandType _commandType;
 
-        public CommandType Type { get { return _commandType; } }
+        public CommandType Type { get => _commandType; }
 
-        public JoypadCommand(View view, JoypadButton joypadButton, CommandType commandType)
+        public JoypadCommand(AtemRunner atem, JoypadButton joypadButton, CommandType commandType)
         {
-            _view = view;
+            _atem = atem;
             _joypadButton = joypadButton;
             _commandType = commandType;
         }
 
         public void Execute(bool pressed)
         {
-            _view.Atem.OnJoypadChange(_joypadButton, pressed);
+            _atem.OnJoypadChange(_joypadButton, pressed);
         }
     }
 }

@@ -21,10 +21,6 @@ namespace Atem.Views.MonoGame
         private readonly InputManager _inputManager;
         private readonly ViewUIManager _viewUIManager;
 
-        public AtemRunner Atem { get => _atem; }
-        public InputManager InputManager { get => _inputManager; }
-        public Screen Screen { get => _screen; }
-
         public delegate void ViewInitializeEvent();
         public event ViewInitializeEvent OnInitialize;
 

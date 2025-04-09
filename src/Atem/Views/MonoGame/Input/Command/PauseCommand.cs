@@ -1,22 +1,24 @@
 ﻿
+using Atem.Core;
+
 namespace Atem.Views.MonoGame.Input.Command
 {
     public class PauseCommand : ICommand
     {
-        private readonly View _view;
+        private readonly AtemRunner _atem;
 
-        public CommandType Type => CommandType.Pause;
+        public CommandType Type { get => CommandType.Pause; }
 
-        public PauseCommand(View view)
+        public PauseCommand(AtemRunner atem)
         {
-            _view = view;
+            _atem = atem;
         }
 
         public void Execute(bool pressed)
         {
             if (pressed)
             {
-                _view.Atem.Paused = !_view.Atem.Paused;
+                _atem.Paused = !_atem.Paused;
             }
         }
     }

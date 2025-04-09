@@ -1,22 +1,23 @@
-﻿
+﻿using Atem.Core;
+
 namespace Atem.Views.MonoGame.Input.Command
 {
     public class ContinueCommand : ICommand
     {
-        private readonly View _view;
+        private readonly AtemRunner _atem;
 
-        public CommandType Type => CommandType.Continue;
+        public CommandType Type { get => CommandType.Continue; }
 
-        public ContinueCommand(View view)
+        public ContinueCommand(AtemRunner atem)
         {
-            _view = view;
+            _atem = atem;
         }
 
         public void Execute(bool pressed)
         {
             if (pressed)
             {
-                _view.Atem.Continue();
+                _atem.Continue();
             }
         }
     }

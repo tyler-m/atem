@@ -5,7 +5,7 @@ namespace Atem.Views.MonoGame.Input.Command
     {
         private readonly View _view;
 
-        public CommandType Type => CommandType.Exit;
+        public CommandType Type { get => CommandType.Exit; }
 
         public ExitCommand(View view)
         {
