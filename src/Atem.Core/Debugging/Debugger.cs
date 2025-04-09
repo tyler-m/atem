@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Debugging
 {
-    public class Debugger
+    public class Debugger : IDebugger
     {
         private readonly Dictionary<ushort, Breakpoint> _breakpointAddressHashset = [];
         private readonly List<Breakpoint> _breakpoints = [];
@@ -14,20 +14,18 @@ namespace Atem.Core.Debugging
         public delegate void OnBreakpointEvent(ushort address);
         public event OnBreakpointEvent OnBreakpoint;
 
-        public Breakpoint AddBreakpoint(ushort address)
+        public bool AddBreakpoint(Breakpoint breakpoint)
         {
-            Breakpoint breakpoint = new(address);
-
-            if (_breakpointAddressHashset.ContainsKey(address))
+            if (_breakpointAddressHashset.ContainsKey(breakpoint.Address))
             {
-                return null;
+                return false;
             }
 
             _breakpoints.Add(breakpoint);
             _breakpoints.Sort();
-            _breakpointAddressHashset.Add(address, breakpoint);
-
-            return breakpoint;
+            _breakpointAddressHashset.Add(breakpoint.Address, breakpoint);
+            
+            return true;
         }
 
         public bool RemoveBreakpoint(Breakpoint breakpoint)

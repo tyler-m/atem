@@ -1,16 +1,17 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
+using ImGuiNET;
+using Atem.Core.Processing;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
     public class ProcessorRegistersWindow
     {
-        private readonly View _view;
+        private IProcessor _processor;
 
-        public ProcessorRegistersWindow(View view)
+        public ProcessorRegistersWindow(IProcessor processor)
         {
-            _view = view;
+            _processor = processor;
         }
 
         public void Draw()
@@ -20,21 +21,21 @@ namespace Atem.Views.MonoGame.UI.Window
 
             ImGui.Begin("CPU Registers", ImGuiWindowFlags.NoResize);
 
-            ImGui.Text("PC: " + _view.Atem.Bus.Processor.Registers.PC.ToString($"X{4}"));
+            ImGui.Text("PC: " + _processor.Registers.PC.ToString("X4"));
             ImGui.SameLine();
-            ImGui.Text(" SP: " + _view.Atem.Bus.Processor.Registers.SP.ToString($"X{4}"));
-            ImGui.Text(" A: " + _view.Atem.Bus.Processor.Registers.A.ToString($"X{4}"));
+            ImGui.Text(" SP: " + _processor.Registers.SP.ToString("X4"));
+            ImGui.Text(" A: " + _processor.Registers.A.ToString("X4"));
             ImGui.SameLine();
-            ImGui.Text("  F: " + Convert.ToString(_view.Atem.Bus.Processor.Registers.AF & 0x00FF, 2).PadLeft(8, '0'));
-            ImGui.Text(" B: " + _view.Atem.Bus.Processor.Registers.B.ToString($"X{4}"));
+            ImGui.Text("  F: " + Convert.ToString(_processor.Registers.AF & 0x00FF, 2).PadLeft(8, '0'));
+            ImGui.Text(" B: " + _processor.Registers.B.ToString("X4"));
             ImGui.SameLine();
-            ImGui.Text("  C: " + _view.Atem.Bus.Processor.Registers.C.ToString($"X{4}"));
-            ImGui.Text(" D: " + _view.Atem.Bus.Processor.Registers.D.ToString($"X{4}"));
+            ImGui.Text("  C: " + _processor.Registers.C.ToString("X4"));
+            ImGui.Text(" D: " + _processor.Registers.D.ToString("X4"));
             ImGui.SameLine();
-            ImGui.Text("  E: " + _view.Atem.Bus.Processor.Registers.E.ToString($"X{4}"));
-            ImGui.Text(" H: " + _view.Atem.Bus.Processor.Registers.H.ToString($"X{4}"));
+            ImGui.Text("  E: " + _processor.Registers.E.ToString("X4"));
+            ImGui.Text(" H: " + _processor.Registers.H.ToString("X4"));
             ImGui.SameLine();
-            ImGui.Text("  L: " + _view.Atem.Bus.Processor.Registers.L.ToString($"X{4}"));
+            ImGui.Text("  L: " + _processor.Registers.L.ToString("X4"));
 
             ImGui.End();
         }

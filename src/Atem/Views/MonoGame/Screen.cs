@@ -5,7 +5,7 @@ using Atem.Core.Graphics;
 
 namespace Atem.Views.MonoGame
 {
-    public class Screen
+    public class Screen : IScreen
     {
         private int _width, _height;
         private float _sizeFactor;
@@ -15,11 +15,21 @@ namespace Atem.Views.MonoGame
 
         public int Width { get => _width; set => _width = value; }
         public int Height { get => _height; set => _height = value; }
-        public float SizeFactor { get => _sizeFactor; set => _sizeFactor = value; }
         public Texture2D Texture { get => _texture; }
+        public float SizeFactor
+        {
+            get => _sizeFactor;
+            set
+            {
+                _sizeFactor = value;
+                OnScreenSizeChange?.Invoke();
+            }
+        }
 
-        public delegate void OnScreenTextureCreatedEvent(Texture2D texture);
         public event OnScreenTextureCreatedEvent OnScreenTextureCreated;
+
+        public delegate void OnScreenSizeChangeEvent();
+        public event OnScreenSizeChangeEvent OnScreenSizeChange;
 
         public Screen(AtemRunner atem)
         {

@@ -18,10 +18,7 @@ namespace Atem.Views.MonoGame
 
         private readonly AtemRunner _atem;
         private readonly ISoundService _soundService;
-        private readonly IViewConfigService _configService;
-        private readonly ISaveStateService _saveStateService;
-        private readonly ICartridgeLoader _cartridgeLoader;
-        private readonly IBatterySaveService _batterySaveService;
+        private readonly IShutdownService _shutdownService;
         private readonly Screen _screen;
         private readonly InputManager _inputManager;
         private readonly ViewUIManager _viewUIManager;
@@ -29,32 +26,26 @@ namespace Atem.Views.MonoGame
         public AtemRunner Atem { get => _atem; }
         public InputManager InputManager { get => _inputManager; }
         public Screen Screen { get => _screen; }
-        public ICartridgeLoader CartridgeLoader { get => _cartridgeLoader; }
-        public ISaveStateService SaveStateService { get => _saveStateService; }
-        public IBatterySaveService BatterySaveService { get => _batterySaveService; }
 
-        public delegate void OnInitializeEvent();
-        public event OnInitializeEvent OnInitialize;
+        public delegate void ViewInitializeEvent();
+        public event ViewInitializeEvent OnInitialize;
 
-        public View(AtemRunner atem, IViewConfigService configService, ISoundService soundService, ISaveStateService saveStateService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService, InputManager inputManager)
+        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, IViewConfigService configService, ISoundService soundService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService, InputManager inputManager, IShutdownService shutdownService)
         {
+            _graphics = new GraphicsDeviceManager(this);
+
+            _viewUIManager = viewUIManager;
             _atem = atem;
             _soundService = soundService;
-            _configService = configService;
-            _saveStateService = saveStateService;
-            _cartridgeLoader = cartridgeLoader;
-            _batterySaveService = batterySaveService;
+            _shutdownService = shutdownService;
             _inputManager = inputManager;
 
-            _screen = new Screen(_atem);
-
-            _configService.Load(this);
+            _screen = screen;
+            _screen.OnScreenSizeChange += UpdateWindowSize;
 
             Window.AllowUserResizing = false;
 
             _atem.Paused = true;
-
-            _graphics = new GraphicsDeviceManager(this);
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -62,37 +53,36 @@ namespace Atem.Views.MonoGame
 
             Exiting += OnExit;
 
-            _viewUIManager = new ViewUIManager(this);
+            _viewUIManager.OnUpdateWindowSize += UpdateWindowSize;
+            _viewUIManager.OnExitRequest += Exit;
 
             UpdateWindowSize();
         }
 
         public void UpdateWindowSize()
         {
-            if (_viewUIManager.Debug)
+            if (_viewUIManager != null)
             {
-                _graphics.PreferredBackBufferWidth = 960;
-                _graphics.PreferredBackBufferHeight = 720;
-                Window.AllowUserResizing = true;
-            }
-            else
-            {
-                _graphics.PreferredBackBufferWidth = (int)(_screen.Width * _screen.SizeFactor);
-                _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
-                Window.AllowUserResizing = false;
-            }
+                if (_viewUIManager.Debug)
+                {
+                    _graphics.PreferredBackBufferWidth = 960;
+                    _graphics.PreferredBackBufferHeight = 720;
+                    Window.AllowUserResizing = true;
+                }
+                else
+                {
+                    _graphics.PreferredBackBufferWidth = (int)(_screen.Width * _screen.SizeFactor);
+                    _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
+                    Window.AllowUserResizing = false;
+                }
 
-            _graphics.ApplyChanges();
+                _graphics.ApplyChanges();
+            }
         }
 
         private void OnExit(object sender, EventArgs e)
         {
-            if (_atem.Bus.Cartridge.Loaded)
-            {
-                _batterySaveService.Save(_cartridgeLoader.Context);
-            }
-
-            _configService.Save(this);
+            _shutdownService.Shutdown();
         }
 
         protected override void Initialize()

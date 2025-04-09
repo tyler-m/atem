@@ -1,8 +1,9 @@
-﻿namespace Atem.Views.MonoGame.Config
+﻿
+namespace Atem.Views.MonoGame.Config
 {
     public interface IViewConfigService
     {
-        public void Save(View view);
-        public void Load(View view);
+        public void Save();
+        public void Load();
     }
 }

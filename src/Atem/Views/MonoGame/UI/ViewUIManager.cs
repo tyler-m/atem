@@ -2,15 +2,21 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
+using Atem.Core;
+using Atem.Views.MonoGame.Input;
+using Atem.Views.MonoGame.Saving;
 using Atem.Views.MonoGame.UI.Window;
 
 namespace Atem.Views.MonoGame.UI
 {
     public class ViewUIManager
     {
-        private readonly View _view;
-        private bool _debug;
-        private ImGuiRenderer _imGui;
+        private readonly ImGuiRenderer _imGui;
+        private readonly AtemRunner _atem;
+        private readonly ISaveStateService _saveStateService;
+        private readonly IBatterySaveService _batterySaveService;
+        private readonly ICartridgeLoader _cartridgeLoader;
+        private readonly IScreen _screen;
 
         private GameDisplayWindow _gameDisplayWindow;
         private readonly FileBrowserWindow _fileBrowserWindow;
@@ -19,53 +25,60 @@ namespace Atem.Views.MonoGame.UI
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
         private readonly OptionsWindow _optionsWindow;
+        
+        private bool _debug;
 
-        public bool Debug { get { return _debug; } }
+        public delegate void UpdateWindowSizeEvent();
+        public event UpdateWindowSizeEvent OnUpdateWindowSize;
 
-        public ViewUIManager(View view)
+        public delegate void ExitRequestEvent();
+        public event ExitRequestEvent OnExitRequest;
+
+        public bool Debug { get => _debug; }
+
+        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, IScreen screen, InputManager inputManager)
         {
-            _view = view;
+            _imGui = imGui;
+            _atem = atem;
+            _saveStateService = saveStateService;
+            _batterySaveService = batterySaveService;
+            _cartridgeLoader = cartridgeLoader;
+            _screen = screen;
 
             _fileBrowserWindow = new FileBrowserWindow();
             _fileBrowserWindow.OnSelectFile += LoadFile;
 
-            _memoryWindow = new MemoryWindow(_view);
+            _memoryWindow = new MemoryWindow(_atem.Bus);
 
             _menuBar = new MenuBar();
-            _menuBar.OnExit += _view.Exit;
+            _menuBar.OnExit += () => OnExitRequest?.Invoke();
             _menuBar.OnDebug += ToggleDebug;
             _menuBar.OnLoadState += LoadStateData;
             _menuBar.OnSaveState += SaveStateData;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
 
-            _breakpointWindow = new BreakpointWindow(_view);
-            _processorRegistersWindow = new ProcessorRegistersWindow(_view);
-            _optionsWindow = new OptionsWindow(_view);
+            _breakpointWindow = new BreakpointWindow(_atem.Debugger);
+            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
+            _optionsWindow = new OptionsWindow(screen, _atem.Bus.Audio, inputManager);
 
-            _view.OnInitialize += OnViewInitialize;
-            _view.Screen.OnScreenTextureCreated += OnScreenTextureCreated;
+            _screen.OnScreenTextureCreated += OnScreenTextureCreated;
         }
 
         private void LoadStateData(int slot)
         {
-            _view.SaveStateService.Load(slot, _view.CartridgeLoader.Context);
+            _saveStateService.Load(slot, _cartridgeLoader.Context);
         }
 
         private void SaveStateData(int slot)
         {
-            _view.SaveStateService.Save(slot, _view.CartridgeLoader.Context);
-        }
-
-        private void OnViewInitialize()
-        {
-            _imGui = new ImGuiRenderer(_view);
+            _saveStateService.Save(slot, _cartridgeLoader.Context);
         }
 
         private void OnScreenTextureCreated(Texture2D texture)
         {
-            nint screenTextureId = _imGui.BindTexture(_view.Screen.Texture);
-            _gameDisplayWindow = new GameDisplayWindow(_view, screenTextureId, _view.Screen.Width, _view.Screen.Height);
+            nint screenTextureId = _imGui.BindTexture(_screen.Texture);
+            _gameDisplayWindow = new GameDisplayWindow(_screen, screenTextureId, _screen.Width, _screen.Height);
         }
 
         public int GetMenuBarHeight()
@@ -75,12 +88,12 @@ namespace Atem.Views.MonoGame.UI
 
         private void LoadFile(FileInfo fileInfo)
         {
-            _view.CartridgeLoader.Context.Id = fileInfo.FullName;
+            _cartridgeLoader.Context.Id = fileInfo.FullName;
 
-            if (_view.CartridgeLoader.Load())
+            if (_cartridgeLoader.Load())
             {
-                _view.BatterySaveService.Load(_view.CartridgeLoader.Context);
-                _view.Atem.Paused = false;
+                _batterySaveService.Load(_cartridgeLoader.Context);
+                _atem.Paused = false;
                 _fileBrowserWindow.Active = false;
                 _menuBar.EnableStates = true;
             }
@@ -99,8 +112,8 @@ namespace Atem.Views.MonoGame.UI
         private void ToggleDebug()
         {
             _debug = !_debug;
-            _view.Atem.Debugger.Active = _debug;
-            _view.UpdateWindowSize();
+            _atem.Debugger.Active = _debug;
+            OnUpdateWindowSize?.Invoke();
         }
 
         public void Draw(GameTime gameTime)

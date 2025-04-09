@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.IO;
 using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public class Processor : IStateful
+    public class Processor : IProcessor, IStateful
     {
         public static int Frequency = 4194304;
 
+        private CPURegisters _registers;
         private Bus _bus;
-        public CPURegisters Registers;
 
-        private Dictionary<byte, Func<Processor, int>> _instructions = new Dictionary<byte, Func<Processor, int>>();
-        private Dictionary<byte, Func<Processor, int>> _instructionsCB = new Dictionary<byte, Func<Processor, int>>();
+        private Dictionary<byte, Func<Processor, int>> _instructions = [];
+        private Dictionary<byte, Func<Processor, int>> _instructionsCB = [];
 
+        public CPURegisters Registers { get => _registers; set => _registers = value; }
         public byte IR;
         public int Length = 0;
         public bool CB = false;
@@ -56,6 +57,7 @@ namespace Atem.Core.Processing
         public Processor(Bus bus)
         {
             _bus = bus;
+            _registers = new CPURegisters();
             PopulateInstructionsLists();
         }
 

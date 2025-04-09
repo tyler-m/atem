@@ -6,7 +6,7 @@ using Atem.Core.Processing;
 
 namespace Atem.Core
 {
-    public class Bus
+    public class Bus : IMemoryProvider
     {
         private Processor _processor;
         private GraphicsManager _graphics;
@@ -31,6 +31,8 @@ namespace Atem.Core
         public Serial Serial { get => _serial; }
         public Interrupt Interrupt { get => _interrupt; }
         public Cartridge Cartridge { get => _cartridge; }
+        public int MemorySize { get => 0x10000; }
+
         public Bus()
         {
             _processor = new Processor(this);

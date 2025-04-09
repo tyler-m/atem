@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ImGuiNET;
+using Atem.Core.Audio;
 using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.Input.Command;
 
@@ -8,21 +9,38 @@ namespace Atem.Views.MonoGame.UI.Window
 {
     public class OptionsWindow
     {
-        private readonly View _view;
+        private readonly IScreen _screen;
+        private readonly IAudioManager _audioManager;
+        private readonly InputManager _inputManager;
         private bool _active;
         private float _volume;
         private int _selectedScreenSizeFactor;
 
-        public bool Active { get => _active; set => _active = value; }
-
-        public delegate void OnSetVolumeEvent(float volume);
-        public event OnSetVolumeEvent OnSetVolume;
-
-        public OptionsWindow(View view)
+        public bool Active
         {
-            _view = view;
-            _volume = view.Atem.Bus.Audio.UserVolumeFactor * 100;
-            _selectedScreenSizeFactor = Math.Clamp((int)_view.Screen.SizeFactor - 1, 0, 5);
+            get => _active;
+            set
+            {
+                _active = value;
+
+                if(_active)
+                {
+                    UpdateOptionsValues();
+                }
+            }
+        }
+
+        private void UpdateOptionsValues()
+        {
+            _volume = _audioManager.VolumeFactor * 100;
+            _selectedScreenSizeFactor = Math.Clamp((int)_screen.SizeFactor - 1, 0, 5);
+        }
+
+        public OptionsWindow(IScreen screen, IAudioManager audioManager, InputManager inputManager)
+        {
+            _screen = screen;
+            _inputManager = inputManager;
+            _audioManager = audioManager;
         }
 
         public void Draw()
@@ -42,7 +60,7 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.BeginTable("RebindTable", 2);
 
                 int buttonIndex = 0;
-                foreach ((CommandType type, List<Keybind> keybindList) in _view.InputManager.Keybinds)
+                foreach ((CommandType type, List<Keybind> keybindList) in _inputManager.Keybinds)
                 {
                     ImGui.TableNextRow();
                     ImGui.TableNextColumn();
@@ -51,7 +69,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                     if (keybindList.Count == 0)
                     {
-                        if (_view.InputManager.Binding && _view.InputManager.BindingType == type)
+                        if (_inputManager.Binding && _inputManager.BindingType == type)
                         {
                             ImGui.Button("~Press A Key~##" + buttonIndex);
                         }
@@ -59,8 +77,8 @@ namespace Atem.Views.MonoGame.UI.Window
                         {
                             if (ImGui.Button("Unbound##" + buttonIndex))
                             {
-                                _view.InputManager.Binding = true;
-                                _view.InputManager.BindingType = type;
+                                _inputManager.Binding = true;
+                                _inputManager.BindingType = type;
                             }
                         }
                     }
@@ -68,7 +86,7 @@ namespace Atem.Views.MonoGame.UI.Window
                     {
                         foreach (Keybind keybind in keybindList)
                         {
-                            if (keybind == _view.InputManager.Rebinding)
+                            if (keybind == _inputManager.Rebinding)
                             {
                                 ImGui.Button("~Press A Key~##" + buttonIndex);
                             }
@@ -82,7 +100,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
                                 if (ImGui.Button(label))
                                 {
-                                    _view.InputManager.Rebinding = keybind;
+                                    _inputManager.Rebinding = keybind;
                                 }
                             }
                         }
@@ -104,8 +122,8 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.SameLine();
                 if (ImGui.SliderFloat("##UserVolumeFactor", ref _volume, 0.0f, 100.0f, "%.0f"))
                 {
-                    _view.Atem.Bus.Audio.UserVolumeFactor = _volume / 100;
-                    _volume = _view.Atem.Bus.Audio.UserVolumeFactor * 100;
+                    _audioManager.VolumeFactor = _volume / 100;
+                    UpdateOptionsValues();
                 }
 
                 ImGui.EndChild();
@@ -120,8 +138,8 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.SameLine();
                 if (ImGui.Combo("##ScreenSizeFactor", ref _selectedScreenSizeFactor, "1x\02x\03x\04x\05x\06x"))
                 {
-                    _view.Screen.SizeFactor = _selectedScreenSizeFactor + 1;
-                    _view.UpdateWindowSize();
+                    _screen.SizeFactor = _selectedScreenSizeFactor + 1;
+                    UpdateOptionsValues();
                 }
 
                 ImGui.EndChild();

@@ -10,12 +10,12 @@ namespace Atem.Views.MonoGame.UI.Window
     public class BreakpointWindow
     {
         private readonly byte[] _inputAddressText = new byte[5];
-        private readonly View _view;
         private readonly Dictionary<Breakpoint, bool> _selected = [];
+        private readonly IDebugger _debugger;
 
-        public BreakpointWindow(View view)
+        public BreakpointWindow(IDebugger debugger)
         {
-            _view = view;
+            _debugger = debugger;
         }
 
         public void Draw()
@@ -29,10 +29,10 @@ namespace Atem.Views.MonoGame.UI.Window
             if (ImGui.Button("Add"))
             {
                 int nullTerminatorIndex = Array.IndexOf(_inputAddressText, (byte)0);
-                ushort value = ushort.Parse(Encoding.ASCII.GetString(_inputAddressText, 0, nullTerminatorIndex), NumberStyles.HexNumber);
-                Breakpoint breakpoint = _view.Atem.Debugger.AddBreakpoint(value);
+                ushort address = ushort.Parse(Encoding.ASCII.GetString(_inputAddressText, 0, nullTerminatorIndex), NumberStyles.HexNumber);
+                Breakpoint breakpoint = new(address);
 
-                if (breakpoint != null)
+                if (_debugger.AddBreakpoint(breakpoint))
                 {
                     _selected.Add(breakpoint, false);
                 }
@@ -47,9 +47,9 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.TableSetupColumn("Hit Count");
                 ImGui.TableHeadersRow();
 
-                for (int i = 0; i < _view.Atem.Debugger.BreakpointCount; i++)
+                for (int i = 0; i < _debugger.BreakpointCount; i++)
                 {
-                    Breakpoint breakpoint = _view.Atem.Debugger.GetBreakpoint(i);
+                    Breakpoint breakpoint = _debugger.GetBreakpoint(i);
                     ushort address = breakpoint.Address;
 
                     ImGui.TableNextRow();
@@ -72,7 +72,7 @@ namespace Atem.Views.MonoGame.UI.Window
                     {
                         foreach ((Breakpoint breakpoint, bool selected) in _selected)
                         {
-                            if (selected && _view.Atem.Debugger.RemoveBreakpoint(breakpoint))
+                            if (selected && _debugger.RemoveBreakpoint(breakpoint))
                             {
                                 _selected.Remove(breakpoint);
                             }

@@ -1,18 +1,21 @@
-﻿using ImGuiNET;
-using System;
+﻿using System;
 using System.Numerics;
+using ImGuiNET;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
     internal class GameDisplayWindow
     {
-        private View _view;
-        private IntPtr _texturePointer;
-        private int _textureWidth, _textureHeight;
+        private static readonly Vector2 WINDOW_PADDING = new(1, 1);
+        private const float WINDOW_TOP_PADDING = -1;
 
-        public GameDisplayWindow(View view, IntPtr texturePointer, int textureWidth, int textureHeight)
+        private readonly IScreen _screen;
+        private readonly IntPtr _texturePointer;
+        private readonly int _textureWidth, _textureHeight;
+
+        public GameDisplayWindow(IScreen screen, IntPtr texturePointer, int textureWidth, int textureHeight)
         {
-            _view = view;
+            _screen = screen;
             _texturePointer = texturePointer;
             _textureWidth = textureWidth;
             _textureHeight = textureHeight;
@@ -20,10 +23,10 @@ namespace Atem.Views.MonoGame.UI.Window
 
         public void Draw()
         {
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(1, 1));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, WINDOW_PADDING);
             ImGui.Begin("Game Display", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.AlwaysAutoResize);
-            ImGui.SetCursorPosY(ImGui.GetCursorPosY() - 1);
-            ImGui.Image(_texturePointer, new Vector2(_textureWidth * _view.Screen.SizeFactor, _textureHeight * _view.Screen.SizeFactor));
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() + WINDOW_TOP_PADDING);
+            ImGui.Image(_texturePointer, new Vector2(_textureWidth * _screen.SizeFactor, _textureHeight * _screen.SizeFactor));
             ImGui.End();
             ImGui.PopStyleVar();
         }

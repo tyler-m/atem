@@ -1,44 +1,52 @@
-﻿
+﻿using Atem.Core.Audio;
+using Atem.Views.MonoGame.Input;
+
 namespace Atem.Views.MonoGame.Config
 {
     public class ViewConfigService : IViewConfigService
     {
         private ViewConfig _config;
         private readonly IViewConfigStore _configStore;
+        private readonly IScreen _screen;
+        private readonly IAudioManager _audioManager;
+        private readonly InputManager _inputManager;
 
-        public ViewConfigService(IViewConfigStore configStore)
+        public ViewConfigService(IViewConfigStore configStore, IScreen screen, IAudioManager audioManager, InputManager inputManager)
         {
             _configStore = configStore;
+            _screen = screen;
+            _audioManager = audioManager;
+            _inputManager = inputManager;
         }
 
-        public void Load(View view)
+        public void Load()
         {
             _config = _configStore.Load();
-            SetViewValuesFromConfig(view);
+            SetViewValuesFromConfig();
         }
 
-        public void Save(View view)
+        public void Save()
         {
-            SetConfigValuesFromView(view);
+            SetConfigValuesFromView();
             _configStore.Save(_config);
         }
 
-        private void SetConfigValuesFromView(View view)
+        private void SetConfigValuesFromView()
         {
-            _config.ScreenWidth = view.Screen.Width;
-            _config.ScreenHeight = view.Screen.Height;
-            _config.ScreenSizeFactor = view.Screen.SizeFactor;
-            _config.UserVolumeFactor = view.Atem.Bus.Audio.UserVolumeFactor;
-            _config.Keybinds = view.InputManager.Keybinds;
+            _config.ScreenWidth = _screen.Width;
+            _config.ScreenHeight = _screen.Height;
+            _config.ScreenSizeFactor = _screen.SizeFactor;
+            _config.UserVolumeFactor = _audioManager.VolumeFactor;
+            _config.Keybinds = _inputManager.Keybinds;
         }
 
-        private void SetViewValuesFromConfig(View view)
+        private void SetViewValuesFromConfig()
         {
-            view.Screen.Width = _config.ScreenWidth;
-            view.Screen.Height = _config.ScreenHeight;
-            view.Screen.SizeFactor = _config.ScreenSizeFactor;
-            view.Atem.Bus.Audio.UserVolumeFactor = _config.UserVolumeFactor;
-            view.InputManager.Keybinds = _config.Keybinds;
+            _screen.Width = _config.ScreenWidth;
+            _screen.Height = _config.ScreenHeight;
+            _screen.SizeFactor = _config.ScreenSizeFactor;
+            _audioManager.VolumeFactor = _config.UserVolumeFactor;
+            _inputManager.Keybinds = _config.Keybinds;
         }
     }
 }

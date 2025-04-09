@@ -7,7 +7,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Audio
 {
-    public class AudioManager: IStateful, IAudioBufferProvider
+    public class AudioManager: IAudioManager, IStateful
     {
         private const float MAX_VOLUME = 15.0f;
         private const int BUFFER_SIZE = 2048;
@@ -22,14 +22,14 @@ namespace Atem.Core.Audio
         private readonly float _samplePeriod = Processor.Frequency / SAMPLE_RATE;
         private byte _leftChannelVolume = 0;
         private byte _rightChannelVolume = 0;
-        private float _userVolumeFactor = 1.0f; // user-controlled volume
+        private float _volumeFactor = 1.0f; // user-controlled volume
 
-        public float UserVolumeFactor
+        public float VolumeFactor
         {
-            get => _userVolumeFactor;
+            get => _volumeFactor;
             set
             {
-                _userVolumeFactor = Math.Clamp(value, 0.0f, 1.0f);
+                _volumeFactor = Math.Clamp(value, 0.0f, 1.0f);
             }
         }
 
@@ -62,8 +62,8 @@ namespace Atem.Core.Audio
             leftMix *= (LeftChannelVolume / MAX_VOLUME);
             rightMix *= (RightChannelVolume / 15.0f);
 
-            leftMix = Math.Clamp(leftMix, -1.0f, 1.0f) * _userVolumeFactor;
-            rightMix = Math.Clamp(rightMix, -1.0f, 1.0f) * _userVolumeFactor;
+            leftMix = Math.Clamp(leftMix, -1.0f, 1.0f) * _volumeFactor;
+            rightMix = Math.Clamp(rightMix, -1.0f, 1.0f) * _volumeFactor;
 
             short leftMixShort = (short)(leftMix * short.MaxValue);
             short rightMixShort = (short)(rightMix  * short.MaxValue);

@@ -31,7 +31,7 @@ namespace Atem.Core.Processing
         }
     }
 
-    public struct CPURegisters
+    public class CPURegisters
     {
         public ushort SP, PC;
         public byte A, B, C, D, E, H, L;

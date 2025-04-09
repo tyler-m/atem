@@ -34,7 +34,7 @@ namespace Atem.Views.MonoGame.UI
         private readonly float SCROLL_WHEEL_FACTOR = 0.01f;
         private Keys[] _allKeys = Enum.GetValues<Keys>();
 
-        public ImGuiRenderer(Game game)
+        public void Initialize(Game game)
         {
             _game = game;
 
