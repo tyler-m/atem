@@ -13,7 +13,7 @@ namespace Atem.Views.MonoGame.UI
         private ImGuiRenderer _imGui;
 
         private GameDisplayWindow _gameDisplayWindow;
-        private readonly FileExplorerWindow _fileExplorerWindow;
+        private readonly FileBrowserWindow _fileBrowserWindow;
         private readonly MemoryWindow _memoryWindow;
         private readonly BreakpointWindow _breakpointWindow;
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
@@ -26,8 +26,8 @@ namespace Atem.Views.MonoGame.UI
         {
             _view = view;
 
-            _fileExplorerWindow = new FileExplorerWindow();
-            _fileExplorerWindow.OnSelectFile += LoadFile;
+            _fileBrowserWindow = new FileBrowserWindow();
+            _fileBrowserWindow.OnSelectFile += LoadFile;
 
             _memoryWindow = new MemoryWindow(_view);
 
@@ -81,14 +81,14 @@ namespace Atem.Views.MonoGame.UI
             {
                 _view.BatterySaveService.Load(_view.CartridgeLoader.Context);
                 _view.Atem.Paused = false;
-                _fileExplorerWindow.Active = false;
+                _fileBrowserWindow.Active = false;
                 _menuBar.EnableStates = true;
             }
         }
 
         private void OnOpen()
         {
-            _fileExplorerWindow.Active = true;
+            _fileBrowserWindow.Active = true;
         }
 
         private void OnOptions()
@@ -119,9 +119,9 @@ namespace Atem.Views.MonoGame.UI
                 _processorRegistersWindow.Draw();
             }
 
-            if (_fileExplorerWindow.Active)
+            if (_fileBrowserWindow.Active)
             {
-                _fileExplorerWindow.Draw();
+                _fileBrowserWindow.Draw();
             }
 
             if (_optionsWindow.Active)

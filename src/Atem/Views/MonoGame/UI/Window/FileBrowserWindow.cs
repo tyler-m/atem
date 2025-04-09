@@ -1,10 +1,10 @@
 ﻿using System.IO;
-using Atem.Misc;
 using ImGuiNET;
+using Atem.Misc;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
-    internal class FileExplorerWindow
+    internal class FileBrowserWindow
     {
         private readonly FileBrowser _fileBrowser;
         private readonly string[] _extensions = [".gb", ".gbc"];
@@ -15,7 +15,7 @@ namespace Atem.Views.MonoGame.UI.Window
 
         public bool Active { get => _active; set => _active = value; }
 
-        public FileExplorerWindow()
+        public FileBrowserWindow()
         {
             _fileBrowser = new FileBrowser(Directory.GetCurrentDirectory());
         }
@@ -24,7 +24,7 @@ namespace Atem.Views.MonoGame.UI.Window
         {
             ImGui.SetNextWindowDockID(ImGui.GetID("Root"));
 
-            ImGui.Begin("File Explorer", ref _active, ImGuiWindowFlags.NoMove
+            ImGui.Begin("File Browser", ref _active, ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoSavedSettings
                 | ImGuiWindowFlags.NoCollapse);
