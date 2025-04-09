@@ -4,7 +4,7 @@ using Atem.Core;
 using Atem.Core.Graphics;
 using Atem.Graphics;
 
-namespace Atem.Views.MonoGame
+namespace Atem.Views.MonoGame.Graphics
 {
     public class Screen : IScreen
     {

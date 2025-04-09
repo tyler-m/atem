@@ -6,6 +6,7 @@ using Atem.Views.MonoGame.UI;
 using Atem.Shutdown;
 using Atem.Audio;
 using Atem.Input;
+using Atem.Views.MonoGame.Graphics;
 
 namespace Atem.Views.MonoGame
 {

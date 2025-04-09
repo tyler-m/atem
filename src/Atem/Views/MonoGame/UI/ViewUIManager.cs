@@ -6,6 +6,7 @@ using Atem.Core;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Input;
 using Atem.Saving;
+using Atem.Views.MonoGame.Graphics;
 
 namespace Atem.Views.MonoGame.UI
 {
