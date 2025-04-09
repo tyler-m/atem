@@ -1,5 +1,4 @@
-﻿
-namespace Atem.Views.MonoGame.Config
+﻿namespace Atem.Config
 {
     public interface IConfigStore
     {

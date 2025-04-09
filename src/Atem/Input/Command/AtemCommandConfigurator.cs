@@ -1,8 +1,7 @@
 ﻿using Atem.Core;
 using Atem.Core.Input;
-using Atem.Views.MonoGame.Input.Command;
 
-namespace Atem.Views.MonoGame.Input
+namespace Atem.Input.Command
 {
     public class AtemCommandConfigurator
     {

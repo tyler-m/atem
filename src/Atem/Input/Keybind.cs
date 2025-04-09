@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Input;
-using Atem.Views.MonoGame.Input.Command;
+using Atem.Input.Command;
 
-namespace Atem.Views.MonoGame.Input
+namespace Atem.Input
 {
     public class Keybind
     {

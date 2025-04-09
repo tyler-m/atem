@@ -1,5 +1,4 @@
-﻿
-namespace Atem.Views.MonoGame.Input.Command
+﻿namespace Atem.Input.Command
 {
     public interface ICommand
     {

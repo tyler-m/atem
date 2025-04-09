@@ -1,7 +1,6 @@
-﻿
-using Atem.Core;
+﻿using Atem.Core;
 
-namespace Atem.Views.MonoGame.Input.Command
+namespace Atem.Input.Command
 {
     public class PauseCommand : ICommand
     {

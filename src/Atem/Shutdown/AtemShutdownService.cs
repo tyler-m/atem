@@ -1,5 +1,5 @@
-﻿using Atem.Core;
-using Atem.Views.MonoGame.Config;
+﻿using Atem.Config;
+using Atem.Core;
 using Atem.Views.MonoGame.Saving;
 
 namespace Atem.Shutdown

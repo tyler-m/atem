@@ -1,7 +1,7 @@
 ﻿using Atem.Core;
 using Atem.Core.Input;
 
-namespace Atem.Views.MonoGame.Input.Command
+namespace Atem.Input.Command
 {
     internal class JoypadCommand : ICommand
     {

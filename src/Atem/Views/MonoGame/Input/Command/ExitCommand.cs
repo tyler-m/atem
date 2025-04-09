@@ -1,4 +1,6 @@
 ﻿
+using Atem.Input.Command;
+
 namespace Atem.Views.MonoGame.Input.Command
 {
     internal class ExitCommand : ICommand

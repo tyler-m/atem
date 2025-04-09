@@ -1,6 +1,6 @@
 ﻿using Atem.Core;
 
-namespace Atem.Views.MonoGame.Input.Command
+namespace Atem.Input.Command
 {
     public class ContinueCommand : ICommand
     {

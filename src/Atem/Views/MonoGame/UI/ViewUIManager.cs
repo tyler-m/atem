@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
-using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.Saving;
 using Atem.Views.MonoGame.UI.Window;
+using Atem.Input;
 
 namespace Atem.Views.MonoGame.UI
 {

@@ -2,10 +2,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Atem.Core;
-using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
 using Atem.Shutdown;
 using Atem.Audio;
+using Atem.Input;
 
 namespace Atem.Views.MonoGame
 {

@@ -1,4 +1,5 @@
-﻿using Atem.Views.MonoGame.Input.Command;
+﻿using Atem.Input;
+using Atem.Views.MonoGame.Input.Command;
 
 namespace Atem.Views.MonoGame.Input
 {

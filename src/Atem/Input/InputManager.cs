@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework.Input;
-using Atem.Views.MonoGame.Input.Command;
+using Atem.Input.Command;
 
-namespace Atem.Views.MonoGame.Input
+namespace Atem.Input
 {
     /// <summary>
     /// A keybind is associated with a command type, and a command type is associated with commands (actions).
@@ -34,7 +34,7 @@ namespace Atem.Views.MonoGame.Input
                 foreach ((CommandType type, List<Keybind> keybinds) in _keybinds)
                 {
                     keybinds.Clear();
-                    
+
                     // replace old keybinds with new keybinds
                     if (value.TryGetValue(type, out List<Keybind> newKeybinds))
                     {
@@ -43,7 +43,7 @@ namespace Atem.Views.MonoGame.Input
                             keybinds.Add(keybind);
                         }
                     }
-                    
+
                 }
             }
         }
@@ -96,7 +96,7 @@ namespace Atem.Views.MonoGame.Input
                 {
                     if (_currentKeyboardState.IsKeyDown(keybind.Key) != _previousKeyboardState.IsKeyDown(keybind.Key))
                     {
-                        if ((keybind.Shift && !shiftPressed) || (keybind.Control && !controlPressed) || (keybind.Alt && !altPressed))
+                        if (keybind.Shift && !shiftPressed || keybind.Control && !controlPressed || keybind.Alt && !altPressed)
                         {
                             continue;
                         }

@@ -1,7 +1,8 @@
 ﻿using Atem.Core.Audio;
-using Atem.Views.MonoGame.Input;
+using Atem.Input;
+using Atem.Views.MonoGame;
 
-namespace Atem.Views.MonoGame.Config
+namespace Atem.Config
 {
     public class ConfigService : IConfigService
     {

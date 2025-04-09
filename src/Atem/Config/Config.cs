@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Atem.Views.MonoGame.Input;
-using Atem.Views.MonoGame.Input.Command;
+using Atem.Input;
+using Atem.Input.Command;
 
-namespace Atem.Views.MonoGame.Config
+namespace Atem.Config
 {
     public class Config
     {

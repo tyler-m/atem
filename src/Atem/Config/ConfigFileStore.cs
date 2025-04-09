@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text.Json;
 
-namespace Atem.Views.MonoGame.Config
+namespace Atem.Config
 {
     public class ConfigFileStore : IConfigStore
     {

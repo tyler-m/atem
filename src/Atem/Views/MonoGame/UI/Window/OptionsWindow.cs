@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using ImGuiNET;
 using Atem.Core.Audio;
-using Atem.Views.MonoGame.Input;
-using Atem.Views.MonoGame.Input.Command;
+using Atem.Input.Command;
+using Atem.Input;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
