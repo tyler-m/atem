@@ -1,13 +1,13 @@
-﻿using Atem.Input;
-using Atem.Views.MonoGame.Input.Command;
+﻿using Atem.Input.Command;
+using Atem.Views;
 
-namespace Atem.Views.MonoGame.Input
+namespace Atem.Input.Configure
 {
     public class ViewCommandConfigurator
     {
-        private readonly View _view;
+        private readonly IAtemView _view;
 
-        public ViewCommandConfigurator(View view)
+        public ViewCommandConfigurator(IAtemView view)
         {
             _view = view;
         }

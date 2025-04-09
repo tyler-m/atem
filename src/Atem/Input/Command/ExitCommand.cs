@@ -1,15 +1,14 @@
-﻿
-using Atem.Input.Command;
+﻿using Atem.Views;
 
-namespace Atem.Views.MonoGame.Input.Command
+namespace Atem.Input.Command
 {
     internal class ExitCommand : ICommand
     {
-        private readonly View _view;
+        private readonly IAtemView _view;
 
         public CommandType Type { get => CommandType.Exit; }
 
-        public ExitCommand(View view)
+        public ExitCommand(IAtemView view)
         {
             _view = view;
         }

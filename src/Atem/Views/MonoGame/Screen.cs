@@ -26,6 +26,7 @@ namespace Atem.Views.MonoGame
             }
         }
 
+        public delegate void OnScreenTextureCreatedEvent(Texture2D texture);
         public event OnScreenTextureCreatedEvent OnScreenTextureCreated;
 
         public delegate void OnScreenSizeChangeEvent();

@@ -9,7 +9,7 @@ using Atem.Input;
 
 namespace Atem.Views.MonoGame
 {
-    public class View : Game
+    public class View : Game, IAtemView
     {
         private const float ScreenRefreshRate = 59.73f;
 

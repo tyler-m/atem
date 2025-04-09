@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
-using Atem.Views.MonoGame.Saving;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Input;
+using Atem.Saving;
 
 namespace Atem.Views.MonoGame.UI
 {
@@ -16,7 +16,7 @@ namespace Atem.Views.MonoGame.UI
         private readonly ISaveStateService _saveStateService;
         private readonly IBatterySaveService _batterySaveService;
         private readonly ICartridgeLoader _cartridgeLoader;
-        private readonly IScreen _screen;
+        private readonly Screen _screen;
 
         private GameDisplayWindow _gameDisplayWindow;
         private readonly FileBrowserWindow _fileBrowserWindow;
@@ -36,7 +36,7 @@ namespace Atem.Views.MonoGame.UI
 
         public bool Debug { get => _debug; }
 
-        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, IScreen screen, InputManager inputManager)
+        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager)
         {
             _imGui = imGui;
             _atem = atem;

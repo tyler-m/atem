@@ -2,11 +2,10 @@
 using Atem.Config;
 using Atem.Core;
 using Atem.Input;
-using Atem.Input.Command;
+using Atem.Input.Configure;
+using Atem.Saving;
 using Atem.Shutdown;
 using Atem.Views.MonoGame.Audio;
-using Atem.Views.MonoGame.Input;
-using Atem.Views.MonoGame.Saving;
 using Atem.Views.MonoGame.UI;
 
 namespace Atem.Views.MonoGame

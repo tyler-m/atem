@@ -1,5 +1,4 @@
-﻿
-namespace Atem.Views.MonoGame.Saving
+﻿namespace Atem.Saving
 {
     internal class FileCartridgeContext : ICartridgeContext
     {

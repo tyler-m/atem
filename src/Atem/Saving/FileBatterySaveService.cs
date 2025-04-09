@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Atem.Core;
 
-namespace Atem.Views.MonoGame.Saving
+namespace Atem.Saving
 {
     public class FileBatterySaveService : IBatterySaveService
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Atem.Misc
+namespace Atem.IO
 {
     internal class FileBrowser
     {

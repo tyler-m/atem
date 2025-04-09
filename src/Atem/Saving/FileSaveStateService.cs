@@ -1,7 +1,7 @@
 ﻿using Atem.Core;
 using System.IO;
 
-namespace Atem.Views.MonoGame.Saving
+namespace Atem.Saving
 {
     public class FileSaveStateService : ISaveStateService
     {

@@ -1,7 +1,8 @@
 ﻿using Atem.Core;
 using Atem.Core.Input;
+using Atem.Input.Command;
 
-namespace Atem.Input.Command
+namespace Atem.Input.Configure
 {
     public class AtemCommandConfigurator
     {

@@ -1,5 +1,4 @@
-﻿
-namespace Atem.Views.MonoGame.Saving
+﻿namespace Atem.Saving
 {
     public interface ICartridgeLoader
     {
