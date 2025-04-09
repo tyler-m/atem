@@ -35,11 +35,6 @@ namespace Atem.Views.MonoGame.UI
                         OnOpen?.Invoke();
                     }
 
-                    if (ImGui.MenuItem("Debug"))
-                    {
-                        OnDebug?.Invoke();
-                    }
-
                     if (ImGui.BeginMenu("Save State", _enableStates))
                     {
                         for (int i = 0; i < 10; i++)
@@ -76,6 +71,13 @@ namespace Atem.Views.MonoGame.UI
                 
                 if (ImGui.BeginMenu("Tools"))
                 {
+                    if (ImGui.MenuItem("Debug"))
+                    {
+                        OnDebug?.Invoke();
+                    }
+
+                    ImGui.Separator();
+
                     if (ImGui.MenuItem("Options..."))
                     {
                         OnOptions?.Invoke();
