@@ -17,7 +17,6 @@ Status
 - **Graphics**
   - [X] Per-pixel rendering
   - [X] Passes [cgb-acid2](https://github.com/mattcurrie/cgb-acid2)
-  - [X] Renders "torture test" games like [_Prehistorik Man_](https://eldred.fr/blog/prehistorik/)
   
 - **Sound**
   - [X] Synthesizes audio for Pulse, Wave, and Noise channels
