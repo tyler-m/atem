@@ -3,9 +3,9 @@ namespace Atem.Views.MonoGame.Config
 {
     public static class ViewConfigDefaults
     {
-        public static ViewConfig Create()
+        public static Config Create()
         {
-            return new ViewConfig()
+            return new Config()
             {
                 ScreenWidth = 160,
                 ScreenHeight = 144,

@@ -3,9 +3,9 @@ using Atem.Views.MonoGame.Input;
 
 namespace Atem.Views.MonoGame.Config
 {
-    public class ViewConfigService : IViewConfigService
+    public class ViewConfigService : IConfigService
     {
-        private ViewConfig _config;
+        private Config _config;
         private readonly IViewConfigStore _configStore;
         private readonly IScreen _screen;
         private readonly IAudioManager _audioManager;

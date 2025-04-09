@@ -14,17 +14,17 @@ namespace Atem.Views.MonoGame.Config
             _serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
         }
 
-        public ViewConfig Load()
+        public Config Load()
         {
             if (!File.Exists(_configFilePath))
             {
                 Save(ViewConfigDefaults.Create());
             }
 
-            return JsonSerializer.Deserialize<ViewConfig>(File.ReadAllText(_configFilePath));
+            return JsonSerializer.Deserialize<Config>(File.ReadAllText(_configFilePath));
         }
 
-        public void Save(ViewConfig config)
+        public void Save(Config config)
         {
             string configJson = JsonSerializer.Serialize(config, _serializerOptions);
             File.WriteAllText(_configFilePath, configJson);

@@ -7,11 +7,11 @@ namespace Atem.Shutdown
     public class AtemShutdownService : IShutdownService
     {
         private readonly AtemRunner _atem;
-        private readonly IViewConfigService _configService;
+        private readonly IConfigService _configService;
         private readonly ICartridgeLoader _cartridgeLoader;
         private readonly IBatterySaveService _batterySaveService;
 
-        public AtemShutdownService(AtemRunner atem, IViewConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
+        public AtemShutdownService(AtemRunner atem, IConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
         {
             _atem = atem;
             _configService = configService;

@@ -4,7 +4,7 @@ using Atem.Views.MonoGame.Input.Command;
 
 namespace Atem.Views.MonoGame.Config
 {
-    public class ViewConfig
+    public class Config
     {
         public Dictionary<CommandType, List<Keybind>> Keybinds { get; set; }
         public int ScreenWidth { get; set; }
