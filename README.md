@@ -3,7 +3,10 @@ atem [![Build](https://github.com/tyler-m/atem/actions/workflows/ci.yml/badge.sv
 
 A cross-platform emulator for the Game Boy Color written in C#
 
-![demo](https://github.com/tyler-m/atem/assets/7759273/3ac33f7a-4caa-4ef3-81b6-41bc6b482adf)
+<a href="images/1.gif"><img src="images/1.gif" width="200"></a> 
+<a href="images/2.png"><img src="images/2.png" width="200"></a>
+
+<a href="images/3.png"><img src="images/3.png" width="418"></a>
 
 Status
 ===
