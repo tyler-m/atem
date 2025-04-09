@@ -1,7 +1,7 @@
 ﻿
 namespace Atem.Views.MonoGame.Config
 {
-    public static class ViewConfigDefaults
+    public static class ConfigDefaults
     {
         public static Config Create()
         {

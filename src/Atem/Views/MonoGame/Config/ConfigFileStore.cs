@@ -3,12 +3,12 @@ using System.Text.Json;
 
 namespace Atem.Views.MonoGame.Config
 {
-    public class ViewConfigFileStore : IViewConfigStore
+    public class ConfigFileStore : IConfigStore
     {
         private string _configFilePath;
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public ViewConfigFileStore(string configFilePath)
+        public ConfigFileStore(string configFilePath)
         {
             _configFilePath = configFilePath;
             _serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
@@ -18,7 +18,7 @@ namespace Atem.Views.MonoGame.Config
         {
             if (!File.Exists(_configFilePath))
             {
-                Save(ViewConfigDefaults.Create());
+                Save(ConfigDefaults.Create());
             }
 
             return JsonSerializer.Deserialize<Config>(File.ReadAllText(_configFilePath));
