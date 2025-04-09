@@ -1,12 +1,13 @@
 ﻿using System.IO;
+using Atem.Misc;
 using ImGuiNET;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
     internal class FileExplorerWindow
     {
-        private DirectoryInfo _cwd;
-        private DirectoryInfo _directory;
+        private readonly FileBrowser _fileBrowser;
+        private readonly string[] _extensions = [".gb", ".gbc"];
         private bool _active;
 
         public delegate void SelectFileEvent(FileInfo fileInfo);
@@ -14,21 +15,9 @@ namespace Atem.Views.MonoGame.UI.Window
 
         public bool Active { get => _active; set => _active = value; }
 
-        public FileExplorerWindow(bool active = false)
+        public FileExplorerWindow()
         {
-            _active = active;
-            _cwd = new DirectoryInfo(Directory.GetCurrentDirectory() + "/roms");
-            _directory = new DirectoryInfo(_cwd.FullName);
-        }
-
-        private void SelectFile(FileInfo file)
-        {
-            OnSelectFile?.Invoke(file);
-        }
-
-        private void SelectDirectory(DirectoryInfo directory)
-        {
-            _directory = directory;
+            _fileBrowser = new FileBrowser(Directory.GetCurrentDirectory());
         }
 
         public void Draw()
@@ -40,33 +29,27 @@ namespace Atem.Views.MonoGame.UI.Window
                 | ImGuiWindowFlags.NoSavedSettings
                 | ImGuiWindowFlags.NoCollapse);
 
-            if (ImGui.ArrowButton("UpDirectory", ImGuiDir.Up))
+            if (ImGui.ArrowButton("NavigateUp", ImGuiDir.Up))
             {
-                if (_directory.Parent != null)
-                {
-                    _directory = _directory.Parent;
-                }
+                _fileBrowser.NavigateUp();
             }
 
             ImGui.SameLine();
-            ImGui.TextDisabled(_directory.FullName);
+            ImGui.TextDisabled(_fileBrowser.CurrentDirectory.FullName);
 
-            foreach (DirectoryInfo directory in _directory.EnumerateDirectories())
+            foreach (DirectoryInfo directory in _fileBrowser.GetDirectories())
             {
                 if (ImGui.Selectable("> " + directory.Name))
                 {
-                    SelectDirectory(directory);
+                    _fileBrowser.NavigateTo(directory);
                 }
             }
 
-            foreach (FileInfo file in _directory.EnumerateFiles())
+            foreach (FileInfo file in _fileBrowser.GetFiles(_extensions))
             {
-                if (file.Name.ToLower().EndsWith(".gb") || file.Name.ToLower().EndsWith(".gbc"))
+                if (ImGui.Selectable(file.Name))
                 {
-                    if (ImGui.Selectable(file.Name))
-                    {
-                        SelectFile(file);
-                    }
+                    OnSelectFile?.Invoke(file);
                 }
             }
 
