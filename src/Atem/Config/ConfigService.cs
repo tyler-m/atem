@@ -1,6 +1,6 @@
 ﻿using Atem.Core.Audio;
+using Atem.Graphics;
 using Atem.Input;
-using Atem.Views.MonoGame;
 
 namespace Atem.Config
 {

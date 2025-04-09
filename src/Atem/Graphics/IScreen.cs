@@ -1,5 +1,5 @@
 ﻿
-namespace Atem.Views.MonoGame
+namespace Atem.Graphics
 {
     public interface IScreen
     {
