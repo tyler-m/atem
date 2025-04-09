@@ -71,22 +71,24 @@ namespace Atem.Views.MonoGame.Input
             _currentKeyboardState = Keyboard.GetState();
 
             bool shiftPressed = _currentKeyboardState.IsKeyDown(Keys.LeftShift) || _currentKeyboardState.IsKeyDown(Keys.RightShift);
+            bool controlPressed = _currentKeyboardState.IsKeyDown(Keys.LeftControl) || _currentKeyboardState.IsKeyDown(Keys.RightControl);
+            bool altPressed = _currentKeyboardState.IsKeyDown(Keys.LeftAlt) || _currentKeyboardState.IsKeyDown(Keys.RightAlt);
 
             if (_rebinding != null)
             {
-                HandleRebinding(shiftPressed);
+                HandleRebinding(shiftPressed, controlPressed, altPressed);
             }
             else if (_binding)
             {
-                HandleBinding(shiftPressed);
+                HandleBinding(shiftPressed, controlPressed, altPressed);
             }
             else
             {
-                HandleInput(shiftPressed);
+                HandleInput(shiftPressed, controlPressed, altPressed);
             }
         }
 
-        private void HandleInput(bool shiftPressed)
+        private void HandleInput(bool shiftPressed, bool controlPressed, bool altPressed)
         {
             foreach ((CommandType type, List<Keybind> keybinds) in _keybinds)
             {
@@ -94,7 +96,7 @@ namespace Atem.Views.MonoGame.Input
                 {
                     if (_currentKeyboardState.IsKeyDown(keybind.Key) != _previousKeyboardState.IsKeyDown(keybind.Key))
                     {
-                        if (keybind.Shift && !shiftPressed)
+                        if ((keybind.Shift && !shiftPressed) || (keybind.Control && !controlPressed) || (keybind.Alt && !altPressed))
                         {
                             continue;
                         }
@@ -108,35 +110,56 @@ namespace Atem.Views.MonoGame.Input
             }
         }
 
-        private void HandleBinding(bool shiftPressed)
+        private void HandleBinding(bool shiftPressed, bool controlPressed, bool altPressed)
         {
             List<Keys> pressedKeys = _currentKeyboardState.GetPressedKeys()
                 .Where(key => !_previousKeyboardState.IsKeyDown(key))
                 .ToList();
 
             // bind if a key has been pressed
-            if (pressedKeys.Count > 0)
+            foreach (Keys key in pressedKeys)
             {
-                Keybind keybind = new Keybind();
-                keybind.Key = pressedKeys[0];
-                keybind.Shift = shiftPressed;
-                keybind.CommandType = BindingType;
+                if (key == Keys.LeftControl || key == Keys.RightControl
+                    || key == Keys.LeftAlt || key == Keys.RightAlt
+                    || key == Keys.LeftShift || key == Keys.RightShift)
+                {
+                    continue;
+                }
+
+                Keybind keybind = new()
+                {
+                    Key = pressedKeys[0],
+                    Shift = shiftPressed,
+                    Control = controlPressed,
+                    Alt = altPressed,
+                    CommandType = BindingType
+                };
+
                 _keybinds[keybind.CommandType].Add(keybind);
                 _binding = false;
             }
         }
 
-        private void HandleRebinding(bool shiftPressed)
+        private void HandleRebinding(bool shiftPressed, bool controlPressed, bool altPressed)
         {
             List<Keys> pressedKeys = _currentKeyboardState.GetPressedKeys()
                 .Where(key => !_previousKeyboardState.IsKeyDown(key))
                 .ToList();
 
             // rebind if a key has been pressed
-            if (pressedKeys.Count > 0)
+            foreach (Keys key in pressedKeys)
             {
-                _rebinding.Shift = shiftPressed;
+                if (key == Keys.LeftControl || key == Keys.RightControl
+                    || key == Keys.LeftAlt || key == Keys.RightAlt
+                    || key == Keys.LeftShift || key == Keys.RightShift)
+                {
+                    continue;
+                }
+
                 _rebinding.Key = pressedKeys[0];
+                _rebinding.Shift = shiftPressed;
+                _rebinding.Control = controlPressed;
+                _rebinding.Alt = altPressed;
                 _rebinding = null;
             }
         }
