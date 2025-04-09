@@ -97,7 +97,7 @@ namespace Atem.Views.MonoGame.UI.Window
                                 label += keybind.Shift ? "Shift+" : "";
                                 label += keybind.Control ? "Control+" : "";
                                 label += keybind.Alt ? "Alt+" : "";
-                                label += keybind.Key.ToString() + "##" + buttonIndex;
+                                label += _inputManager.KeyProvider.GetKeyString(keybind.Key) + "##" + buttonIndex;
 
                                 if (ImGui.Button(label))
                                 {

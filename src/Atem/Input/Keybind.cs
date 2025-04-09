@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework.Input;
-using Atem.Input.Command;
+﻿using Atem.Input.Command;
 
 namespace Atem.Input
 {
@@ -9,6 +8,6 @@ namespace Atem.Input
         public bool Shift { get; set; }
         public bool Control { get; set; }
         public bool Alt { get; set; }
-        public Keys Key { get; set; }
+        public int Key { get; set; }
     }
 }

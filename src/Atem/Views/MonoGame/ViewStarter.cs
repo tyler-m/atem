@@ -6,6 +6,7 @@ using Atem.Input.Configure;
 using Atem.Saving;
 using Atem.Shutdown;
 using Atem.Views.MonoGame.Audio;
+using Atem.Views.MonoGame.Input;
 using Atem.Views.MonoGame.UI;
 
 namespace Atem.Views.MonoGame
@@ -34,7 +35,7 @@ namespace Atem.Views.MonoGame
             FileSaveStateService saveStateService = new(_atem);
             FileCartridgeLoader cartridgeLoader = new(_atem);
             FileBatterySaveService batterySaveService = new(_atem);
-            InputManager inputManager = new();
+            InputManager inputManager = new(new KeyProvider());
             ImGuiRenderer imGui = new();
             Screen screen = new(_atem);
             ConfigService configService = new(configStore, screen, _atem.Bus.Audio, inputManager);
