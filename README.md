@@ -9,7 +9,7 @@ A cross-platform emulator for the Game Boy Color written in C#
 <a href="images/3.png"><img src="images/3.png" width="418"></a>
 
 Status
-===
+---
 - **Processor**
   - [X] Fully implemented Game Boy CPU instruction set
   - [X] Passes Blargg's [cpu_instrs](https://github.com/libretro/testroms/blob/master/blargg-cpu-instrs/) test suite
@@ -42,6 +42,29 @@ Status
   - [X] Memory view
   - [X] CPU register view
   - [X] Address-based breakpoints
+
+Developing
+---
+
+- SDK for .NET 8.0+ must be installed
+
+Grab the repo
+```
+git clone https://github.com/tyler-m/atem.git
+cd atem
+```
+
+Restore dependencies
+
+`dotnet restore`
+
+Build
+
+`dotnet build`
+
+Test
+
+`dotnet test`
 
 Notes
 ---
