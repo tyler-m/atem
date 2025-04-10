@@ -26,7 +26,8 @@ namespace Atem.Shutdown
                 _batterySaveService.Save(_cartridgeLoader.Context);
             }
 
-            _configService.Save();
+            _configService.SaveValues();
+            _configService.SaveConfig();
         }
     }
 }

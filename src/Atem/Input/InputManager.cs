@@ -44,15 +44,26 @@ namespace Atem.Input
             }
         }
 
+        public static Dictionary<CommandType, List<Keybind>> GetDefaultKeybinds()
+        {
+            Dictionary<CommandType, List<Keybind>> keybinds = [];
+
+            foreach (CommandType type in Enum.GetValues(typeof(CommandType)))
+            {
+                keybinds.Add(type, []);
+            }
+
+            return keybinds;
+        }
+
         public InputManager(IKeyProvider keyProvider)
         {
-            _keybinds = [];
+            _keybinds = GetDefaultKeybinds();
             _commands = [];
 
             foreach (CommandType type in Enum.GetValues(typeof(CommandType)))
             {
                 _commands.Add(type, []);
-                _keybinds.Add(type, []);
             }
 
             _keyProvider = keyProvider;

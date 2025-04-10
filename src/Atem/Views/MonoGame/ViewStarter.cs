@@ -31,7 +31,6 @@ namespace Atem.Views.MonoGame
 
         public void InitializeView()
         {
-            ConfigFileStore configStore = new(Directory.GetCurrentDirectory() + "/config.json");
             SoundService soundService = new(_atem.Bus.Audio);
             FileSaveStateService saveStateService = new(_atem);
             FileCartridgeLoader cartridgeLoader = new(_atem);
@@ -39,7 +38,8 @@ namespace Atem.Views.MonoGame
             InputManager inputManager = new(new KeyProvider());
             ImGuiRenderer imGui = new();
             Screen screen = new(_atem);
-            ConfigService configService = new(configStore, screen, _atem.Bus.Audio, inputManager);
+            ConfigFileStore<AtemConfig> configStore = new(Directory.GetCurrentDirectory() + "/config.json");
+            AtemConfigService configService = new(configStore, screen, _atem.Bus.Audio, inputManager);
             ViewUIManager viewUIManager = new(imGui, _atem, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager);
             AtemShutdownService shutdownService = new(_atem, configService, cartridgeLoader, batterySaveService);
 
@@ -52,7 +52,8 @@ namespace Atem.Views.MonoGame
             atemCommandConfigurator.Configure(inputManager);
             viewCommandConfigurator.Configure(inputManager);
 
-            configService.Load();
+            configService.LoadConfig();
+            configService.LoadValues();
         }
     }
 }

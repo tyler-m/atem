@@ -1,8 +1,11 @@
-﻿namespace Atem.Config
+﻿
+namespace Atem.Config
 {
     public interface IConfigService
     {
-        public void Save();
-        public void Load();
+        public void SaveValues();
+        public void LoadValues();
+        public void SaveConfig();
+        public void LoadConfig();
     }
 }

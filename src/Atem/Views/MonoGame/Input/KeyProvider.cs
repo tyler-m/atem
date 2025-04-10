@@ -5,7 +5,7 @@ using Atem.Input;
 
 namespace Atem.Views.MonoGame.Input
 {
-    internal class KeyProvider : IKeyProvider
+    public class KeyProvider : IKeyProvider
     {
         private KeyboardState _currentState;
         private KeyboardState _previousState;

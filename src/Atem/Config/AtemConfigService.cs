@@ -4,31 +4,42 @@ using Atem.Input;
 
 namespace Atem.Config
 {
-    public class ConfigService : IConfigService
+    public class AtemConfigService : IConfigService
     {
         private AtemConfig _config;
-        private readonly IConfigStore _configStore;
+        private readonly IConfigStore<AtemConfig> _configStore;
         private readonly IScreen _screen;
         private readonly IAudioManager _audioManager;
         private readonly InputManager _inputManager;
 
-        public ConfigService(IConfigStore configStore, IScreen screen, IAudioManager audioManager, InputManager inputManager)
+        public AtemConfig Config => _config;
+
+        public AtemConfigService(IConfigStore<AtemConfig> configStore, IScreen screen, IAudioManager audioManager, InputManager inputManager)
         {
+            _config = AtemConfig.GetDefaults();
             _configStore = configStore;
             _screen = screen;
             _audioManager = audioManager;
             _inputManager = inputManager;
         }
 
-        public void Load()
+        public void LoadValues()
         {
-            _config = _configStore.Load();
             SetValuesFromConfig();
         }
 
-        public void Save()
+        public void LoadConfig()
+        {
+            _config = _configStore.Load();
+        }
+
+        public void SaveValues()
         {
             SetConfigValues();
+        }
+
+        public void SaveConfig()
+        {
             _configStore.Save(_config);
         }
 

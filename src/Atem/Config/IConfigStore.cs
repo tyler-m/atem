@@ -1,8 +1,9 @@
-﻿namespace Atem.Config
+﻿
+namespace Atem.Config
 {
-    public interface IConfigStore
+    public interface IConfigStore<T> where T : IConfig<T>
     {
-        public void Save(AtemConfig config);
-        public AtemConfig Load();
+        public void Save(T config);
+        public T Load();
     }
 }

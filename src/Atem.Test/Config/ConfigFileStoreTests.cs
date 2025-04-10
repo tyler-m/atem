@@ -9,7 +9,7 @@ namespace Atem.Test.Config
         {
             string tempFilePath = Path.GetTempFileName();
             File.Delete(tempFilePath);
-            ConfigFileStore store = new(tempFilePath);
+            ConfigFileStore<AtemConfig> store = new(tempFilePath);
 
             store.Load();
 
@@ -21,9 +21,9 @@ namespace Atem.Test.Config
         {
             string tempFilePath = Path.GetTempFileName();
             File.Delete(tempFilePath);
-            ConfigFileStore store = new(tempFilePath);
+            ConfigFileStore<AtemConfig> store = new(tempFilePath);
 
-            store.Save(ConfigDefaults.Create());
+            store.Save(AtemConfig.GetDefaults());
 
             Assert.True(File.Exists(tempFilePath));
         }
@@ -33,8 +33,8 @@ namespace Atem.Test.Config
         {
             string tempFilePath = Path.GetTempFileName();
             File.Delete(tempFilePath);
-            ConfigFileStore store = new(tempFilePath);
-            AtemConfig config = ConfigDefaults.Create();
+            ConfigFileStore<AtemConfig> store = new(tempFilePath);
+            AtemConfig config = AtemConfig.GetDefaults();
 
             store.Save(config);
             AtemConfig loadedConfig = store.Load();
@@ -45,7 +45,7 @@ namespace Atem.Test.Config
         [Fact]
         public void Save_WithNullConfig_ThrowsArgumentNullException()
         {
-            ConfigFileStore store = new(Path.GetTempFileName());
+            ConfigFileStore<AtemConfig> store = new(Path.GetTempFileName());
 
             Assert.Throws<ArgumentNullException>(() => store.Save(null));
         }
