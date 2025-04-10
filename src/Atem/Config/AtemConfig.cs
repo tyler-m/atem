@@ -4,7 +4,7 @@ using Atem.Input.Command;
 
 namespace Atem.Config
 {
-    public class Config
+    public class AtemConfig
     {
         public Dictionary<CommandType, List<Keybind>> Keybinds { get; set; }
         public int ScreenWidth { get; set; }

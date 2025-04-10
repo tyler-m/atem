@@ -2,7 +2,7 @@
 {
     public interface IConfigStore
     {
-        public void Save(Config config);
-        public Config Load();
+        public void Save(AtemConfig config);
+        public AtemConfig Load();
     }
 }

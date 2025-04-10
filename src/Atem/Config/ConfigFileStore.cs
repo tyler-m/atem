@@ -14,17 +14,17 @@ namespace Atem.Config
             _serializerOptions = new JsonSerializerOptions() { WriteIndented = true };
         }
 
-        public Config Load()
+        public AtemConfig Load()
         {
             if (!File.Exists(_configFilePath))
             {
                 Save(ConfigDefaults.Create());
             }
 
-            return JsonSerializer.Deserialize<Config>(File.ReadAllText(_configFilePath));
+            return JsonSerializer.Deserialize<AtemConfig>(File.ReadAllText(_configFilePath));
         }
 
-        public void Save(Config config)
+        public void Save(AtemConfig config)
         {
             string configJson = JsonSerializer.Serialize(config, _serializerOptions);
             File.WriteAllText(_configFilePath, configJson);

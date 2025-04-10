@@ -6,7 +6,7 @@ namespace Atem.Config
 {
     public class ConfigService : IConfigService
     {
-        private Config _config;
+        private AtemConfig _config;
         private readonly IConfigStore _configStore;
         private readonly IScreen _screen;
         private readonly IAudioManager _audioManager;

@@ -2,9 +2,9 @@
 {
     public static class ConfigDefaults
     {
-        public static Config Create()
+        public static AtemConfig Create()
         {
-            return new Config()
+            return new AtemConfig()
             {
                 ScreenWidth = 160,
                 ScreenHeight = 144,
