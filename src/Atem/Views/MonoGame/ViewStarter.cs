@@ -49,8 +49,10 @@ namespace Atem.Views.MonoGame
             // add commands to the input manager
             AtemCommandConfigurator atemCommandConfigurator = new(_atem);
             ViewCommandConfigurator viewCommandConfigurator = new(_view);
+            StateCommandConfigurator stateCommandConfigurator = new(saveStateService, cartridgeLoader.Context);
             atemCommandConfigurator.Configure(inputManager);
             viewCommandConfigurator.Configure(inputManager);
+            stateCommandConfigurator.Configure(inputManager);
 
             configService.LoadConfig();
             configService.LoadValues();

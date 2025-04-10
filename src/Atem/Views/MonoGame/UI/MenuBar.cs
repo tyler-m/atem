@@ -35,6 +35,8 @@ namespace Atem.Views.MonoGame.UI
                         OnOpen?.Invoke();
                     }
 
+                    ImGui.Separator();
+
                     if (ImGui.BeginMenu("Save State", _enableStates))
                     {
                         for (int i = 0; i < 10; i++)
