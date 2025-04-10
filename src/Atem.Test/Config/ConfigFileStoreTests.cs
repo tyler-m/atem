@@ -41,5 +41,13 @@ namespace Atem.Test.Config
 
             Assert.True(loadedConfig.Equals(config));
         }
+
+        [Fact]
+        public void Save_WithNullConfig_ThrowsArgumentNullException()
+        {
+            ConfigFileStore store = new(Path.GetTempFileName());
+
+            Assert.Throws<ArgumentNullException>(() => store.Save(null));
+        }
     }
 }
