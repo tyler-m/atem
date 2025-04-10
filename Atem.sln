@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem", "src\Atem\Atem.cspro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Core", "src\Atem.Core\Atem.Core.csproj", "{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Test", "src\Atem.Test\Atem.Test.csproj", "{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDCA32AD-59F8-4301-80D1-46F18F0D64DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
