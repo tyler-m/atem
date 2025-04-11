@@ -11,7 +11,8 @@ namespace Atem.Test.Config
     {
         private static AtemConfig CreateConfig()
         {
-            return new AtemConfig() {
+            return new AtemConfig()
+            {
                 ScreenWidth = int.MaxValue,
                 ScreenHeight = int.MinValue,
                 ScreenSizeFactor = float.MaxValue,

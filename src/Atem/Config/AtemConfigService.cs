@@ -16,7 +16,7 @@ namespace Atem.Config
 
         public AtemConfigService(IConfigStore<AtemConfig> configStore, IScreen screen, IAudioManager audioManager, InputManager inputManager)
         {
-            _config = AtemConfig.GetDefaults();
+            _config = new AtemConfig();
             _configStore = configStore;
             _screen = screen;
             _audioManager = audioManager;

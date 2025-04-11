@@ -13,18 +13,6 @@ namespace Atem.Config
         public float ScreenSizeFactor { get; set; }
         public float UserVolumeFactor { get; set; }
 
-        public static AtemConfig GetDefaults()
-        {
-            return new AtemConfig()
-            {
-                ScreenWidth = 160,
-                ScreenHeight = 144,
-                ScreenSizeFactor = 2.0f,
-                Keybinds = [],
-                UserVolumeFactor = 1.0f,
-            };
-        }
-
         public bool Equals(AtemConfig otherConfig)
         {
             if (otherConfig == null)
