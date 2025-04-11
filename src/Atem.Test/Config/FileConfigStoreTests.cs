@@ -2,7 +2,7 @@
 
 namespace Atem.Test.Config
 {
-    public class ConfigFileStoreTests
+    public class FileConfigStoreTests
     {
         private StubAtemConfigDefaultsProvider _defaultsProvider = new();
 
@@ -11,7 +11,7 @@ namespace Atem.Test.Config
         {
             string tempFilePath = Path.GetTempFileName();
             File.Delete(tempFilePath);
-            ConfigFileStore<AtemConfig> store = new(_defaultsProvider, tempFilePath);
+            FileConfigStore<AtemConfig> store = new(_defaultsProvider, tempFilePath);
 
             store.Load();
 
@@ -23,7 +23,7 @@ namespace Atem.Test.Config
         {
             string tempFilePath = Path.GetTempFileName();
             File.Delete(tempFilePath);
-            ConfigFileStore<AtemConfig> store = new(_defaultsProvider, tempFilePath);
+            FileConfigStore<AtemConfig> store = new(_defaultsProvider, tempFilePath);
 
             store.Save(_defaultsProvider.GetDefaults());
 
@@ -33,7 +33,7 @@ namespace Atem.Test.Config
         [Fact]
         public void Save_WithNullConfig_ThrowsArgumentNullException()
         {
-            ConfigFileStore<AtemConfig> store = new(_defaultsProvider, Path.GetTempFileName());
+            FileConfigStore<AtemConfig> store = new(_defaultsProvider, Path.GetTempFileName());
 
             Assert.Throws<ArgumentNullException>(() => store.Save(null));
         }

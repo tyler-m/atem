@@ -4,13 +4,13 @@ using System.Text.Json;
 
 namespace Atem.Config
 {
-    public class ConfigFileStore<T> : IConfigStore<T> where T : IConfig<T>
+    public class FileConfigStore<T> : IConfigStore<T> where T : IConfig<T>
     {
         private readonly IConfigDefaultsProvider<T> _configDefaultsProvider;
         private readonly string _configFilePath;
         private readonly JsonSerializerOptions _serializerOptions;
 
-        public ConfigFileStore(IConfigDefaultsProvider<T> configDefaultsProvider, string configFilePath)
+        public FileConfigStore(IConfigDefaultsProvider<T> configDefaultsProvider, string configFilePath)
         {
             _configDefaultsProvider = configDefaultsProvider;
             _configFilePath = configFilePath;
