@@ -15,9 +15,9 @@ namespace Atem.Core.Processing
 
         private int _divTick;
         private int _timaTick;
-        private Bus _bus;
+        private IBus _bus;
 
-        public Timer(Bus bus)
+        public Timer(IBus bus)
         {
             _bus = bus;
         }

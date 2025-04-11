@@ -19,7 +19,7 @@ namespace Atem.Core.Graphics
     {
         public static float FrameRate = 59.73f;
 
-        private Bus _bus;
+        private IBus _bus;
         private List<Sprite> _spriteBuffer = new List<Sprite>();
         private int _lineDotCount;
         private byte _linePixel;
@@ -145,7 +145,7 @@ namespace Atem.Core.Graphics
             }
         }
 
-        public GraphicsManager(Bus bus)
+        public GraphicsManager(IBus bus)
         {
             _bus = bus;
             Registers = new GraphicsRegisters(this);

@@ -20,7 +20,7 @@ namespace Atem.Core.Input
     {
         private byte _joypad;
         private byte _joyp;
-        private readonly Bus _bus;
+        private readonly IBus _bus;
 
         private bool Up => _joypad.GetBit((int)JoypadButton.Up);
         private bool Down => _joypad.GetBit((int)JoypadButton.Down);
@@ -31,7 +31,7 @@ namespace Atem.Core.Input
         private bool Select => _joypad.GetBit((int)JoypadButton.Select);
         private bool Start => _joypad.GetBit((int)JoypadButton.Start);
 
-        public Joypad(Bus bus)
+        public Joypad(IBus bus)
         {
             _bus = bus;
         }

@@ -660,7 +660,7 @@ namespace Atem.Core
             }
         }
 
-        internal void RequestInterrupt(InterruptType interruptType)
+        public void RequestInterrupt(InterruptType interruptType)
         {
             _interrupt.SetInterrupt(interruptType);
         }

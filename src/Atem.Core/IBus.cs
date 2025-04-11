@@ -18,7 +18,9 @@ namespace Atem.Core
         Cartridge Cartridge { get; }
         byte[] HRAM { get; }
         byte[] WRAM { get; }
+        bool ColorMode { get; }
         public void Write(ushort address, byte value);
         public bool LoadCartridge(byte[] data);
+        public void RequestInterrupt(InterruptType interruptType);
     }
 }
