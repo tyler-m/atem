@@ -32,7 +32,16 @@ namespace Atem.Config
                 Save(_configDefaultsProvider.GetDefaults());
             }
 
-            return JsonSerializer.Deserialize<T>(File.ReadAllText(_configFilePath));
+            string configJson = File.ReadAllText(_configFilePath);
+
+            try
+            {
+                return JsonSerializer.Deserialize<T>(configJson);
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidConfigException("Configuration file unable to be deserialized.", exception);
+            }
         }
     }
 }
