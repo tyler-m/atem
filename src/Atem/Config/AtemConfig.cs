@@ -34,32 +34,37 @@ namespace Atem.Config
 
             if (Keybinds == null || otherConfig.Keybinds == null)
             {
-                return Keybinds == otherConfig.Keybinds;
+                if (Keybinds != null || otherConfig.Keybinds != null)
+                {
+                    return false;
+                }
             }
-
-            if (Keybinds.Count != otherConfig.Keybinds.Count)
+            else
             {
-                return false;
-            }
-
-            foreach ((CommandType type, List<Keybind> keybinds) in Keybinds)
-            {
-                if (!otherConfig.Keybinds.TryGetValue(type, out List<Keybind> otherKeybinds))
+                if (Keybinds.Count != otherConfig.Keybinds.Count)
                 {
                     return false;
                 }
 
-                if (keybinds.Count != otherKeybinds.Count)
+                foreach ((CommandType type, List<Keybind> keybinds) in Keybinds)
                 {
-                    return false;
-                }
-
-                // the order of keybinds matters
-                for (int i = 0; i < keybinds.Count; i++)
-                {
-                    if (!keybinds[i].Equals(otherKeybinds[i]))
+                    if (!otherConfig.Keybinds.TryGetValue(type, out List<Keybind> otherKeybinds))
                     {
                         return false;
+                    }
+
+                    if (keybinds.Count != otherKeybinds.Count)
+                    {
+                        return false;
+                    }
+
+                    // the order of keybinds matters
+                    for (int i = 0; i < keybinds.Count; i++)
+                    {
+                        if (!keybinds[i].Equals(otherKeybinds[i]))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
