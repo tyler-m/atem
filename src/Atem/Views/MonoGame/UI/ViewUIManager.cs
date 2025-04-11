@@ -14,7 +14,6 @@ namespace Atem.Views.MonoGame.UI
     {
         private readonly ImGuiRenderer _imGui;
         private readonly AtemRunner _atem;
-        private readonly ISaveStateService _saveStateService;
         private readonly IBatterySaveService _batterySaveService;
         private readonly ICartridgeLoader _cartridgeLoader;
         private readonly Screen _screen;
@@ -41,39 +40,22 @@ namespace Atem.Views.MonoGame.UI
         {
             _imGui = imGui;
             _atem = atem;
-            _saveStateService = saveStateService;
             _batterySaveService = batterySaveService;
             _cartridgeLoader = cartridgeLoader;
             _screen = screen;
 
             _fileBrowserWindow = new FileBrowserWindow();
             _fileBrowserWindow.OnSelectFile += LoadFile;
-
             _memoryWindow = new MemoryWindow(_atem.Bus);
-
-            _menuBar = new MenuBar();
+            _menuBar = new MenuBar(saveStateService, cartridgeLoader);
             _menuBar.OnExit += () => OnExitRequest?.Invoke();
             _menuBar.OnDebug += ToggleDebug;
-            _menuBar.OnLoadState += LoadStateData;
-            _menuBar.OnSaveState += SaveStateData;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
-
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
             _optionsWindow = new OptionsWindow(screen, _atem.Bus.Audio, inputManager);
-
             _screen.OnScreenTextureCreated += OnScreenTextureCreated;
-        }
-
-        private void LoadStateData(int slot)
-        {
-            _saveStateService.Load(slot, _cartridgeLoader.Context);
-        }
-
-        private void SaveStateData(int slot)
-        {
-            _saveStateService.Save(slot, _cartridgeLoader.Context);
         }
 
         private void OnScreenTextureCreated(Texture2D texture)

@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using Atem.Saving;
+using ImGuiNET;
 
 namespace Atem.Views.MonoGame.UI
 {
@@ -6,15 +7,13 @@ namespace Atem.Views.MonoGame.UI
     {
         private int _height = 19;
         private bool _enableStates;
+        private readonly ISaveStateService _saveStateService;
+        private readonly ICartridgeLoader _cartridgeLoader;
 
         public delegate void ExitEvent();
         public event ExitEvent OnExit;
         public delegate void DebugEvent();
         public event DebugEvent OnDebug;
-        public delegate void SaveStateEvent(int slot);
-        public event SaveStateEvent OnSaveState;
-        public delegate void LoadStateEvent(int slot);
-        public event LoadStateEvent OnLoadState;
         public delegate void OnOpenEvent();
         public event OnOpenEvent OnOpen;
         public delegate void OnOptionsEvent();
@@ -23,6 +22,12 @@ namespace Atem.Views.MonoGame.UI
         public int Height { get => _height; }
 
         public bool EnableStates { get => _enableStates; set => _enableStates = value; }
+
+        public MenuBar(ISaveStateService saveStateService, ICartridgeLoader cartridgeLoader)
+        {
+            _saveStateService = saveStateService;
+            _cartridgeLoader = cartridgeLoader;
+        }
 
         public void Draw()
         {
@@ -43,7 +48,7 @@ namespace Atem.Views.MonoGame.UI
                         {
                             if (ImGui.MenuItem("Slot " + i))
                             {
-                                OnSaveState?.Invoke(i);
+                                _saveStateService.Save(i, _cartridgeLoader.Context);
                             }
                         }
                         ImGui.EndMenu();
@@ -55,7 +60,7 @@ namespace Atem.Views.MonoGame.UI
                         {
                             if (ImGui.MenuItem("Slot " + i))
                             {
-                                OnLoadState?.Invoke(i);
+                                _saveStateService.Load(i, _cartridgeLoader.Context);
                             }
                         }
                         ImGui.EndMenu();
