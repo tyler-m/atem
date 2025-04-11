@@ -12,14 +12,14 @@ namespace Atem.Core
         private static float ClocksPerFrame => Processor.Frequency / GraphicsManager.FrameRate;
         private float _leftoverClocks = 0.0f;
         private readonly int _clockCost = 4;
-        private readonly Bus _bus;
+        private readonly IBus _bus;
         private readonly Debugger _debugger;
         private bool _forceClock;
         private bool _paused;
 
         public Debugger Debugger { get => _debugger; }
 
-        public Bus Bus { get =>  _bus; }
+        public IBus Bus { get =>  _bus; }
 
         public bool Paused { get => _paused; set => _paused = value; }
 
