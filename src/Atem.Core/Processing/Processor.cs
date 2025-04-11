@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.IO;
-using Atem.Core.State;
+using System.Numerics;
 
 namespace Atem.Core.Processing
 {
-    public class Processor : IProcessor, IStateful
+    public class Processor : IProcessor
     {
         public static int Frequency = 4194304;
 

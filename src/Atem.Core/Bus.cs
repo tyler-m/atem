@@ -8,7 +8,7 @@ namespace Atem.Core
 {
     public class Bus : IBus
     {
-        private Processor _processor;
+        private IProcessor _processor;
         private GraphicsManager _graphics;
         private Timer _timer;
         private Interrupt _interrupt;
@@ -23,7 +23,7 @@ namespace Atem.Core
         public byte SVBK = 0;
         public byte[] HRAM { get => _hram; }
         public byte[] WRAM { get => _wram; }
-        public Processor Processor { get => _processor; }
+        public IProcessor Processor { get => _processor; }
         public Timer Timer { get => _timer; }
         public AudioManager Audio { get => _audio; }
         public GraphicsManager Graphics { get => _graphics; }
