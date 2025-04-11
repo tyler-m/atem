@@ -37,5 +37,16 @@ namespace Atem.Test.Config
 
             Assert.Throws<ArgumentNullException>(() => store.Save(null));
         }
+
+        [Fact]
+        public void Load_WithInvalidJson_ThrowsInvalidConfigException()
+        {
+            string tempFilePath = Path.GetTempFileName();
+            File.WriteAllText(tempFilePath, "invalid json");
+
+            FileConfigStore<AtemConfig> store = new(_defaultsProvider, tempFilePath);
+
+            Assert.Throws<InvalidConfigException>(store.Load);
+        }
     }
 }
