@@ -6,7 +6,7 @@ namespace Atem.Core.Processing.Instructions
 {
     internal static class Control
     {
-        public static void PopulateLookup(Dictionary<byte, Func<Processor, int>> lookup)
+        public static void PopulateLookup(Dictionary<byte, Func<IProcessor, int>> lookup)
         {
             lookup.Add(0x00, NOP);
             lookup.Add(0x10, STOP);
@@ -53,7 +53,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int RelativeJump(Processor cpu, bool condition)
+        private static int RelativeJump(IProcessor cpu, bool condition)
         {
             sbyte offset = (sbyte)cpu.ReadByte();
 
@@ -75,7 +75,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Return(Processor cpu, bool condition, bool shortCircuit = false)
+        private static int Return(IProcessor cpu, bool condition, bool shortCircuit = false)
         {
             if (shortCircuit || condition)
             {
@@ -88,7 +88,7 @@ namespace Atem.Core.Processing.Instructions
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Jump(Processor cpu, bool condition)
+        private static int Jump(IProcessor cpu, bool condition)
         {
             ushort address = cpu.ReadWord();
             if (condition)
@@ -101,7 +101,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Call(Processor cpu, bool condition)
+        private static int Call(IProcessor cpu, bool condition)
         {
             ushort address = cpu.ReadWord();
             if (condition)
@@ -115,19 +115,19 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int RST(Processor cpu, ushort address)
+        private static int RST(IProcessor cpu, ushort address)
         {
             cpu.PushWord(cpu.Registers.PC);
             cpu.Registers.PC = address;
             return 4;
         }
 
-        public static int NOP(Processor cpu) // 0x00
+        public static int NOP(IProcessor cpu) // 0x00
         {
             return 1;
         }
 
-        public static int STOP(Processor cpu) // 0x10
+        public static int STOP(IProcessor cpu) // 0x10
         {
             if (cpu.SpeedSwitchFlag)
             {
@@ -138,178 +138,178 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int HALT(Processor cpu) // 0x76
+        public static int HALT(IProcessor cpu) // 0x76
         {
             cpu.Halt();
             return 1;
         }
 
-        public static int PREFIX(Processor cpu) // 0xCB
+        public static int PREFIX(IProcessor cpu) // 0xCB
         {
             cpu.CB = true;
             return 1;
         }
 
-        public static int DI(Processor cpu) // 0xF3
+        public static int DI(IProcessor cpu) // 0xF3
         {
             cpu.IME = false;
             return 1;
         }
 
-        public static int EI(Processor cpu) // 0xFB
+        public static int EI(IProcessor cpu) // 0xFB
         {
             cpu.IME = true;
             return 1;
         }
 
-        public static int JR(Processor cpu) // 0x18
+        public static int JR(IProcessor cpu) // 0x18
         {
             return RelativeJump(cpu, true);
         }
 
-        public static int JRNZ(Processor cpu) // 0x20
+        public static int JRNZ(IProcessor cpu) // 0x20
         {
             return RelativeJump(cpu, !cpu.Registers.Flags.Z);
         }
 
-        public static int JRZ(Processor cpu) // 0x28
+        public static int JRZ(IProcessor cpu) // 0x28
         {
             return RelativeJump(cpu, cpu.Registers.Flags.Z);
         }
 
-        public static int JRNC(Processor cpu) // 0x30
+        public static int JRNC(IProcessor cpu) // 0x30
         {
             return RelativeJump(cpu, !cpu.Registers.Flags.C);
         }
 
-        public static int JRC(Processor cpu) // 0x38
+        public static int JRC(IProcessor cpu) // 0x38
         {
             return RelativeJump(cpu, cpu.Registers.Flags.C);
         }
 
-        public static int RETNZ(Processor cpu) // 0xC0
+        public static int RETNZ(IProcessor cpu) // 0xC0
         {
             return Return(cpu, !cpu.Registers.Flags.Z);
         }
 
-        public static int RETZ(Processor cpu) // 0xC8
+        public static int RETZ(IProcessor cpu) // 0xC8
         {
             return Return(cpu, cpu.Registers.Flags.Z);
         }
 
-        public static int RET(Processor cpu) // 0xC9
+        public static int RET(IProcessor cpu) // 0xC9
         {
             return Return(cpu, true, true);
         }
 
-        public static int RETNC(Processor cpu) // 0xD0
+        public static int RETNC(IProcessor cpu) // 0xD0
         {
             return Return(cpu, !cpu.Registers.Flags.C);
         }
 
-        public static int RETC(Processor cpu) // 0xD8
+        public static int RETC(IProcessor cpu) // 0xD8
         {
             return Return(cpu, cpu.Registers.Flags.C);
         }
 
-        public static int RETI(Processor cpu) // 0xD9
+        public static int RETI(IProcessor cpu) // 0xD9
         {
             cpu.IME = true;
             return Return(cpu, true, true);
         }
 
-        public static int JPNZ(Processor cpu) // 0xC2
+        public static int JPNZ(IProcessor cpu) // 0xC2
         {
             return Jump(cpu, !cpu.Registers.Flags.Z);
         }
 
-        public static int JP(Processor cpu) // 0xC3
+        public static int JP(IProcessor cpu) // 0xC3
         {
             return Jump(cpu, true);
         }
 
-        public static int JPZ(Processor cpu) // 0xCA
+        public static int JPZ(IProcessor cpu) // 0xCA
         {
             return Jump(cpu, cpu.Registers.Flags.Z);
         }
 
-        public static int JPNC(Processor cpu) // 0xD2
+        public static int JPNC(IProcessor cpu) // 0xD2
         {
             return Jump(cpu, !cpu.Registers.Flags.C);
         }
 
-        public static int JPC(Processor cpu) // 0xDA
+        public static int JPC(IProcessor cpu) // 0xDA
         {
             return Jump(cpu, cpu.Registers.Flags.C);
         }
 
-        public static int JPHL(Processor cpu) // 0xE9
+        public static int JPHL(IProcessor cpu) // 0xE9
         {
             cpu.Registers.PC = cpu.Registers.HL;
             return 1;
         }
 
-        public static int CALLNZ(Processor cpu) // 0xC4
+        public static int CALLNZ(IProcessor cpu) // 0xC4
         {
             return Call(cpu, !cpu.Registers.Flags.Z);
         }
 
-        public static int CALLZ(Processor cpu) // 0xCC
+        public static int CALLZ(IProcessor cpu) // 0xCC
         {
             return Call(cpu, cpu.Registers.Flags.Z);
         }
 
-        public static int CALL(Processor cpu) // 0xCD
+        public static int CALL(IProcessor cpu) // 0xCD
         {
             return Call(cpu, true);
         }
 
-        public static int CALLNC(Processor cpu) // 0xD4
+        public static int CALLNC(IProcessor cpu) // 0xD4
         {
             return Call(cpu, !cpu.Registers.Flags.C);
         }
 
-        public static int CALLC(Processor cpu) // 0xDC
+        public static int CALLC(IProcessor cpu) // 0xDC
         {
             return Call(cpu, cpu.Registers.Flags.C);
         }
 
-        public static int RST00(Processor cpu) // 0xC7
+        public static int RST00(IProcessor cpu) // 0xC7
         {
             return RST(cpu, 0x00);
         }
 
-        public static int RST08(Processor cpu) // 0xCF
+        public static int RST08(IProcessor cpu) // 0xCF
         {
             return RST(cpu, 0x08);
         }
 
-        public static int RST10(Processor cpu) // 0xD7
+        public static int RST10(IProcessor cpu) // 0xD7
         {
             return RST(cpu, 0x10);
         }
 
-        public static int RST18(Processor cpu) // 0xDF
+        public static int RST18(IProcessor cpu) // 0xDF
         {
             return RST(cpu, 0x18);
         }
 
-        public static int RST20(Processor cpu) // 0xE7
+        public static int RST20(IProcessor cpu) // 0xE7
         {
             return RST(cpu, 0x20);
         }
 
-        public static int RST28(Processor cpu) // 0xEF
+        public static int RST28(IProcessor cpu) // 0xEF
         {
             return RST(cpu, 0x28);
         }
 
-        public static int RST30(Processor cpu) // 0xF7
+        public static int RST30(IProcessor cpu) // 0xF7
         {
             return RST(cpu, 0x30);
         }
 
-        public static int RST38(Processor cpu) // 0xFF
+        public static int RST38(IProcessor cpu) // 0xFF
         {
             return RST(cpu, 0x38);
         }

@@ -4,9 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace Atem.Core.Processing.Instructions
 {
-    internal static class Bit
+    public static class Bit
     {
-        public static void PopulateLookup(Dictionary<byte, Func<Processor, int>> lookup)
+        public static void PopulateLookup(Dictionary<byte, Func<IProcessor, int>> lookup)
         {
             lookup.Add(0x00, RLCB);
             lookup.Add(0x01, RLCC);
@@ -300,7 +300,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Rlc(Processor cpu, ref byte value)
+        private static int Rlc(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -312,7 +312,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Rrc(Processor cpu, ref byte value)
+        private static int Rrc(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -324,7 +324,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Rl(Processor cpu, ref byte value)
+        private static int Rl(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -337,7 +337,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Rr(Processor cpu, ref byte value)
+        private static int Rr(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -350,7 +350,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Sla(Processor cpu, ref byte value)
+        private static int Sla(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -361,7 +361,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Sra(Processor cpu, ref byte value)
+        private static int Sra(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -374,7 +374,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Swap(Processor cpu, ref byte value)
+        private static int Swap(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -385,7 +385,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Srl(Processor cpu, ref byte value)
+        private static int Srl(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -396,7 +396,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int FlipBit(Processor cpu, int bit, ref byte value)
+        private static int FlipBit(IProcessor cpu, int bit, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = true;
@@ -405,50 +405,50 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Res(Processor cpu, int bit, ref byte value)
+        private static int Res(IProcessor cpu, int bit, ref byte value)
         {
             value = value.ClearBit(Convert.ToInt32(bit));
             return 2;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Set(Processor cpu, int bit, ref byte value)
+        private static int Set(IProcessor cpu, int bit, ref byte value)
         {
             value = value.SetBit(Convert.ToInt32(bit));
             return 2;
         }
 
-        public static int RLCB(Processor cpu) // 0x00
+        public static int RLCB(IProcessor cpu) // 0x00
         {
             return Rlc(cpu, ref cpu.Registers.B);
         }
 
-        public static int RLCC(Processor cpu) // 0x01
+        public static int RLCC(IProcessor cpu) // 0x01
         {
             return Rlc(cpu, ref cpu.Registers.C);
         }
 
-        public static int RLCD(Processor cpu) // 0x02
+        public static int RLCD(IProcessor cpu) // 0x02
         {
             return Rlc(cpu, ref cpu.Registers.D);
         }
 
-        public static int RLCE(Processor cpu) // 0x03
+        public static int RLCE(IProcessor cpu) // 0x03
         {
             return Rlc(cpu, ref cpu.Registers.E);
         }
 
-        public static int RLCH(Processor cpu) // 0x04
+        public static int RLCH(IProcessor cpu) // 0x04
         {
             return Rlc(cpu, ref cpu.Registers.H);
         }
 
-        public static int RLCL(Processor cpu) // 0x05
+        public static int RLCL(IProcessor cpu) // 0x05
         {
             return Rlc(cpu, ref cpu.Registers.L);
         }
 
-        public static int RLC_HL_(Processor cpu) // 0x06
+        public static int RLC_HL_(IProcessor cpu) // 0x06
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Rlc(cpu, ref value);
@@ -456,42 +456,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RLCA(Processor cpu) // 0x07
+        public static int RLCA(IProcessor cpu) // 0x07
         {
             return Rlc(cpu, ref cpu.Registers.A);
         }
 
-        public static int RRCB(Processor cpu) // 0x08
+        public static int RRCB(IProcessor cpu) // 0x08
         {
             return Rrc(cpu, ref cpu.Registers.B);
         }
 
-        public static int RRCC(Processor cpu) // 0x09
+        public static int RRCC(IProcessor cpu) // 0x09
         {
             return Rrc(cpu, ref cpu.Registers.C);
         }
 
-        public static int RRCD(Processor cpu) // 0x0A
+        public static int RRCD(IProcessor cpu) // 0x0A
         {
             return Rrc(cpu, ref cpu.Registers.D);
         }
 
-        public static int RRCE(Processor cpu) // 0x0B
+        public static int RRCE(IProcessor cpu) // 0x0B
         {
             return Rrc(cpu, ref cpu.Registers.E);
         }
 
-        public static int RRCH(Processor cpu) // 0x0C
+        public static int RRCH(IProcessor cpu) // 0x0C
         {
             return Rrc(cpu, ref cpu.Registers.H);
         }
 
-        public static int RRCL(Processor cpu) // 0x0D
+        public static int RRCL(IProcessor cpu) // 0x0D
         {
             return Rrc(cpu, ref cpu.Registers.L);
         }
 
-        public static int RRC_HL_(Processor cpu) // 0x0E
+        public static int RRC_HL_(IProcessor cpu) // 0x0E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Rrc(cpu, ref value);
@@ -499,42 +499,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RRCA(Processor cpu) // 0x0F
+        public static int RRCA(IProcessor cpu) // 0x0F
         {
             return Rrc(cpu, ref cpu.Registers.A);
         }
 
-        public static int RLB(Processor cpu) // 0x10
+        public static int RLB(IProcessor cpu) // 0x10
         {
             return Rl(cpu, ref cpu.Registers.B);
         }
 
-        public static int RLC(Processor cpu) // 0x11
+        public static int RLC(IProcessor cpu) // 0x11
         {
             return Rl(cpu, ref cpu.Registers.C);
         }
 
-        public static int RLD(Processor cpu) // 0x12
+        public static int RLD(IProcessor cpu) // 0x12
         {
             return Rl(cpu, ref cpu.Registers.D);
         }
 
-        public static int RLE(Processor cpu) // 0x13
+        public static int RLE(IProcessor cpu) // 0x13
         {
             return Rl(cpu, ref cpu.Registers.E);
         }
 
-        public static int RLH(Processor cpu) // 0x14
+        public static int RLH(IProcessor cpu) // 0x14
         {
             return Rl(cpu, ref cpu.Registers.H);
         }
 
-        public static int RLL(Processor cpu) // 0x15
+        public static int RLL(IProcessor cpu) // 0x15
         {
             return Rl(cpu, ref cpu.Registers.L);
         }
 
-        public static int RL_HL_(Processor cpu) // 0x16
+        public static int RL_HL_(IProcessor cpu) // 0x16
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Rl(cpu, ref value);
@@ -542,42 +542,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RLA(Processor cpu) // 0x17
+        public static int RLA(IProcessor cpu) // 0x17
         {
             return Rl(cpu, ref cpu.Registers.A);
         }
 
-        public static int RRB(Processor cpu) // 0x18
+        public static int RRB(IProcessor cpu) // 0x18
         {
             return Rr(cpu, ref cpu.Registers.B);
         }
 
-        public static int RRC(Processor cpu) // 0x19
+        public static int RRC(IProcessor cpu) // 0x19
         {
             return Rr(cpu, ref cpu.Registers.C);
         }
 
-        public static int RRD(Processor cpu) // 0x1A
+        public static int RRD(IProcessor cpu) // 0x1A
         {
             return Rr(cpu, ref cpu.Registers.D);
         }
 
-        public static int RRE(Processor cpu) // 0x1B
+        public static int RRE(IProcessor cpu) // 0x1B
         {
             return Rr(cpu, ref cpu.Registers.E);
         }
 
-        public static int RRH(Processor cpu) // 0x1C
+        public static int RRH(IProcessor cpu) // 0x1C
         {
             return Rr(cpu, ref cpu.Registers.H);
         }
 
-        public static int RRL(Processor cpu) // 0x1D
+        public static int RRL(IProcessor cpu) // 0x1D
         {
             return Rr(cpu, ref cpu.Registers.L);
         }
 
-        public static int RR_HL_(Processor cpu) // 0x1E
+        public static int RR_HL_(IProcessor cpu) // 0x1E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Rr(cpu, ref value);
@@ -585,42 +585,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RRA(Processor cpu) // 0x1F
+        public static int RRA(IProcessor cpu) // 0x1F
         {
             return Rr(cpu, ref cpu.Registers.A);
         }
 
-        public static int SLAB(Processor cpu) // 0x20
+        public static int SLAB(IProcessor cpu) // 0x20
         {
             return Sla(cpu, ref cpu.Registers.B);
         }
 
-        public static int SLAC(Processor cpu) // 0x21
+        public static int SLAC(IProcessor cpu) // 0x21
         {
             return Sla(cpu, ref cpu.Registers.C);
         }
 
-        public static int SLAD(Processor cpu) // 0x22
+        public static int SLAD(IProcessor cpu) // 0x22
         {
             return Sla(cpu, ref cpu.Registers.D);
         }
 
-        public static int SLAE(Processor cpu) // 0x23
+        public static int SLAE(IProcessor cpu) // 0x23
         {
             return Sla(cpu, ref cpu.Registers.E);
         }
 
-        public static int SLAH(Processor cpu) // 0x24
+        public static int SLAH(IProcessor cpu) // 0x24
         {
             return Sla(cpu, ref cpu.Registers.H);
         }
 
-        public static int SLAL(Processor cpu) // 0x25
+        public static int SLAL(IProcessor cpu) // 0x25
         {
             return Sla(cpu, ref cpu.Registers.L);
         }
 
-        public static int SLA_HL_(Processor cpu) // 0x26
+        public static int SLA_HL_(IProcessor cpu) // 0x26
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Sla(cpu, ref value);
@@ -628,42 +628,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SLAA(Processor cpu) // 0x27
+        public static int SLAA(IProcessor cpu) // 0x27
         {
             return Sla(cpu, ref cpu.Registers.A);
         }
 
-        public static int SRAB(Processor cpu) // 0x28
+        public static int SRAB(IProcessor cpu) // 0x28
         {
             return Sra(cpu, ref cpu.Registers.B);
         }
 
-        public static int SRAC(Processor cpu) // 0x29
+        public static int SRAC(IProcessor cpu) // 0x29
         {
             return Sra(cpu, ref cpu.Registers.C);
         }
 
-        public static int SRAD(Processor cpu) // 0x2A
+        public static int SRAD(IProcessor cpu) // 0x2A
         {
             return Sra(cpu, ref cpu.Registers.D);
         }
 
-        public static int SRAE(Processor cpu) // 0x2B
+        public static int SRAE(IProcessor cpu) // 0x2B
         {
             return Sra(cpu, ref cpu.Registers.E);
         }
 
-        public static int SRAH(Processor cpu) // 0x2C
+        public static int SRAH(IProcessor cpu) // 0x2C
         {
             return Sra(cpu, ref cpu.Registers.H);
         }
 
-        public static int SRAL(Processor cpu) // 0x2D
+        public static int SRAL(IProcessor cpu) // 0x2D
         {
             return Sra(cpu, ref cpu.Registers.L);
         }
 
-        public static int SRA_HL_(Processor cpu) // 0x2E
+        public static int SRA_HL_(IProcessor cpu) // 0x2E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Sra(cpu, ref value);
@@ -671,42 +671,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SRAA(Processor cpu) // 0x2F
+        public static int SRAA(IProcessor cpu) // 0x2F
         {
             return Sra(cpu, ref cpu.Registers.A);
         }
 
-        public static int SWAPB(Processor cpu) // 0x30
+        public static int SWAPB(IProcessor cpu) // 0x30
         {
             return Swap(cpu, ref cpu.Registers.B);
         }
 
-        public static int SWAPC(Processor cpu) // 0x31
+        public static int SWAPC(IProcessor cpu) // 0x31
         {
             return Swap(cpu, ref cpu.Registers.C);
         }
 
-        public static int SWAPD(Processor cpu) // 0x32
+        public static int SWAPD(IProcessor cpu) // 0x32
         {
             return Swap(cpu, ref cpu.Registers.D);
         }
 
-        public static int SWAPE(Processor cpu) // 0x33
+        public static int SWAPE(IProcessor cpu) // 0x33
         {
             return Swap(cpu, ref cpu.Registers.E);
         }
 
-        public static int SWAPH(Processor cpu) // 0x34
+        public static int SWAPH(IProcessor cpu) // 0x34
         {
             return Swap(cpu, ref cpu.Registers.H);
         }
 
-        public static int SWAPL(Processor cpu) // 0x35
+        public static int SWAPL(IProcessor cpu) // 0x35
         {
             return Swap(cpu, ref cpu.Registers.L);
         }
 
-        public static int SWAP_HL_(Processor cpu) // 0x36
+        public static int SWAP_HL_(IProcessor cpu) // 0x36
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Swap(cpu, ref value);
@@ -714,42 +714,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SWAPA(Processor cpu) // 0x37
+        public static int SWAPA(IProcessor cpu) // 0x37
         {
             return Swap(cpu, ref cpu.Registers.A);
         }
 
-        public static int SRLB(Processor cpu) // 0x38
+        public static int SRLB(IProcessor cpu) // 0x38
         {
             return Srl(cpu, ref cpu.Registers.B);
         }
 
-        public static int SRLC(Processor cpu) // 0x39
+        public static int SRLC(IProcessor cpu) // 0x39
         {
             return Srl(cpu, ref cpu.Registers.C);
         }
 
-        public static int SRLD(Processor cpu) // 0x3A
+        public static int SRLD(IProcessor cpu) // 0x3A
         {
             return Srl(cpu, ref cpu.Registers.D);
         }
 
-        public static int SRLE(Processor cpu) // 0x3B
+        public static int SRLE(IProcessor cpu) // 0x3B
         {
             return Srl(cpu, ref cpu.Registers.E);
         }
 
-        public static int SRLH(Processor cpu) // 0x3C
+        public static int SRLH(IProcessor cpu) // 0x3C
         {
             return Srl(cpu, ref cpu.Registers.H);
         }
 
-        public static int SRLL(Processor cpu) // 0x3D
+        public static int SRLL(IProcessor cpu) // 0x3D
         {
             return Srl(cpu, ref cpu.Registers.L);
         }
 
-        public static int SRL_HL_(Processor cpu) // 0x3E
+        public static int SRL_HL_(IProcessor cpu) // 0x3E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Srl(cpu, ref value);
@@ -757,42 +757,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SRLA(Processor cpu) // 0x3F
+        public static int SRLA(IProcessor cpu) // 0x3F
         {
             return Srl(cpu, ref cpu.Registers.A);
         }
 
-        public static int BIT0B(Processor cpu) // 0x40
+        public static int BIT0B(IProcessor cpu) // 0x40
         {
             return FlipBit(cpu, 0, ref cpu.Registers.B);
         }
 
-        public static int BIT0C(Processor cpu) // 0x41
+        public static int BIT0C(IProcessor cpu) // 0x41
         {
             return FlipBit(cpu, 0, ref cpu.Registers.C);
         }
 
-        public static int BIT0D(Processor cpu) // 0x42
+        public static int BIT0D(IProcessor cpu) // 0x42
         {
             return FlipBit(cpu, 0, ref cpu.Registers.D);
         }
 
-        public static int BIT0E(Processor cpu) // 0x43
+        public static int BIT0E(IProcessor cpu) // 0x43
         {
             return FlipBit(cpu, 0, ref cpu.Registers.E);
         }
 
-        public static int BIT0H(Processor cpu) // 0x44
+        public static int BIT0H(IProcessor cpu) // 0x44
         {
             return FlipBit(cpu, 0, ref cpu.Registers.H);
         }
 
-        public static int BIT0L(Processor cpu) // 0x45
+        public static int BIT0L(IProcessor cpu) // 0x45
         {
             return FlipBit(cpu, 0, ref cpu.Registers.L);
         }
 
-        public static int BIT0_HL_(Processor cpu) // 0x46
+        public static int BIT0_HL_(IProcessor cpu) // 0x46
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 0, ref value);
@@ -800,42 +800,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT0A(Processor cpu) // 0x47
+        public static int BIT0A(IProcessor cpu) // 0x47
         {
             return FlipBit(cpu, 0, ref cpu.Registers.A);
         }
 
-        public static int BIT1B(Processor cpu) // 0x48
+        public static int BIT1B(IProcessor cpu) // 0x48
         {
             return FlipBit(cpu, 1, ref cpu.Registers.B);
         }
 
-        public static int BIT1C(Processor cpu) // 0x49
+        public static int BIT1C(IProcessor cpu) // 0x49
         {
             return FlipBit(cpu, 1, ref cpu.Registers.C);
         }
 
-        public static int BIT1D(Processor cpu) // 0x4A
+        public static int BIT1D(IProcessor cpu) // 0x4A
         {
             return FlipBit(cpu, 1, ref cpu.Registers.D);
         }
 
-        public static int BIT1E(Processor cpu) // 0x4B
+        public static int BIT1E(IProcessor cpu) // 0x4B
         {
             return FlipBit(cpu, 1, ref cpu.Registers.E);
         }
 
-        public static int BIT1H(Processor cpu) // 0x4C
+        public static int BIT1H(IProcessor cpu) // 0x4C
         {
             return FlipBit(cpu, 1, ref cpu.Registers.H);
         }
 
-        public static int BIT1L(Processor cpu) // 0x4D
+        public static int BIT1L(IProcessor cpu) // 0x4D
         {
             return FlipBit(cpu, 1, ref cpu.Registers.L);
         }
 
-        public static int BIT1_HL_(Processor cpu) // 0x4E
+        public static int BIT1_HL_(IProcessor cpu) // 0x4E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 1, ref value);
@@ -843,42 +843,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT1A(Processor cpu) // 0x4F
+        public static int BIT1A(IProcessor cpu) // 0x4F
         {
             return FlipBit(cpu, 1, ref cpu.Registers.A);
         }
 
-        public static int BIT2B(Processor cpu) // 0x50
+        public static int BIT2B(IProcessor cpu) // 0x50
         {
             return FlipBit(cpu, 2, ref cpu.Registers.B);
         }
 
-        public static int BIT2C(Processor cpu) // 0x51
+        public static int BIT2C(IProcessor cpu) // 0x51
         {
             return FlipBit(cpu, 2, ref cpu.Registers.C);
         }
 
-        public static int BIT2D(Processor cpu) // 0x52
+        public static int BIT2D(IProcessor cpu) // 0x52
         {
             return FlipBit(cpu, 2, ref cpu.Registers.D);
         }
 
-        public static int BIT2E(Processor cpu) // 0x53
+        public static int BIT2E(IProcessor cpu) // 0x53
         {
             return FlipBit(cpu, 2, ref cpu.Registers.E);
         }
 
-        public static int BIT2H(Processor cpu) // 0x54
+        public static int BIT2H(IProcessor cpu) // 0x54
         {
             return FlipBit(cpu, 2, ref cpu.Registers.H);
         }
 
-        public static int BIT2L(Processor cpu) // 0x55
+        public static int BIT2L(IProcessor cpu) // 0x55
         {
             return FlipBit(cpu, 2, ref cpu.Registers.L);
         }
 
-        public static int BIT2_HL_(Processor cpu) // 0x56
+        public static int BIT2_HL_(IProcessor cpu) // 0x56
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 2, ref value);
@@ -886,42 +886,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT2A(Processor cpu) // 0x57
+        public static int BIT2A(IProcessor cpu) // 0x57
         {
             return FlipBit(cpu, 2, ref cpu.Registers.A);
         }
 
-        public static int BIT3B(Processor cpu) // 0x58
+        public static int BIT3B(IProcessor cpu) // 0x58
         {
             return FlipBit(cpu, 3, ref cpu.Registers.B);
         }
 
-        public static int BIT3C(Processor cpu) // 0x59
+        public static int BIT3C(IProcessor cpu) // 0x59
         {
             return FlipBit(cpu, 3, ref cpu.Registers.C);
         }
 
-        public static int BIT3D(Processor cpu) // 0x5A
+        public static int BIT3D(IProcessor cpu) // 0x5A
         {
             return FlipBit(cpu, 3, ref cpu.Registers.D);
         }
 
-        public static int BIT3E(Processor cpu) // 0x5B
+        public static int BIT3E(IProcessor cpu) // 0x5B
         {
             return FlipBit(cpu, 3, ref cpu.Registers.E);
         }
 
-        public static int BIT3H(Processor cpu) // 0x5C
+        public static int BIT3H(IProcessor cpu) // 0x5C
         {
             return FlipBit(cpu, 3, ref cpu.Registers.H);
         }
 
-        public static int BIT3L(Processor cpu) // 0x5D
+        public static int BIT3L(IProcessor cpu) // 0x5D
         {
             return FlipBit(cpu, 3, ref cpu.Registers.L);
         }
 
-        public static int BIT3_HL_(Processor cpu) // 0x5E
+        public static int BIT3_HL_(IProcessor cpu) // 0x5E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 3, ref value);
@@ -929,42 +929,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT3A(Processor cpu) // 0x5F
+        public static int BIT3A(IProcessor cpu) // 0x5F
         {
             return FlipBit(cpu, 3, ref cpu.Registers.A);
         }
 
-        public static int BIT4B(Processor cpu) // 0x60
+        public static int BIT4B(IProcessor cpu) // 0x60
         {
             return FlipBit(cpu, 4, ref cpu.Registers.B);
         }
 
-        public static int BIT4C(Processor cpu) // 0x61
+        public static int BIT4C(IProcessor cpu) // 0x61
         {
             return FlipBit(cpu, 4, ref cpu.Registers.C);
         }
 
-        public static int BIT4D(Processor cpu) // 0x62
+        public static int BIT4D(IProcessor cpu) // 0x62
         {
             return FlipBit(cpu, 4, ref cpu.Registers.D);
         }
 
-        public static int BIT4E(Processor cpu) // 0x63
+        public static int BIT4E(IProcessor cpu) // 0x63
         {
             return FlipBit(cpu, 4, ref cpu.Registers.E);
         }
 
-        public static int BIT4H(Processor cpu) // 0x64
+        public static int BIT4H(IProcessor cpu) // 0x64
         {
             return FlipBit(cpu, 4, ref cpu.Registers.H);
         }
 
-        public static int BIT4L(Processor cpu) // 0x65
+        public static int BIT4L(IProcessor cpu) // 0x65
         {
             return FlipBit(cpu, 4, ref cpu.Registers.L);
         }
 
-        public static int BIT4_HL_(Processor cpu) // 0x66
+        public static int BIT4_HL_(IProcessor cpu) // 0x66
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 4, ref value);
@@ -972,42 +972,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT4A(Processor cpu) // 0x67
+        public static int BIT4A(IProcessor cpu) // 0x67
         {
             return FlipBit(cpu, 4, ref cpu.Registers.A);
         }
 
-        public static int BIT5B(Processor cpu) // 0x68
+        public static int BIT5B(IProcessor cpu) // 0x68
         {
             return FlipBit(cpu, 5, ref cpu.Registers.B);
         }
 
-        public static int BIT5C(Processor cpu) // 0x69
+        public static int BIT5C(IProcessor cpu) // 0x69
         {
             return FlipBit(cpu, 5, ref cpu.Registers.C);
         }
 
-        public static int BIT5D(Processor cpu) // 0x6A
+        public static int BIT5D(IProcessor cpu) // 0x6A
         {
             return FlipBit(cpu, 5, ref cpu.Registers.D);
         }
 
-        public static int BIT5E(Processor cpu) // 0x6B
+        public static int BIT5E(IProcessor cpu) // 0x6B
         {
             return FlipBit(cpu, 5, ref cpu.Registers.E);
         }
 
-        public static int BIT5H(Processor cpu) // 0x6C
+        public static int BIT5H(IProcessor cpu) // 0x6C
         {
             return FlipBit(cpu, 5, ref cpu.Registers.H);
         }
 
-        public static int BIT5L(Processor cpu) // 0x6D
+        public static int BIT5L(IProcessor cpu) // 0x6D
         {
             return FlipBit(cpu, 5, ref cpu.Registers.L);
         }
 
-        public static int BIT5_HL_(Processor cpu) // 0x6E
+        public static int BIT5_HL_(IProcessor cpu) // 0x6E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 5, ref value);
@@ -1015,42 +1015,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT5A(Processor cpu) // 0x6F
+        public static int BIT5A(IProcessor cpu) // 0x6F
         {
             return FlipBit(cpu, 5, ref cpu.Registers.A);
         }
 
-        public static int BIT6B(Processor cpu) // 0x70
+        public static int BIT6B(IProcessor cpu) // 0x70
         {
             return FlipBit(cpu, 6, ref cpu.Registers.B);
         }
 
-        public static int BIT6C(Processor cpu) // 0x71
+        public static int BIT6C(IProcessor cpu) // 0x71
         {
             return FlipBit(cpu, 6, ref cpu.Registers.C);
         }
 
-        public static int BIT6D(Processor cpu) // 0x72
+        public static int BIT6D(IProcessor cpu) // 0x72
         {
             return FlipBit(cpu, 6, ref cpu.Registers.D);
         }
 
-        public static int BIT6E(Processor cpu) // 0x73
+        public static int BIT6E(IProcessor cpu) // 0x73
         {
             return FlipBit(cpu, 6, ref cpu.Registers.E);
         }
 
-        public static int BIT6H(Processor cpu) // 0x74
+        public static int BIT6H(IProcessor cpu) // 0x74
         {
             return FlipBit(cpu, 6, ref cpu.Registers.H);
         }
 
-        public static int BIT6L(Processor cpu) // 0x75
+        public static int BIT6L(IProcessor cpu) // 0x75
         {
             return FlipBit(cpu, 6, ref cpu.Registers.L);
         }
 
-        public static int BIT6_HL_(Processor cpu) // 0x76
+        public static int BIT6_HL_(IProcessor cpu) // 0x76
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 6, ref value);
@@ -1058,42 +1058,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT6A(Processor cpu) // 0x77
+        public static int BIT6A(IProcessor cpu) // 0x77
         {
             return FlipBit(cpu, 6, ref cpu.Registers.A);
         }
 
-        public static int BIT7B(Processor cpu) // 0x78
+        public static int BIT7B(IProcessor cpu) // 0x78
         {
             return FlipBit(cpu, 7, ref cpu.Registers.B);
         }
 
-        public static int BIT7C(Processor cpu) // 0x79
+        public static int BIT7C(IProcessor cpu) // 0x79
         {
             return FlipBit(cpu, 7, ref cpu.Registers.C);
         }
 
-        public static int BIT7D(Processor cpu) // 0x7A
+        public static int BIT7D(IProcessor cpu) // 0x7A
         {
             return FlipBit(cpu, 7, ref cpu.Registers.D);
         }
 
-        public static int BIT7E(Processor cpu) // 0x7B
+        public static int BIT7E(IProcessor cpu) // 0x7B
         {
             return FlipBit(cpu, 7, ref cpu.Registers.E);
         }
 
-        public static int BIT7H(Processor cpu) // 0x7C
+        public static int BIT7H(IProcessor cpu) // 0x7C
         {
             return FlipBit(cpu, 7, ref cpu.Registers.H);
         }
 
-        public static int BIT7L(Processor cpu) // 0x7D
+        public static int BIT7L(IProcessor cpu) // 0x7D
         {
             return FlipBit(cpu, 7, ref cpu.Registers.L);
         }
 
-        public static int BIT7_HL_(Processor cpu) // 0x7E
+        public static int BIT7_HL_(IProcessor cpu) // 0x7E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 7, ref value);
@@ -1101,42 +1101,42 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int BIT7A(Processor cpu) // 0x7F
+        public static int BIT7A(IProcessor cpu) // 0x7F
         {
             return FlipBit(cpu, 7, ref cpu.Registers.A);
         }
 
-        public static int RES0B(Processor cpu) // 0x80
+        public static int RES0B(IProcessor cpu) // 0x80
         {
             return Res(cpu, 0, ref cpu.Registers.B);
         }
 
-        public static int RES0C(Processor cpu) // 0x81
+        public static int RES0C(IProcessor cpu) // 0x81
         {
             return Res(cpu, 0, ref cpu.Registers.C);
         }
 
-        public static int RES0D(Processor cpu) // 0x82
+        public static int RES0D(IProcessor cpu) // 0x82
         {
             return Res(cpu, 0, ref cpu.Registers.D);
         }
 
-        public static int RES0E(Processor cpu) // 0x83
+        public static int RES0E(IProcessor cpu) // 0x83
         {
             return Res(cpu, 0, ref cpu.Registers.E);
         }
 
-        public static int RES0H(Processor cpu) // 0x84
+        public static int RES0H(IProcessor cpu) // 0x84
         {
             return Res(cpu, 0, ref cpu.Registers.H);
         }
 
-        public static int RES0L(Processor cpu) // 0x85
+        public static int RES0L(IProcessor cpu) // 0x85
         {
             return Res(cpu, 0, ref cpu.Registers.L);
         }
 
-        public static int RES0_HL_(Processor cpu) // 0x86
+        public static int RES0_HL_(IProcessor cpu) // 0x86
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 0, ref value);
@@ -1144,42 +1144,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES0A(Processor cpu) // 0x87
+        public static int RES0A(IProcessor cpu) // 0x87
         {
             return Res(cpu, 0, ref cpu.Registers.A);
         }
 
-        public static int RES1B(Processor cpu) // 0x88
+        public static int RES1B(IProcessor cpu) // 0x88
         {
             return Res(cpu, 1, ref cpu.Registers.B);
         }
 
-        public static int RES1C(Processor cpu) // 0x89
+        public static int RES1C(IProcessor cpu) // 0x89
         {
             return Res(cpu, 1, ref cpu.Registers.C);
         }
 
-        public static int RES1D(Processor cpu) // 0x8A
+        public static int RES1D(IProcessor cpu) // 0x8A
         {
             return Res(cpu, 1, ref cpu.Registers.D);
         }
 
-        public static int RES1E(Processor cpu) // 0x8B
+        public static int RES1E(IProcessor cpu) // 0x8B
         {
             return Res(cpu, 1, ref cpu.Registers.E);
         }
 
-        public static int RES1H(Processor cpu) // 0x8C
+        public static int RES1H(IProcessor cpu) // 0x8C
         {
             return Res(cpu, 1, ref cpu.Registers.H);
         }
 
-        public static int RES1L(Processor cpu) // 0x8D
+        public static int RES1L(IProcessor cpu) // 0x8D
         {
             return Res(cpu, 1, ref cpu.Registers.L);
         }
 
-        public static int RES1_HL_(Processor cpu) // 0x8E
+        public static int RES1_HL_(IProcessor cpu) // 0x8E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 1, ref value);
@@ -1187,42 +1187,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES1A(Processor cpu) // 0x8F
+        public static int RES1A(IProcessor cpu) // 0x8F
         {
             return Res(cpu, 1, ref cpu.Registers.A);
         }
 
-        public static int RES2B(Processor cpu) // 0x90
+        public static int RES2B(IProcessor cpu) // 0x90
         {
             return Res(cpu, 2, ref cpu.Registers.B);
         }
 
-        public static int RES2C(Processor cpu) // 0x91
+        public static int RES2C(IProcessor cpu) // 0x91
         {
             return Res(cpu, 2, ref cpu.Registers.C);
         }
 
-        public static int RES2D(Processor cpu) // 0x92
+        public static int RES2D(IProcessor cpu) // 0x92
         {
             return Res(cpu, 2, ref cpu.Registers.D);
         }
 
-        public static int RES2E(Processor cpu) // 0x93
+        public static int RES2E(IProcessor cpu) // 0x93
         {
             return Res(cpu, 2, ref cpu.Registers.E);
         }
 
-        public static int RES2H(Processor cpu) // 0x94
+        public static int RES2H(IProcessor cpu) // 0x94
         {
             return Res(cpu, 2, ref cpu.Registers.H);
         }
 
-        public static int RES2L(Processor cpu) // 0x95
+        public static int RES2L(IProcessor cpu) // 0x95
         {
             return Res(cpu, 2, ref cpu.Registers.L);
         }
 
-        public static int RES2_HL_(Processor cpu) // 0x96
+        public static int RES2_HL_(IProcessor cpu) // 0x96
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 2, ref value);
@@ -1230,42 +1230,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES2A(Processor cpu) // 0x97
+        public static int RES2A(IProcessor cpu) // 0x97
         {
             return Res(cpu, 2, ref cpu.Registers.A);
         }
 
-        public static int RES3B(Processor cpu) // 0x98
+        public static int RES3B(IProcessor cpu) // 0x98
         {
             return Res(cpu, 3, ref cpu.Registers.B);
         }
 
-        public static int RES3C(Processor cpu) // 0x99
+        public static int RES3C(IProcessor cpu) // 0x99
         {
             return Res(cpu, 3, ref cpu.Registers.C);
         }
 
-        public static int RES3D(Processor cpu) // 0x9A
+        public static int RES3D(IProcessor cpu) // 0x9A
         {
             return Res(cpu, 3, ref cpu.Registers.D);
         }
 
-        public static int RES3E(Processor cpu) // 0x9B
+        public static int RES3E(IProcessor cpu) // 0x9B
         {
             return Res(cpu, 3, ref cpu.Registers.E);
         }
 
-        public static int RES3H(Processor cpu) // 0x9C
+        public static int RES3H(IProcessor cpu) // 0x9C
         {
             return Res(cpu, 3, ref cpu.Registers.H);
         }
 
-        public static int RES3L(Processor cpu) // 0x9D
+        public static int RES3L(IProcessor cpu) // 0x9D
         {
             return Res(cpu, 3, ref cpu.Registers.L);
         }
 
-        public static int RES3_HL_(Processor cpu) // 0x9E
+        public static int RES3_HL_(IProcessor cpu) // 0x9E
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 3, ref value);
@@ -1273,42 +1273,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES3A(Processor cpu) // 0x9F
+        public static int RES3A(IProcessor cpu) // 0x9F
         {
             return Res(cpu, 3, ref cpu.Registers.A);
         }
 
-        public static int RES4B(Processor cpu) // 0xA0
+        public static int RES4B(IProcessor cpu) // 0xA0
         {
             return Res(cpu, 4, ref cpu.Registers.B);
         }
 
-        public static int RES4C(Processor cpu) // 0xA1
+        public static int RES4C(IProcessor cpu) // 0xA1
         {
             return Res(cpu, 4, ref cpu.Registers.C);
         }
 
-        public static int RES4D(Processor cpu) // 0xA2
+        public static int RES4D(IProcessor cpu) // 0xA2
         {
             return Res(cpu, 4, ref cpu.Registers.D);
         }
 
-        public static int RES4E(Processor cpu) // 0xA3
+        public static int RES4E(IProcessor cpu) // 0xA3
         {
             return Res(cpu, 4, ref cpu.Registers.E);
         }
 
-        public static int RES4H(Processor cpu) // 0xA4
+        public static int RES4H(IProcessor cpu) // 0xA4
         {
             return Res(cpu, 4, ref cpu.Registers.H);
         }
 
-        public static int RES4L(Processor cpu) // 0xA5
+        public static int RES4L(IProcessor cpu) // 0xA5
         {
             return Res(cpu, 4, ref cpu.Registers.L);
         }
 
-        public static int RES4_HL_(Processor cpu) // 0xA6
+        public static int RES4_HL_(IProcessor cpu) // 0xA6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 4, ref value);
@@ -1316,42 +1316,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES4A(Processor cpu) // 0xA7
+        public static int RES4A(IProcessor cpu) // 0xA7
         {
             return Res(cpu, 4, ref cpu.Registers.A);
         }
 
-        public static int RES5B(Processor cpu) // 0xA8
+        public static int RES5B(IProcessor cpu) // 0xA8
         {
             return Res(cpu, 5, ref cpu.Registers.B);
         }
 
-        public static int RES5C(Processor cpu) // 0xA9
+        public static int RES5C(IProcessor cpu) // 0xA9
         {
             return Res(cpu, 5, ref cpu.Registers.C);
         }
 
-        public static int RES5D(Processor cpu) // 0xAA
+        public static int RES5D(IProcessor cpu) // 0xAA
         {
             return Res(cpu, 5, ref cpu.Registers.D);
         }
 
-        public static int RES5E(Processor cpu) // 0xAB
+        public static int RES5E(IProcessor cpu) // 0xAB
         {
             return Res(cpu, 5, ref cpu.Registers.E);
         }
 
-        public static int RES5H(Processor cpu) // 0xAC
+        public static int RES5H(IProcessor cpu) // 0xAC
         {
             return Res(cpu, 5, ref cpu.Registers.H);
         }
 
-        public static int RES5L(Processor cpu) // 0xAD
+        public static int RES5L(IProcessor cpu) // 0xAD
         {
             return Res(cpu, 5, ref cpu.Registers.L);
         }
 
-        public static int RES5_HL_(Processor cpu) // 0xAE
+        public static int RES5_HL_(IProcessor cpu) // 0xAE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 5, ref value);
@@ -1359,42 +1359,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES5A(Processor cpu) // 0xAF
+        public static int RES5A(IProcessor cpu) // 0xAF
         {
             return Res(cpu, 5, ref cpu.Registers.A);
         }
 
-        public static int RES6B(Processor cpu) // 0xB0
+        public static int RES6B(IProcessor cpu) // 0xB0
         {
             return Res(cpu, 6, ref cpu.Registers.B);
         }
 
-        public static int RES6C(Processor cpu) // 0xB1
+        public static int RES6C(IProcessor cpu) // 0xB1
         {
             return Res(cpu, 6, ref cpu.Registers.C);
         }
 
-        public static int RES6D(Processor cpu) // 0xB2
+        public static int RES6D(IProcessor cpu) // 0xB2
         {
             return Res(cpu, 6, ref cpu.Registers.D);
         }
 
-        public static int RES6E(Processor cpu) // 0xB3
+        public static int RES6E(IProcessor cpu) // 0xB3
         {
             return Res(cpu, 6, ref cpu.Registers.E);
         }
 
-        public static int RES6H(Processor cpu) // 0xB4
+        public static int RES6H(IProcessor cpu) // 0xB4
         {
             return Res(cpu, 6, ref cpu.Registers.H);
         }
 
-        public static int RES6L(Processor cpu) // 0xB5
+        public static int RES6L(IProcessor cpu) // 0xB5
         {
             return Res(cpu, 6, ref cpu.Registers.L);
         }
 
-        public static int RES6_HL_(Processor cpu) // 0xB6
+        public static int RES6_HL_(IProcessor cpu) // 0xB6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 6, ref value);
@@ -1402,42 +1402,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES6A(Processor cpu) // 0xB7
+        public static int RES6A(IProcessor cpu) // 0xB7
         {
             return Res(cpu, 6, ref cpu.Registers.A);
         }
 
-        public static int RES7B(Processor cpu) // 0xB8
+        public static int RES7B(IProcessor cpu) // 0xB8
         {
             return Res(cpu, 7, ref cpu.Registers.B);
         }
 
-        public static int RES7C(Processor cpu) // 0xB9
+        public static int RES7C(IProcessor cpu) // 0xB9
         {
             return Res(cpu, 7, ref cpu.Registers.C);
         }
 
-        public static int RES7D(Processor cpu) // 0xBA
+        public static int RES7D(IProcessor cpu) // 0xBA
         {
             return Res(cpu, 7, ref cpu.Registers.D);
         }
 
-        public static int RES7E(Processor cpu) // 0xBB
+        public static int RES7E(IProcessor cpu) // 0xBB
         {
             return Res(cpu, 7, ref cpu.Registers.E);
         }
 
-        public static int RES7H(Processor cpu) // 0xBC
+        public static int RES7H(IProcessor cpu) // 0xBC
         {
             return Res(cpu, 7, ref cpu.Registers.H);
         }
 
-        public static int RES7L(Processor cpu) // 0xBD
+        public static int RES7L(IProcessor cpu) // 0xBD
         {
             return Res(cpu, 7, ref cpu.Registers.L);
         }
 
-        public static int RES7_HL_(Processor cpu) // 0xBE
+        public static int RES7_HL_(IProcessor cpu) // 0xBE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Res(cpu, 7, ref value);
@@ -1445,42 +1445,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int RES7A(Processor cpu) // 0xBF
+        public static int RES7A(IProcessor cpu) // 0xBF
         {
             return Res(cpu, 7, ref cpu.Registers.A);
         }
 
-        public static int SET0B(Processor cpu) // 0xC0
+        public static int SET0B(IProcessor cpu) // 0xC0
         {
             return Set(cpu, 0, ref cpu.Registers.B);
         }
 
-        public static int SET0C(Processor cpu) // 0xC1
+        public static int SET0C(IProcessor cpu) // 0xC1
         {
             return Set(cpu, 0, ref cpu.Registers.C);
         }
 
-        public static int SET0D(Processor cpu) // 0xC2
+        public static int SET0D(IProcessor cpu) // 0xC2
         {
             return Set(cpu, 0, ref cpu.Registers.D);
         }
 
-        public static int SET0E(Processor cpu) // 0xC3
+        public static int SET0E(IProcessor cpu) // 0xC3
         {
             return Set(cpu, 0, ref cpu.Registers.E);
         }
 
-        public static int SET0H(Processor cpu) // 0xC4
+        public static int SET0H(IProcessor cpu) // 0xC4
         {
             return Set(cpu, 0, ref cpu.Registers.H);
         }
 
-        public static int SET0L(Processor cpu) // 0xC5
+        public static int SET0L(IProcessor cpu) // 0xC5
         {
             return Set(cpu, 0, ref cpu.Registers.L);
         }
 
-        public static int SET0_HL_(Processor cpu) // 0xC6
+        public static int SET0_HL_(IProcessor cpu) // 0xC6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 0, ref value);
@@ -1488,42 +1488,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET0A(Processor cpu) // 0xC7
+        public static int SET0A(IProcessor cpu) // 0xC7
         {
             return Set(cpu, 0, ref cpu.Registers.A);
         }
 
-        public static int SET1B(Processor cpu) // 0xC8
+        public static int SET1B(IProcessor cpu) // 0xC8
         {
             return Set(cpu, 1, ref cpu.Registers.B);
         }
 
-        public static int SET1C(Processor cpu) // 0xC9
+        public static int SET1C(IProcessor cpu) // 0xC9
         {
             return Set(cpu, 1, ref cpu.Registers.C);
         }
 
-        public static int SET1D(Processor cpu) // 0xCA
+        public static int SET1D(IProcessor cpu) // 0xCA
         {
             return Set(cpu, 1, ref cpu.Registers.D);
         }
 
-        public static int SET1E(Processor cpu) // 0xCB
+        public static int SET1E(IProcessor cpu) // 0xCB
         {
             return Set(cpu, 1, ref cpu.Registers.E);
         }
 
-        public static int SET1H(Processor cpu) // 0xCC
+        public static int SET1H(IProcessor cpu) // 0xCC
         {
             return Set(cpu, 1, ref cpu.Registers.H);
         }
 
-        public static int SET1L(Processor cpu) // 0xCD
+        public static int SET1L(IProcessor cpu) // 0xCD
         {
             return Set(cpu, 1, ref cpu.Registers.L);
         }
 
-        public static int SET1_HL_(Processor cpu) // 0xCE
+        public static int SET1_HL_(IProcessor cpu) // 0xCE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 1, ref value);
@@ -1531,42 +1531,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET1A(Processor cpu) // 0xCF
+        public static int SET1A(IProcessor cpu) // 0xCF
         {
             return Set(cpu, 1, ref cpu.Registers.A);
         }
 
-        public static int SET2B(Processor cpu) // 0xD0
+        public static int SET2B(IProcessor cpu) // 0xD0
         {
             return Set(cpu, 2, ref cpu.Registers.B);
         }
 
-        public static int SET2C(Processor cpu) // 0xD1
+        public static int SET2C(IProcessor cpu) // 0xD1
         {
             return Set(cpu, 2, ref cpu.Registers.C);
         }
 
-        public static int SET2D(Processor cpu) // 0xD2
+        public static int SET2D(IProcessor cpu) // 0xD2
         {
             return Set(cpu, 2, ref cpu.Registers.D);
         }
 
-        public static int SET2E(Processor cpu) // 0xD3
+        public static int SET2E(IProcessor cpu) // 0xD3
         {
             return Set(cpu, 2, ref cpu.Registers.E);
         }
 
-        public static int SET2H(Processor cpu) // 0xD4
+        public static int SET2H(IProcessor cpu) // 0xD4
         {
             return Set(cpu, 2, ref cpu.Registers.H);
         }
 
-        public static int SET2L(Processor cpu) // 0xD5
+        public static int SET2L(IProcessor cpu) // 0xD5
         {
             return Set(cpu, 2, ref cpu.Registers.L);
         }
 
-        public static int SET2_HL_(Processor cpu) // 0xD6
+        public static int SET2_HL_(IProcessor cpu) // 0xD6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 2, ref value);
@@ -1574,42 +1574,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET2A(Processor cpu) // 0xD7
+        public static int SET2A(IProcessor cpu) // 0xD7
         {
             return Set(cpu, 2, ref cpu.Registers.A);
         }
 
-        public static int SET3B(Processor cpu) // 0xD8
+        public static int SET3B(IProcessor cpu) // 0xD8
         {
             return Set(cpu, 3, ref cpu.Registers.B);
         }
 
-        public static int SET3C(Processor cpu) // 0xD9
+        public static int SET3C(IProcessor cpu) // 0xD9
         {
             return Set(cpu, 3, ref cpu.Registers.C);
         }
 
-        public static int SET3D(Processor cpu) // 0xDA
+        public static int SET3D(IProcessor cpu) // 0xDA
         {
             return Set(cpu, 3, ref cpu.Registers.D);
         }
 
-        public static int SET3E(Processor cpu) // 0xDB
+        public static int SET3E(IProcessor cpu) // 0xDB
         {
             return Set(cpu, 3, ref cpu.Registers.E);
         }
 
-        public static int SET3H(Processor cpu) // 0xDC
+        public static int SET3H(IProcessor cpu) // 0xDC
         {
             return Set(cpu, 3, ref cpu.Registers.H);
         }
 
-        public static int SET3L(Processor cpu) // 0xDD
+        public static int SET3L(IProcessor cpu) // 0xDD
         {
             return Set(cpu, 3, ref cpu.Registers.L);
         }
 
-        public static int SET3_HL_(Processor cpu) // 0xDE
+        public static int SET3_HL_(IProcessor cpu) // 0xDE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 3, ref value);
@@ -1617,42 +1617,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET3A(Processor cpu) // 0xDF
+        public static int SET3A(IProcessor cpu) // 0xDF
         {
             return Set(cpu, 3, ref cpu.Registers.A);
         }
 
-        public static int SET4B(Processor cpu) // 0xE0
+        public static int SET4B(IProcessor cpu) // 0xE0
         {
             return Set(cpu, 4, ref cpu.Registers.B);
         }
 
-        public static int SET4C(Processor cpu) // 0xE1
+        public static int SET4C(IProcessor cpu) // 0xE1
         {
             return Set(cpu, 4, ref cpu.Registers.C);
         }
 
-        public static int SET4D(Processor cpu) // 0xE2
+        public static int SET4D(IProcessor cpu) // 0xE2
         {
             return Set(cpu, 4, ref cpu.Registers.D);
         }
 
-        public static int SET4E(Processor cpu) // 0xE3
+        public static int SET4E(IProcessor cpu) // 0xE3
         {
             return Set(cpu, 4, ref cpu.Registers.E);
         }
 
-        public static int SET4H(Processor cpu) // 0xE4
+        public static int SET4H(IProcessor cpu) // 0xE4
         {
             return Set(cpu, 4, ref cpu.Registers.H);
         }
 
-        public static int SET4L(Processor cpu) // 0xE5
+        public static int SET4L(IProcessor cpu) // 0xE5
         {
             return Set(cpu, 4, ref cpu.Registers.L);
         }
 
-        public static int SET4_HL_(Processor cpu) // 0xE6
+        public static int SET4_HL_(IProcessor cpu) // 0xE6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 4, ref value);
@@ -1660,42 +1660,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET4A(Processor cpu) // 0xE7
+        public static int SET4A(IProcessor cpu) // 0xE7
         {
             return Set(cpu, 4, ref cpu.Registers.A);
         }
 
-        public static int SET5B(Processor cpu) // 0xE8
+        public static int SET5B(IProcessor cpu) // 0xE8
         {
             return Set(cpu, 5, ref cpu.Registers.B);
         }
 
-        public static int SET5C(Processor cpu) // 0xE9
+        public static int SET5C(IProcessor cpu) // 0xE9
         {
             return Set(cpu, 5, ref cpu.Registers.C);
         }
 
-        public static int SET5D(Processor cpu) // 0xEA
+        public static int SET5D(IProcessor cpu) // 0xEA
         {
             return Set(cpu, 5, ref cpu.Registers.D);
         }
 
-        public static int SET5E(Processor cpu) // 0xEB
+        public static int SET5E(IProcessor cpu) // 0xEB
         {
             return Set(cpu, 5, ref cpu.Registers.E);
         }
 
-        public static int SET5H(Processor cpu) // 0xEC
+        public static int SET5H(IProcessor cpu) // 0xEC
         {
             return Set(cpu, 5, ref cpu.Registers.H);
         }
 
-        public static int SET5L(Processor cpu) // 0xED
+        public static int SET5L(IProcessor cpu) // 0xED
         {
             return Set(cpu, 5, ref cpu.Registers.L);
         }
 
-        public static int SET5_HL_(Processor cpu) // 0xEE
+        public static int SET5_HL_(IProcessor cpu) // 0xEE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 5, ref value);
@@ -1703,42 +1703,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET5A(Processor cpu) // 0xEF
+        public static int SET5A(IProcessor cpu) // 0xEF
         {
             return Set(cpu, 5, ref cpu.Registers.A);
         }
 
-        public static int SET6B(Processor cpu) // 0xF0
+        public static int SET6B(IProcessor cpu) // 0xF0
         {
             return Set(cpu, 6, ref cpu.Registers.B);
         }
 
-        public static int SET6C(Processor cpu) // 0xF1
+        public static int SET6C(IProcessor cpu) // 0xF1
         {
             return Set(cpu, 6, ref cpu.Registers.C);
         }
 
-        public static int SET6D(Processor cpu) // 0xF2
+        public static int SET6D(IProcessor cpu) // 0xF2
         {
             return Set(cpu, 6, ref cpu.Registers.D);
         }
 
-        public static int SET6E(Processor cpu) // 0xF3
+        public static int SET6E(IProcessor cpu) // 0xF3
         {
             return Set(cpu, 6, ref cpu.Registers.E);
         }
 
-        public static int SET6H(Processor cpu) // 0xF4
+        public static int SET6H(IProcessor cpu) // 0xF4
         {
             return Set(cpu, 6, ref cpu.Registers.H);
         }
 
-        public static int SET6L(Processor cpu) // 0xF5
+        public static int SET6L(IProcessor cpu) // 0xF5
         {
             return Set(cpu, 6, ref cpu.Registers.L);
         }
 
-        public static int SET6_HL_(Processor cpu) // 0xF6
+        public static int SET6_HL_(IProcessor cpu) // 0xF6
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 6, ref value);
@@ -1746,42 +1746,42 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET6A(Processor cpu) // 0xF7
+        public static int SET6A(IProcessor cpu) // 0xF7
         {
             return Set(cpu, 6, ref cpu.Registers.A);
         }
 
-        public static int SET7B(Processor cpu) // 0xF8
+        public static int SET7B(IProcessor cpu) // 0xF8
         {
             return Set(cpu, 7, ref cpu.Registers.B);
         }
 
-        public static int SET7C(Processor cpu) // 0xF9
+        public static int SET7C(IProcessor cpu) // 0xF9
         {
             return Set(cpu, 7, ref cpu.Registers.C);
         }
 
-        public static int SET7D(Processor cpu) // 0xFA
+        public static int SET7D(IProcessor cpu) // 0xFA
         {
             return Set(cpu, 7, ref cpu.Registers.D);
         }
 
-        public static int SET7E(Processor cpu) // 0xFB
+        public static int SET7E(IProcessor cpu) // 0xFB
         {
             return Set(cpu, 7, ref cpu.Registers.E);
         }
 
-        public static int SET7H(Processor cpu) // 0xFC
+        public static int SET7H(IProcessor cpu) // 0xFC
         {
             return Set(cpu, 7, ref cpu.Registers.H);
         }
 
-        public static int SET7L(Processor cpu) // 0xFD
+        public static int SET7L(IProcessor cpu) // 0xFD
         {
             return Set(cpu, 7, ref cpu.Registers.L);
         }
 
-        public static int SET7_HL_(Processor cpu) // 0xFE
+        public static int SET7_HL_(IProcessor cpu) // 0xFE
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Set(cpu, 7, ref value);
@@ -1789,7 +1789,7 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int SET7A(Processor cpu) // 0xFF
+        public static int SET7A(IProcessor cpu) // 0xFF
         {
             return Set(cpu, 7, ref cpu.Registers.A);
         }

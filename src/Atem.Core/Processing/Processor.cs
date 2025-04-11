@@ -11,19 +11,23 @@ namespace Atem.Core.Processing
         public static int Frequency = 4194304;
 
         private CPURegisters _registers;
-        private Bus _bus;
+        private IBus _bus;
+        private bool _cb = false;
+        private bool _ime = false;
+        private bool _doubleSpeed = false;
+        private bool _speedSwitchFlag = false;
 
-        private Dictionary<byte, Func<Processor, int>> _instructions = [];
-        private Dictionary<byte, Func<Processor, int>> _instructionsCB = [];
+        private Dictionary<byte, Func<IProcessor, int>> _instructions = [];
+        private Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
 
         public CPURegisters Registers { get => _registers; set => _registers = value; }
         public byte IR;
         public int Length = 0;
-        public bool CB = false;
-        public bool IME = false;
 
-        public bool DoubleSpeed = false;
-        public bool SpeedSwitchFlag = false;
+        public bool CB { get => _cb; set => _cb = value; }
+        public bool DoubleSpeed { get => _doubleSpeed; set => _doubleSpeed = value; }
+        public bool SpeedSwitchFlag { get => _speedSwitchFlag; set => _speedSwitchFlag = value; }
+        public bool IME { get => _ime; set => _ime = value; }
 
         public byte KEY1
         {
@@ -54,7 +58,7 @@ namespace Atem.Core.Processing
             }
         }
 
-        public Processor(Bus bus)
+        public Processor(IBus bus)
         {
             _bus = bus;
             _registers = new CPURegisters();

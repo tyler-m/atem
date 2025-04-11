@@ -6,7 +6,7 @@ namespace Atem.Core.Processing.Instructions
 {
     internal static class Arithmetic
     {
-        public static void PopulateLookup(Dictionary<byte, Func<Processor, int>> lookup)
+        public static void PopulateLookup(Dictionary<byte, Func<IProcessor, int>> lookup)
         {
             lookup.Add(0x07, RLCA);
             lookup.Add(0x0F, RRCA);
@@ -130,7 +130,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Inc(Processor cpu, ref byte value)
+        private static int Inc(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = value.WillHalfCarry(1);
@@ -140,7 +140,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Dec(Processor cpu, ref byte value)
+        private static int Dec(IProcessor cpu, ref byte value)
         {
             cpu.Registers.Flags.N = true;
             cpu.Registers.Flags.H = value.WillHalfBorrow(1);
@@ -150,7 +150,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Add(Processor cpu, byte value)
+        private static int Add(IProcessor cpu, byte value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = cpu.Registers.A.WillHalfCarry(value);
@@ -161,7 +161,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int ADDHL(Processor cpu, ushort value)
+        private static int ADDHL(IProcessor cpu, ushort value)
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = cpu.Registers.HL.WillHalfCarry(value);
@@ -171,7 +171,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int ADC(Processor cpu, byte value)
+        private static int ADC(IProcessor cpu, byte value)
         {
             byte newValue = (byte)(cpu.Registers.A + (cpu.Registers.Flags.C ? 1 : 0));
             cpu.Registers.Flags.H = cpu.Registers.A.WillHalfCarry(cpu.Registers.Flags.C ? 1 : 0);
@@ -186,7 +186,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Sub(Processor cpu, byte value)
+        private static int Sub(IProcessor cpu, byte value)
         {
             cpu.Registers.Flags.N = true;
             cpu.Registers.Flags.H = cpu.Registers.A.WillHalfBorrow(value);
@@ -197,7 +197,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int SBC(Processor cpu, byte value)
+        private static int SBC(IProcessor cpu, byte value)
         {
             int carry = cpu.Registers.Flags.C ? 1 : 0;
             cpu.Registers.Flags.H = cpu.Registers.A.WillHalfBorrow(carry);
@@ -212,7 +212,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int AND(Processor cpu, byte value)
+        private static int AND(IProcessor cpu, byte value)
         {
             cpu.Registers.A &= value;
             cpu.Registers.Flags.Z = cpu.Registers.A == 0;
@@ -223,7 +223,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int XOR(Processor cpu, byte value)
+        private static int XOR(IProcessor cpu, byte value)
         {
             cpu.Registers.A ^= value;
             cpu.Registers.Flags.Z = cpu.Registers.A == 0;
@@ -234,7 +234,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int OR(Processor cpu, byte value)
+        private static int OR(IProcessor cpu, byte value)
         {
             cpu.Registers.A |= value;
             cpu.Registers.Flags.Z = cpu.Registers.A == 0;
@@ -245,7 +245,7 @@ namespace Atem.Core.Processing.Instructions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int CP(Processor cpu, byte value)
+        private static int CP(IProcessor cpu, byte value)
         {
             ushort value2 = value;
             byte newValue = (byte)(cpu.Registers.A - value2);
@@ -256,7 +256,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int RLCA(Processor cpu) // 0x07
+        public static int RLCA(IProcessor cpu) // 0x07
         {
             cpu.Registers.Flags.Z = false;
             cpu.Registers.Flags.N = false;
@@ -267,7 +267,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int RRCA(Processor cpu) // 0x0F
+        public static int RRCA(IProcessor cpu) // 0x0F
         {
             cpu.Registers.Flags.Z = false;
             cpu.Registers.Flags.N = false;
@@ -278,7 +278,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int RLA(Processor cpu) // 0x17
+        public static int RLA(IProcessor cpu) // 0x17
         {
             cpu.Registers.Flags.Z = false;
             cpu.Registers.Flags.N = false;
@@ -290,7 +290,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int RRA(Processor cpu) // 0x1F
+        public static int RRA(IProcessor cpu) // 0x1F
         {
             cpu.Registers.Flags.Z = false;
             cpu.Registers.Flags.N = false;
@@ -302,7 +302,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int DAA(Processor cpu) // 0x27
+        public static int DAA(IProcessor cpu) // 0x27
         {
             int adj = 0;
             if (cpu.Registers.Flags.C || cpu.Registers.A > 0x99 && !cpu.Registers.Flags.N)
@@ -320,7 +320,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int CPL(Processor cpu) // 0x2F
+        public static int CPL(IProcessor cpu) // 0x2F
         {
             cpu.Registers.A = (byte)~cpu.Registers.A;
             cpu.Registers.Flags.N = true;
@@ -328,7 +328,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int SCF(Processor cpu) // 0x37
+        public static int SCF(IProcessor cpu) // 0x37
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -336,7 +336,7 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int CCF(Processor cpu) // 3F
+        public static int CCF(IProcessor cpu) // 3F
         {
             cpu.Registers.Flags.N = false;
             cpu.Registers.Flags.H = false;
@@ -344,46 +344,46 @@ namespace Atem.Core.Processing.Instructions
             return 1;
         }
 
-        public static int INCBC(Processor cpu) // 0x03
+        public static int INCBC(IProcessor cpu) // 0x03
         {
             cpu.Registers.BC++;
             return 2;
         }
 
-        public static int INCDE(Processor cpu) // 0x13
+        public static int INCDE(IProcessor cpu) // 0x13
         {
             cpu.Registers.DE++;
             return 2;
         }
 
-        public static int INCHL(Processor cpu) // 0x23
+        public static int INCHL(IProcessor cpu) // 0x23
         {
             cpu.Registers.HL++;
             return 2;
         }
 
-        public static int INCSP(Processor cpu) // 0x33
+        public static int INCSP(IProcessor cpu) // 0x33
         {
             cpu.Registers.SP++;
             return 2;
         }
 
-        public static int INCB(Processor cpu) // 0x04
+        public static int INCB(IProcessor cpu) // 0x04
         {
             return Inc(cpu, ref cpu.Registers.B);
         }
 
-        public static int INCD(Processor cpu) // 0x14
+        public static int INCD(IProcessor cpu) // 0x14
         {
             return Inc(cpu, ref cpu.Registers.D);
         }
 
-        public static int INCH(Processor cpu) // 0x24
+        public static int INCH(IProcessor cpu) // 0x24
         {
             return Inc(cpu, ref cpu.Registers.H);
         }
 
-        public static int INC_HL_(Processor cpu) // 0x34
+        public static int INC_HL_(IProcessor cpu) // 0x34
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Inc(cpu, ref value);
@@ -391,81 +391,81 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int INCC(Processor cpu) // 0x0C
+        public static int INCC(IProcessor cpu) // 0x0C
         {
             return Inc(cpu, ref cpu.Registers.C);
         }
 
-        public static int INCE(Processor cpu) // 0x1C
+        public static int INCE(IProcessor cpu) // 0x1C
         {
             return Inc(cpu, ref cpu.Registers.E);
         }
 
-        public static int INCL(Processor cpu) // 0x2C
+        public static int INCL(IProcessor cpu) // 0x2C
         {
             return Inc(cpu, ref cpu.Registers.L);
         }
 
-        public static int INCA(Processor cpu) // 0x3C
+        public static int INCA(IProcessor cpu) // 0x3C
         {
             return Inc(cpu, ref cpu.Registers.A);
         }
 
-        public static int DECBC(Processor cpu) // 0x0B
+        public static int DECBC(IProcessor cpu) // 0x0B
         {
             cpu.Registers.BC--;
             return 2;
         }
 
-        public static int DECDE(Processor cpu) // 0x1B
+        public static int DECDE(IProcessor cpu) // 0x1B
         {
             cpu.Registers.DE--;
             return 2;
         }
 
-        public static int DECHL(Processor cpu) // 0x2B
+        public static int DECHL(IProcessor cpu) // 0x2B
         {
             cpu.Registers.HL--;
             return 2;
         }
 
-        public static int DECSP(Processor cpu) // 0x3B
+        public static int DECSP(IProcessor cpu) // 0x3B
         {
             cpu.Registers.SP--;
             return 2;
         }
 
-        public static int DECB(Processor cpu) // 0x05
+        public static int DECB(IProcessor cpu) // 0x05
         {
             return Dec(cpu, ref cpu.Registers.B);
         }
 
-        public static int DECC(Processor cpu) // 0x0D
+        public static int DECC(IProcessor cpu) // 0x0D
         {
             return Dec(cpu, ref cpu.Registers.C);
         }
 
-        public static int DECD(Processor cpu) // 0x15
+        public static int DECD(IProcessor cpu) // 0x15
         {
             return Dec(cpu, ref cpu.Registers.D);
         }
 
-        public static int DECE(Processor cpu) // 0x1D
+        public static int DECE(IProcessor cpu) // 0x1D
         {
             return Dec(cpu, ref cpu.Registers.E);
         }
 
-        public static int DECH(Processor cpu) // 0x25
+        public static int DECH(IProcessor cpu) // 0x25
         {
             return Dec(cpu, ref cpu.Registers.H);
         }
 
-        public static int DECL(Processor cpu) // 0x2D
+        public static int DECL(IProcessor cpu) // 0x2D
         {
             return Dec(cpu, ref cpu.Registers.L);
         }
 
-        public static int DEC_HL_(Processor cpu) // 0x35
+        public static int DEC_HL_(IProcessor cpu) // 0x35
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             Dec(cpu, ref value);
@@ -473,79 +473,79 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int DECA(Processor cpu) // 0x3D
+        public static int DECA(IProcessor cpu) // 0x3D
         {
             return Dec(cpu, ref cpu.Registers.A);
         }
 
-        public static int ADDB(Processor cpu) // 0x80
+        public static int ADDB(IProcessor cpu) // 0x80
         {
             return Add(cpu, cpu.Registers.B);
         }
 
-        public static int ADDC(Processor cpu) // 0x81
+        public static int ADDC(IProcessor cpu) // 0x81
         {
             return Add(cpu, cpu.Registers.C);
         }
 
-        public static int ADDD(Processor cpu) // 0x82
+        public static int ADDD(IProcessor cpu) // 0x82
         {
             return Add(cpu, cpu.Registers.D);
         }
 
-        public static int ADDE(Processor cpu) // 0x83
+        public static int ADDE(IProcessor cpu) // 0x83
         {
             return Add(cpu, cpu.Registers.E);
         }
 
-        public static int ADDH(Processor cpu) // 0x84
+        public static int ADDH(IProcessor cpu) // 0x84
         {
             return Add(cpu, cpu.Registers.H);
         }
 
-        public static int ADDL(Processor cpu) // 0x85
+        public static int ADDL(IProcessor cpu) // 0x85
         {
             return Add(cpu, cpu.Registers.L);
         }
 
-        public static int ADD_HL_(Processor cpu) // 0x86
+        public static int ADD_HL_(IProcessor cpu) // 0x86
         {
             Add(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int ADDA(Processor cpu) // 0x87
+        public static int ADDA(IProcessor cpu) // 0x87
         {
             return Add(cpu, cpu.Registers.A);
         }
 
-        public static int ADDAU8(Processor cpu) // 0xC6
+        public static int ADDAU8(IProcessor cpu) // 0xC6
         {
             Add(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int ADDHLBC(Processor cpu) // 0x09
+        public static int ADDHLBC(IProcessor cpu) // 0x09
         {
             return ADDHL(cpu, cpu.Registers.BC);
         }
 
-        public static int ADDHLDE(Processor cpu) // 0x19
+        public static int ADDHLDE(IProcessor cpu) // 0x19
         {
             return ADDHL(cpu, cpu.Registers.DE);
         }
 
-        public static int ADDHLHL(Processor cpu) // 0x29
+        public static int ADDHLHL(IProcessor cpu) // 0x29
         {
             return ADDHL(cpu, cpu.Registers.HL);
         }
 
-        public static int ADDHLSP(Processor cpu) // 0x39
+        public static int ADDHLSP(IProcessor cpu) // 0x39
         {
             return ADDHL(cpu, cpu.Registers.SP);
         }
 
-        public static int ADDSPS8(Processor cpu) // 0xE8
+        public static int ADDSPS8(IProcessor cpu) // 0xE8
         {
             sbyte offset = (sbyte)cpu.ReadByte();
 
@@ -566,330 +566,330 @@ namespace Atem.Core.Processing.Instructions
             return 4;
         }
 
-        public static int ADCAB(Processor cpu) // 0x88
+        public static int ADCAB(IProcessor cpu) // 0x88
         {
             return ADC(cpu, cpu.Registers.B);
         }
 
-        public static int ADCAC(Processor cpu) // 0x89
+        public static int ADCAC(IProcessor cpu) // 0x89
         {
             return ADC(cpu, cpu.Registers.C);
         }
 
-        public static int ADCAD(Processor cpu) // 0x8A
+        public static int ADCAD(IProcessor cpu) // 0x8A
         {
             return ADC(cpu, cpu.Registers.D);
         }
 
-        public static int ADCAE(Processor cpu) // 0x8B
+        public static int ADCAE(IProcessor cpu) // 0x8B
         {
             return ADC(cpu, cpu.Registers.E);
         }
 
-        public static int ADCAH(Processor cpu) // 0x8C
+        public static int ADCAH(IProcessor cpu) // 0x8C
         {
             return ADC(cpu, cpu.Registers.H);
         }
 
-        public static int ADCAL(Processor cpu) // 0x8D
+        public static int ADCAL(IProcessor cpu) // 0x8D
         {
             return ADC(cpu, cpu.Registers.L);
         }
 
-        public static int ADCA_HL_(Processor cpu) // 0x8E
+        public static int ADCA_HL_(IProcessor cpu) // 0x8E
         {
             ADC(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int ADCAA(Processor cpu) // 0x8F
+        public static int ADCAA(IProcessor cpu) // 0x8F
         {
             return ADC(cpu, cpu.Registers.A);
         }
 
-        private static int ADCAU8(Processor cpu) // 0xCE
+        private static int ADCAU8(IProcessor cpu) // 0xCE
         {
             ADC(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int SUBB(Processor cpu) // 0x90
+        public static int SUBB(IProcessor cpu) // 0x90
         {
             return Sub(cpu, cpu.Registers.B);
         }
 
-        public static int SUBC(Processor cpu) // 0x91
+        public static int SUBC(IProcessor cpu) // 0x91
         {
             return Sub(cpu, cpu.Registers.C);
         }
 
-        public static int SUBD(Processor cpu) // 0x92
+        public static int SUBD(IProcessor cpu) // 0x92
         {
             return Sub(cpu, cpu.Registers.D);
         }
 
-        public static int SUBE(Processor cpu) // 0x93
+        public static int SUBE(IProcessor cpu) // 0x93
         {
             return Sub(cpu, cpu.Registers.E);
         }
 
-        public static int SUBH(Processor cpu) // 0x94
+        public static int SUBH(IProcessor cpu) // 0x94
         {
             return Sub(cpu, cpu.Registers.H);
         }
 
-        public static int SUBL(Processor cpu) // 0x95
+        public static int SUBL(IProcessor cpu) // 0x95
         {
             return Sub(cpu, cpu.Registers.L);
         }
 
-        public static int SUB_HL_(Processor cpu) // 0x96
+        public static int SUB_HL_(IProcessor cpu) // 0x96
         {
             Sub(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int SUBA(Processor cpu) // 0x97
+        public static int SUBA(IProcessor cpu) // 0x97
         {
             return Sub(cpu, cpu.Registers.A);
         }
 
-        private static int SUBAU8(Processor cpu) // 0xD6
+        private static int SUBAU8(IProcessor cpu) // 0xD6
         {
             Sub(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int SBCB(Processor cpu) // 0x98
+        public static int SBCB(IProcessor cpu) // 0x98
         {
             return SBC(cpu, cpu.Registers.B);
         }
 
-        public static int SBCC(Processor cpu) // 0x99
+        public static int SBCC(IProcessor cpu) // 0x99
         {
             return SBC(cpu, cpu.Registers.C);
         }
 
-        public static int SBCD(Processor cpu) // 0x9A
+        public static int SBCD(IProcessor cpu) // 0x9A
         {
             return SBC(cpu, cpu.Registers.D);
         }
 
-        public static int SBCE(Processor cpu) // 0x9B
+        public static int SBCE(IProcessor cpu) // 0x9B
         {
             return SBC(cpu, cpu.Registers.E);
         }
 
-        public static int SBCH(Processor cpu) // 0x9C
+        public static int SBCH(IProcessor cpu) // 0x9C
         {
             return SBC(cpu, cpu.Registers.H);
         }
 
-        public static int SBCL(Processor cpu) // 0x9D
+        public static int SBCL(IProcessor cpu) // 0x9D
         {
             return SBC(cpu, cpu.Registers.L);
         }
 
-        public static int SBC_HL_(Processor cpu) // 0x9E
+        public static int SBC_HL_(IProcessor cpu) // 0x9E
         {
             SBC(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int SBCA(Processor cpu) // 0x9F
+        public static int SBCA(IProcessor cpu) // 0x9F
         {
             return SBC(cpu, cpu.Registers.A);
         }
 
-        private static int SBCAU8(Processor cpu) // 0xDE
+        private static int SBCAU8(IProcessor cpu) // 0xDE
         {
             SBC(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int ANDB(Processor cpu) // 0xA0;
+        public static int ANDB(IProcessor cpu) // 0xA0;
         {
             return AND(cpu, cpu.Registers.B);
         }
 
-        public static int ANDC(Processor cpu) // 0xA1;
+        public static int ANDC(IProcessor cpu) // 0xA1;
         {
             return AND(cpu, cpu.Registers.C);
         }
 
-        public static int ANDD(Processor cpu) // 0xA2;
+        public static int ANDD(IProcessor cpu) // 0xA2;
         {
             return AND(cpu, cpu.Registers.D);
         }
 
-        public static int ANDE(Processor cpu) // 0xA3;
+        public static int ANDE(IProcessor cpu) // 0xA3;
         {
             return AND(cpu, cpu.Registers.E);
         }
 
-        public static int ANDH(Processor cpu) // 0xA4;
+        public static int ANDH(IProcessor cpu) // 0xA4;
         {
             return AND(cpu, cpu.Registers.H);
         }
 
-        public static int ANDL(Processor cpu) // 0xA5;
+        public static int ANDL(IProcessor cpu) // 0xA5;
         {
             return AND(cpu, cpu.Registers.L);
         }
 
-        public static int AND_HL_(Processor cpu) // 0xA6;
+        public static int AND_HL_(IProcessor cpu) // 0xA6;
         {
             AND(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int ANDA(Processor cpu) // 0xA7;
+        public static int ANDA(IProcessor cpu) // 0xA7;
         {
             return AND(cpu, cpu.Registers.A);
         }
 
-        private static int ANDAU8(Processor cpu) // 0xE6
+        private static int ANDAU8(IProcessor cpu) // 0xE6
         {
             AND(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int XORB(Processor cpu) // 0xA8
+        public static int XORB(IProcessor cpu) // 0xA8
         {
             return XOR(cpu, cpu.Registers.B);
         }
 
-        public static int XORC(Processor cpu) // 0xA9
+        public static int XORC(IProcessor cpu) // 0xA9
         {
             return XOR(cpu, cpu.Registers.C);
         }
 
-        public static int XORD(Processor cpu) // 0xAA
+        public static int XORD(IProcessor cpu) // 0xAA
         {
             return XOR(cpu, cpu.Registers.D);
         }
 
-        public static int XORE(Processor cpu) // 0xAB
+        public static int XORE(IProcessor cpu) // 0xAB
         {
             return XOR(cpu, cpu.Registers.E);
         }
 
-        public static int XORH(Processor cpu) // 0xAC
+        public static int XORH(IProcessor cpu) // 0xAC
         {
             return XOR(cpu, cpu.Registers.H);
         }
 
-        public static int XORL(Processor cpu) // 0xAD
+        public static int XORL(IProcessor cpu) // 0xAD
         {
             return XOR(cpu, cpu.Registers.L);
         }
 
-        public static int XOR_HL_(Processor cpu) // 0xAE
+        public static int XOR_HL_(IProcessor cpu) // 0xAE
         {
             XOR(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int XORA(Processor cpu) // 0xAF
+        public static int XORA(IProcessor cpu) // 0xAF
         {
             return XOR(cpu, cpu.Registers.A);
         }
 
-        private static int XORAU8(Processor cpu) // 0xEE
+        private static int XORAU8(IProcessor cpu) // 0xEE
         {
             XOR(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int ORB(Processor cpu) // 0xB0
+        public static int ORB(IProcessor cpu) // 0xB0
         {
             return OR(cpu, cpu.Registers.B);
         }
 
-        public static int ORC(Processor cpu) // 0xB1
+        public static int ORC(IProcessor cpu) // 0xB1
         {
             return OR(cpu, cpu.Registers.C);
         }
 
-        public static int ORD(Processor cpu) // 0xB2
+        public static int ORD(IProcessor cpu) // 0xB2
         {
             return OR(cpu, cpu.Registers.D);
         }
 
-        public static int ORE(Processor cpu) // 0xB3
+        public static int ORE(IProcessor cpu) // 0xB3
         {
             return OR(cpu, cpu.Registers.E);
         }
 
-        public static int ORH(Processor cpu) // 0xB4
+        public static int ORH(IProcessor cpu) // 0xB4
         {
             return OR(cpu, cpu.Registers.H);
         }
 
-        public static int ORL(Processor cpu) // 0xB5
+        public static int ORL(IProcessor cpu) // 0xB5
         {
             return OR(cpu, cpu.Registers.L);
         }
 
-        public static int OR_HL_(Processor cpu) // 0xB6
+        public static int OR_HL_(IProcessor cpu) // 0xB6
         {
             OR(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int ORA(Processor cpu) // 0xB7
+        public static int ORA(IProcessor cpu) // 0xB7
         {
             return OR(cpu, cpu.Registers.A);
         }
 
-        private static int ORAU8(Processor cpu) // 0xF6
+        private static int ORAU8(IProcessor cpu) // 0xF6
         {
             OR(cpu, cpu.ReadByte());
             return 2;
         }
 
-        public static int CPAB(Processor cpu) // 0xB8
+        public static int CPAB(IProcessor cpu) // 0xB8
         {
             return CP(cpu, cpu.Registers.B);
         }
 
-        public static int CPAC(Processor cpu) // 0xB9
+        public static int CPAC(IProcessor cpu) // 0xB9
         {
             return CP(cpu, cpu.Registers.C);
         }
 
-        public static int CPAD(Processor cpu) // 0xBA
+        public static int CPAD(IProcessor cpu) // 0xBA
         {
             return CP(cpu, cpu.Registers.D);
         }
 
-        public static int CPAE(Processor cpu) // 0xBB
+        public static int CPAE(IProcessor cpu) // 0xBB
         {
             return CP(cpu, cpu.Registers.E);
         }
 
-        public static int CPAH(Processor cpu) // 0xBC
+        public static int CPAH(IProcessor cpu) // 0xBC
         {
             return CP(cpu, cpu.Registers.H);
         }
 
-        public static int CPAL(Processor cpu) // 0xBD
+        public static int CPAL(IProcessor cpu) // 0xBD
         {
             return CP(cpu, cpu.Registers.L);
         }
 
-        public static int CPA_HL_(Processor cpu) // 0xBE
+        public static int CPA_HL_(IProcessor cpu) // 0xBE
         {
             CP(cpu, cpu.ReadBus(cpu.Registers.HL));
             return 2;
         }
 
-        public static int CPAA(Processor cpu) // 0xBF
+        public static int CPAA(IProcessor cpu) // 0xBF
         {
             return CP(cpu, cpu.Registers.A);
         }
 
-        private static int CPAU8(Processor cpu) // 0xFE
+        private static int CPAU8(IProcessor cpu) // 0xFE
         {
             CP(cpu, cpu.ReadByte());
             return 2;

@@ -5,7 +5,7 @@ namespace Atem.Core.Processing.Instructions
 {
     internal static class Load
     {
-        public static void PopulateLookup(Dictionary<byte, Func<Processor, int>> lookup)
+        public static void PopulateLookup(Dictionary<byte, Func<IProcessor, int>> lookup)
         {
             lookup.Add(0x01, LDBCU16);
             lookup.Add(0x11, LDDEU16);
@@ -129,79 +129,79 @@ namespace Atem.Core.Processing.Instructions
             lookup.Add(0xF5, PUSHAF);
         }
 
-        public static int LDBCU16(Processor cpu) // 0x01
+        public static int LDBCU16(IProcessor cpu) // 0x01
         {
             cpu.Registers.BC = cpu.ReadWord();
             return 3;
         }
 
-        public static int LDDEU16(Processor cpu) // 0x11
+        public static int LDDEU16(IProcessor cpu) // 0x11
         {
             cpu.Registers.DE = cpu.ReadWord();
             return 3;
         }
 
-        public static int LDHLU16(Processor cpu) // 0x21
+        public static int LDHLU16(IProcessor cpu) // 0x21
         {
             cpu.Registers.HL = cpu.ReadWord();
             return 3;
         }
 
-        public static int LDSPU16(Processor cpu) // 0x31
+        public static int LDSPU16(IProcessor cpu) // 0x31
         {
             cpu.Registers.SP = cpu.ReadWord();
             return 3;
         }
 
-        public static int LD_BC_A(Processor cpu) // 0x02
+        public static int LD_BC_A(IProcessor cpu) // 0x02
         {
             cpu.WriteBus(cpu.Registers.BC, cpu.Registers.A);
             return 2;
         }
 
-        public static int LD_DE_A(Processor cpu) // 0x12
+        public static int LD_DE_A(IProcessor cpu) // 0x12
         {
             cpu.WriteBus(cpu.Registers.DE, cpu.Registers.A);
             return 2;
         }
 
-        public static int LD_HLI_A(Processor cpu) // 0x22
+        public static int LD_HLI_A(IProcessor cpu) // 0x22
         {
             cpu.WriteBus(cpu.Registers.HL++, cpu.Registers.A);
             return 2;
         }
 
-        public static int LD_HLD_A(Processor cpu) // 0x32
+        public static int LD_HLD_A(IProcessor cpu) // 0x32
         {
             cpu.WriteBus(cpu.Registers.HL--, cpu.Registers.A);
             return 2;
         }
 
-        public static int LDBU8(Processor cpu) // 0x06
+        public static int LDBU8(IProcessor cpu) // 0x06
         {
             cpu.Registers.B = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDDU8(Processor cpu) // 0x16
+        public static int LDDU8(IProcessor cpu) // 0x16
         {
             cpu.Registers.D = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDHU8(Processor cpu) // 0x26
+        public static int LDHU8(IProcessor cpu) // 0x26
         {
             cpu.Registers.H = cpu.ReadByte();
             return 2;
         }
 
-        public static int LD_HL_U8(Processor cpu) // 0x36
+        public static int LD_HL_U8(IProcessor cpu) // 0x36
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.ReadByte());
             return 3;
         }
 
-        public static int LD_U16_SP(Processor cpu) // 0x08
+        public static int LD_U16_SP(IProcessor cpu) // 0x08
         {
             ushort address = cpu.ReadWord();
             cpu.WriteBus(address++, cpu.Registers.SP.GetLowByte());
@@ -209,450 +209,450 @@ namespace Atem.Core.Processing.Instructions
             return 5;
         }
 
-        public static int LDA_BC_(Processor cpu) // 0x0A
+        public static int LDA_BC_(IProcessor cpu) // 0x0A
         {
             cpu.Registers.A = cpu.ReadBus(cpu.Registers.BC);
             return 2;
         }
 
-        public static int LDA_DE_(Processor cpu) // 0x1A
+        public static int LDA_DE_(IProcessor cpu) // 0x1A
         {
             cpu.Registers.A = cpu.ReadBus(cpu.Registers.DE);
             return 2;
         }
 
-        public static int LDA_HLI_(Processor cpu) // 0x2A
+        public static int LDA_HLI_(IProcessor cpu) // 0x2A
         {
             cpu.Registers.A = cpu.ReadBus(cpu.Registers.HL++);
             return 2;
         }
 
-        public static int LDA_HLD_(Processor cpu) // 0x3A
+        public static int LDA_HLD_(IProcessor cpu) // 0x3A
         {
             cpu.Registers.A = cpu.ReadBus(cpu.Registers.HL--);
             return 2;
         }
 
-        public static int LDCU8(Processor cpu) // 0x0E
+        public static int LDCU8(IProcessor cpu) // 0x0E
         {
             cpu.Registers.C = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDEU8(Processor cpu) // 0x1E
+        public static int LDEU8(IProcessor cpu) // 0x1E
         {
             cpu.Registers.E = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDLU8(Processor cpu) // 0x2E
+        public static int LDLU8(IProcessor cpu) // 0x2E
         {
             cpu.Registers.L = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDAU8(Processor cpu) // 0x3E
+        public static int LDAU8(IProcessor cpu) // 0x3E
         {
             cpu.Registers.A = cpu.ReadByte();
             return 2;
         }
 
-        public static int LDBB(Processor cpu) // 0x40
+        public static int LDBB(IProcessor cpu) // 0x40
         {
             return 1;
         }
 
-        public static int LDBC(Processor cpu) // 0x41
+        public static int LDBC(IProcessor cpu) // 0x41
         {
             cpu.Registers.B = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDBD(Processor cpu) // 0x42
+        public static int LDBD(IProcessor cpu) // 0x42
         {
             cpu.Registers.B = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDBE(Processor cpu) // 0x43
+        public static int LDBE(IProcessor cpu) // 0x43
         {
             cpu.Registers.B = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDBH(Processor cpu) // 0x44
+        public static int LDBH(IProcessor cpu) // 0x44
         {
             cpu.Registers.B = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDBL(Processor cpu) // 0x45
+        public static int LDBL(IProcessor cpu) // 0x45
         {
             cpu.Registers.B = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDB_HL_(Processor cpu) // 0x46
+        public static int LDB_HL_(IProcessor cpu) // 0x46
         {
             cpu.Registers.B = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDBA(Processor cpu) // 0x47
+        public static int LDBA(IProcessor cpu) // 0x47
         {
             cpu.Registers.B = cpu.Registers.A;
             return 1;
         }
 
-        public static int LDCB(Processor cpu) // 0x48
+        public static int LDCB(IProcessor cpu) // 0x48
         {
             cpu.Registers.C = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDCC(Processor cpu) // 0x49
+        public static int LDCC(IProcessor cpu) // 0x49
         {
             return 1;
         }
 
-        public static int LDCD(Processor cpu) // 0x4A
+        public static int LDCD(IProcessor cpu) // 0x4A
         {
             cpu.Registers.C = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDCE(Processor cpu) // 0x4B
+        public static int LDCE(IProcessor cpu) // 0x4B
         {
             cpu.Registers.C = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDCH(Processor cpu) // 0x4C
+        public static int LDCH(IProcessor cpu) // 0x4C
         {
             cpu.Registers.C = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDCL(Processor cpu) // 0x4D
+        public static int LDCL(IProcessor cpu) // 0x4D
         {
             cpu.Registers.C = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDC_HL_(Processor cpu) // 0x4E
+        public static int LDC_HL_(IProcessor cpu) // 0x4E
         {
             cpu.Registers.C = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDCA(Processor cpu) // 0x4F
+        public static int LDCA(IProcessor cpu) // 0x4F
         {
             cpu.Registers.C = cpu.Registers.A;
             return 1;
         }
 
-        public static int LDDB(Processor cpu) // 0x50
+        public static int LDDB(IProcessor cpu) // 0x50
         {
             cpu.Registers.D = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDDC(Processor cpu) // 0x51
+        public static int LDDC(IProcessor cpu) // 0x51
         {
             cpu.Registers.D = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDDD(Processor cpu) // 0x52
+        public static int LDDD(IProcessor cpu) // 0x52
         {
             return 1;
         }
 
-        public static int LDDE(Processor cpu) // 0x53
+        public static int LDDE(IProcessor cpu) // 0x53
         {
             cpu.Registers.D = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDDH(Processor cpu) // 0x54
+        public static int LDDH(IProcessor cpu) // 0x54
         {
             cpu.Registers.D = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDDL(Processor cpu) // 0x55
+        public static int LDDL(IProcessor cpu) // 0x55
         {
             cpu.Registers.D = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDD_HL_(Processor cpu) // 0x56
+        public static int LDD_HL_(IProcessor cpu) // 0x56
         {
             cpu.Registers.D = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDDA(Processor cpu) // 0x57
+        public static int LDDA(IProcessor cpu) // 0x57
         {
             cpu.Registers.D = cpu.Registers.A;
             return 1;
         }
 
-        public static int LDEB(Processor cpu) // 0x58
+        public static int LDEB(IProcessor cpu) // 0x58
         {
             cpu.Registers.E = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDEC(Processor cpu) // 0x59
+        public static int LDEC(IProcessor cpu) // 0x59
         {
             cpu.Registers.E = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDED(Processor cpu) // 0x5A
+        public static int LDED(IProcessor cpu) // 0x5A
         {
             cpu.Registers.E = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDEE(Processor cpu) // 0x5B
+        public static int LDEE(IProcessor cpu) // 0x5B
         {
             return 1;
         }
 
-        public static int LDEH(Processor cpu) // 0x5C
+        public static int LDEH(IProcessor cpu) // 0x5C
         {
             cpu.Registers.E = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDEL(Processor cpu) // 0x5D
+        public static int LDEL(IProcessor cpu) // 0x5D
         {
             cpu.Registers.E = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDE_HL_(Processor cpu) // 0x5E
+        public static int LDE_HL_(IProcessor cpu) // 0x5E
         {
             cpu.Registers.E = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDEA(Processor cpu) // 0x5F
+        public static int LDEA(IProcessor cpu) // 0x5F
         {
             cpu.Registers.E = cpu.Registers.A;
             return 1;
         }
 
-        public static int LDHB(Processor cpu) // 0x60
+        public static int LDHB(IProcessor cpu) // 0x60
         {
             cpu.Registers.H = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDHC(Processor cpu) // 0x61
+        public static int LDHC(IProcessor cpu) // 0x61
         {
             cpu.Registers.H = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDHD(Processor cpu) // 0x62
+        public static int LDHD(IProcessor cpu) // 0x62
         {
             cpu.Registers.H = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDHE(Processor cpu) // 0x63
+        public static int LDHE(IProcessor cpu) // 0x63
         {
             cpu.Registers.H = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDHH(Processor cpu) // 0x64
+        public static int LDHH(IProcessor cpu) // 0x64
         {
             return 1;
         }
 
-        public static int LDHL(Processor cpu) // 0x65
+        public static int LDHL(IProcessor cpu) // 0x65
         {
             cpu.Registers.H = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDH_HL_(Processor cpu) // 0x66
+        public static int LDH_HL_(IProcessor cpu) // 0x66
         {
             cpu.Registers.H = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDHA(Processor cpu) // 0x67
+        public static int LDHA(IProcessor cpu) // 0x67
         {
             cpu.Registers.H = cpu.Registers.A;
             return 1;
         }
 
-        public static int LDLB(Processor cpu) // 0x68
+        public static int LDLB(IProcessor cpu) // 0x68
         {
             cpu.Registers.L = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDLC(Processor cpu) // 0x69
+        public static int LDLC(IProcessor cpu) // 0x69
         {
             cpu.Registers.L = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDLD(Processor cpu) // 0x6A
+        public static int LDLD(IProcessor cpu) // 0x6A
         {
             cpu.Registers.L = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDLE(Processor cpu) // 0x6B
+        public static int LDLE(IProcessor cpu) // 0x6B
         {
             cpu.Registers.L = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDLH(Processor cpu) // 0x6C
+        public static int LDLH(IProcessor cpu) // 0x6C
         {
             cpu.Registers.L = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDLL(Processor cpu) // 0x6D
+        public static int LDLL(IProcessor cpu) // 0x6D
         {
             return 1;
         }
 
-        public static int LDL_HL_(Processor cpu) // 0x6E
+        public static int LDL_HL_(IProcessor cpu) // 0x6E
         {
             cpu.Registers.L = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDLA(Processor cpu) // 0x6F
+        public static int LDLA(IProcessor cpu) // 0x6F
         {
             cpu.Registers.L = cpu.Registers.A;
             return 1;
         }
 
-        public static int LD_HL_B(Processor cpu) // 0x70
+        public static int LD_HL_B(IProcessor cpu) // 0x70
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.B);
             return 2;
         }
 
-        public static int LD_HL_C(Processor cpu) // 0x71
+        public static int LD_HL_C(IProcessor cpu) // 0x71
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.C);
             return 2;
         }
 
-        public static int LD_HL_D(Processor cpu) // 0x72
+        public static int LD_HL_D(IProcessor cpu) // 0x72
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.D);
             return 2;
         }
 
-        public static int LD_HL_E(Processor cpu) // 0x73
+        public static int LD_HL_E(IProcessor cpu) // 0x73
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.E);
             return 2;
         }
 
-        public static int LD_HL_H(Processor cpu) // 0x74
+        public static int LD_HL_H(IProcessor cpu) // 0x74
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.H);
             return 2;
         }
 
-        public static int LD_HL_L(Processor cpu) // 0x75
+        public static int LD_HL_L(IProcessor cpu) // 0x75
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.L);
             return 2;
         }
 
-        public static int LD_HL_A(Processor cpu) // 0x77
+        public static int LD_HL_A(IProcessor cpu) // 0x77
         {
             cpu.WriteBus(cpu.Registers.HL, cpu.Registers.A);
             return 2;
         }
 
-        public static int LDAB(Processor cpu) // 0x78
+        public static int LDAB(IProcessor cpu) // 0x78
         {
             cpu.Registers.A = cpu.Registers.B;
             return 1;
         }
 
-        public static int LDAC(Processor cpu) // 0x79
+        public static int LDAC(IProcessor cpu) // 0x79
         {
             cpu.Registers.A = cpu.Registers.C;
             return 1;
         }
 
-        public static int LDAD(Processor cpu) // 0x7A
+        public static int LDAD(IProcessor cpu) // 0x7A
         {
             cpu.Registers.A = cpu.Registers.D;
             return 1;
         }
 
-        public static int LDAE(Processor cpu) // 0x7B
+        public static int LDAE(IProcessor cpu) // 0x7B
         {
             cpu.Registers.A = cpu.Registers.E;
             return 1;
         }
 
-        public static int LDAH(Processor cpu) // 0x7C
+        public static int LDAH(IProcessor cpu) // 0x7C
         {
             cpu.Registers.A = cpu.Registers.H;
             return 1;
         }
 
-        public static int LDAL(Processor cpu) // 0x7D
+        public static int LDAL(IProcessor cpu) // 0x7D
         {
             cpu.Registers.A = cpu.Registers.L;
             return 1;
         }
 
-        public static int LDA_HL_(Processor cpu) // 0x7E
+        public static int LDA_HL_(IProcessor cpu) // 0x7E
         {
             cpu.Registers.A = cpu.ReadBus(cpu.Registers.HL);
             return 2;
         }
 
-        public static int LDAA(Processor cpu) // 0x7F
+        public static int LDAA(IProcessor cpu) // 0x7F
         {
             return 1;
         }
 
-        public static int LD_U8_A(Processor cpu) // 0xE0
+        public static int LD_U8_A(IProcessor cpu) // 0xE0
         {
             cpu.WriteBus((ushort)(0xFF00 + cpu.ReadByte()), cpu.Registers.A);
             return 3;
         }
 
-        public static int LDA_U8_(Processor cpu) // 0xF0
+        public static int LDA_U8_(IProcessor cpu) // 0xF0
         {
             cpu.Registers.A = cpu.ReadBus((ushort)(0xFF00 + cpu.ReadByte()));
             return 3;
         }
 
-        public static int LD_C_A(Processor cpu) // 0xE2
+        public static int LD_C_A(IProcessor cpu) // 0xE2
         {
             cpu.WriteBus((ushort)(0xFF00 + cpu.Registers.C), cpu.Registers.A);
             return 2;
         }
 
-        public static int LDA_C_(Processor cpu) // 0xF2
+        public static int LDA_C_(IProcessor cpu) // 0xF2
         {
             cpu.Registers.A = cpu.ReadBus((ushort)(0xFF00 + cpu.Registers.C));
             return 2;
         }
 
-        public static int LDHLS8(Processor cpu) // 0xF8
+        public static int LDHLS8(IProcessor cpu) // 0xF8
         {
             ushort value = cpu.Registers.SP;
             byte low = value.GetLowByte();
@@ -676,67 +676,67 @@ namespace Atem.Core.Processing.Instructions
             return 3;
         }
 
-        public static int LDSPHL(Processor cpu) // 0xF9
+        public static int LDSPHL(IProcessor cpu) // 0xF9
         {
             cpu.Registers.SP = cpu.Registers.HL;
             return 2;
         }
 
-        public static int LD_U16_A(Processor cpu) // 0xEA
+        public static int LD_U16_A(IProcessor cpu) // 0xEA
         {
             cpu.WriteBus(cpu.ReadWord(), cpu.Registers.A);
             return 4;
         }
 
-        public static int LDA_U16_(Processor cpu) // 0xFA
+        public static int LDA_U16_(IProcessor cpu) // 0xFA
         {
             cpu.Registers.A = cpu.ReadBus(cpu.ReadWord());
             return 4;
         }
 
-        public static int POPBC(Processor cpu) // 0xC1
+        public static int POPBC(IProcessor cpu) // 0xC1
         {
             cpu.Registers.BC = cpu.PopWord();
             return 3;
         }
 
-        public static int POPDE(Processor cpu) // 0xD1
+        public static int POPDE(IProcessor cpu) // 0xD1
         {
             cpu.Registers.DE = cpu.PopWord();
             return 3;
         }
 
-        public static int POPHL(Processor cpu) // 0xE1
+        public static int POPHL(IProcessor cpu) // 0xE1
         {
             cpu.Registers.HL = cpu.PopWord();
             return 3;
         }
 
-        public static int POPAF(Processor cpu) // 0xF1
+        public static int POPAF(IProcessor cpu) // 0xF1
         {
             cpu.Registers.AF = cpu.PopWord();
             return 3;
         }
 
-        public static int PUSHBC(Processor cpu) // 0xC5
+        public static int PUSHBC(IProcessor cpu) // 0xC5
         {
             cpu.PushWord(cpu.Registers.BC);
             return 4;
         }
 
-        public static int PUSHDE(Processor cpu) // 0xD5
+        public static int PUSHDE(IProcessor cpu) // 0xD5
         {
             cpu.PushWord(cpu.Registers.DE);
             return 4;
         }
 
-        public static int PUSHHL(Processor cpu) // 0xE5
+        public static int PUSHHL(IProcessor cpu) // 0xE5
         {
             cpu.PushWord(cpu.Registers.HL);
             return 4;
         }
 
-        public static int PUSHAF(Processor cpu) // 0xF5
+        public static int PUSHAF(IProcessor cpu) // 0xF5
         {
             cpu.PushWord(cpu.Registers.AF);
             return 4;
