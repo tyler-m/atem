@@ -9,8 +9,8 @@
   </PropertyGroup>
   <PropertyGroup>
 	<Copyright></Copyright>
-    <Version>0.1.0</Version>
-	<InformationalVersion>0.1.0-alpha</InformationalVersion>
+    <Version>0.1.1</Version>
+	<InformationalVersion>0.1.1-alpha</InformationalVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
