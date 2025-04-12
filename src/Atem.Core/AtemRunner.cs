@@ -1,25 +1,25 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Atem.Core.Debugging;
 using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class AtemRunner
+    public class AtemRunner : IStateful
     {
         private static float ClocksPerFrame => Processor.Frequency / GraphicsManager.FrameRate;
-        private float _leftoverClocks = 0.0f;
+        private double _leftoverClocks = 0.0f;
         private readonly int _clockCost = 4;
-        private readonly IBus _bus;
+        private readonly Bus _bus;
         private readonly Debugger _debugger;
         private bool _forceClock;
         private bool _paused;
 
         public Debugger Debugger { get => _debugger; }
 
-        public IBus Bus { get =>  _bus; }
+        public Bus Bus { get =>  _bus; }
 
         public bool Paused { get => _paused; set => _paused = value; }
 
@@ -216,42 +216,16 @@ namespace Atem.Core
             _bus.Joypad.OnJoypadChange(button, down);
         }
 
-        public byte[] GetState()
+        public void GetState(BinaryWriter writer)
         {
-            using MemoryStream stream = new();
-            using BinaryWriter writer = new(stream);
-
-            Bus.Processor.GetState(writer);
-            Bus.Timer.GetState(writer);
-            Bus.Interrupt.GetState(writer);
-            Bus.Joypad.GetState(writer);
-            Bus.Serial.GetState(writer);
-            Bus.Graphics.GetState(writer);
-            Bus.Audio.GetState(writer);
-            Bus.Cartridge.GetState(writer);
-
-            writer.Write(Bus.HRAM);
-            writer.Write(Bus.WRAM);
-
-            return stream.ToArray();
+            writer.Write(_leftoverClocks);
+            _bus.GetState(writer);
         }
 
-        public void SetState(byte[] saveStateData)
+        public void SetState(BinaryReader reader)
         {
-            using MemoryStream stream = new(saveStateData);
-            using BinaryReader reader = new(stream);
-
-            Bus.Processor.SetState(reader);
-            Bus.Timer.SetState(reader);
-            Bus.Interrupt.SetState(reader);
-            Bus.Joypad.SetState(reader);
-            Bus.Serial.SetState(reader);
-            Bus.Graphics.SetState(reader);
-            Bus.Audio.SetState(reader);
-            Bus.Cartridge.SetState(reader);
-
-            Array.Copy(reader.ReadBytes(Bus.HRAM.Length), Bus.HRAM, Bus.HRAM.Length);
-            Array.Copy(reader.ReadBytes(Bus.WRAM.Length), Bus.WRAM, Bus.WRAM.Length);
+            _leftoverClocks = reader.ReadDouble();
+            _bus.SetState(reader);
         }
     }
 }

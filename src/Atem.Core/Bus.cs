@@ -1,26 +1,30 @@
-﻿using Atem.Core.Audio;
+﻿using System;
+using System.IO;
+using Atem.Core.Audio;
 using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class Bus : IBus
+    public class Bus : IBus, IStateful
     {
-        private IProcessor _processor;
-        private GraphicsManager _graphics;
-        private Timer _timer;
-        private Interrupt _interrupt;
-        private Joypad _joypad;
-        private Serial _serial;
+        private readonly IProcessor _processor;
+        private readonly GraphicsManager _graphics;
+        private readonly Timer _timer;
+        private readonly Interrupt _interrupt;
+        private readonly Joypad _joypad;
+        private readonly Serial _serial;
         private BootROM _bootROM;
         private Cartridge _cartridge;
-        private AudioManager _audio;
-        private byte[] _hram = new byte[0x7F];
-        private byte[] _wram = new byte[0x2000 * 4];
+        private readonly AudioManager _audio;
+        private readonly byte[] _hram = new byte[0x7F];
+        private readonly byte[] _wram = new byte[0x2000 * 4];
+        private byte _svbk;
 
-        public byte SVBK = 0;
+        public byte SVBK { get => _svbk; set => _svbk = value; }
         public byte[] HRAM { get => _hram; }
         public byte[] WRAM { get => _wram; }
         public IProcessor Processor { get => _processor; }
@@ -663,6 +667,38 @@ namespace Atem.Core
         public void RequestInterrupt(InterruptType interruptType)
         {
             _interrupt.SetInterrupt(interruptType);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            _processor.GetState(writer);
+            _timer.GetState(writer);
+            _interrupt.GetState(writer);
+            _joypad.GetState(writer);
+            _serial.GetState(writer);
+            _graphics.GetState(writer);
+            _audio.GetState(writer);
+            _cartridge.GetState(writer);
+            
+            writer.Write(_svbk);
+            writer.Write(_hram);
+            writer.Write(_wram);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _processor.SetState(reader);
+            _timer.SetState(reader);
+            _interrupt.SetState(reader);
+            _joypad.SetState(reader);
+            _serial.SetState(reader);
+            _graphics.SetState(reader);
+            _audio.SetState(reader);
+            _cartridge.SetState(reader);
+
+            _svbk = reader.ReadByte();
+            Array.Copy(reader.ReadBytes(_hram.Length), _hram, _hram.Length);
+            Array.Copy(reader.ReadBytes(_wram.Length), _wram, _wram.Length);
         }
     }
 }
