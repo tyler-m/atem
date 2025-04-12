@@ -11,17 +11,17 @@ namespace Atem.Core.Processing
 
         private CPURegisters _registers;
         private IBus _bus;
-        private bool _cb = false;
-        private bool _ime = false;
-        private bool _doubleSpeed = false;
-        private bool _speedSwitchFlag = false;
+        private byte _instruction;
+        private bool _cb;
+        private bool _ime;
+        private bool _doubleSpeed;
+        private bool _speedSwitchFlag;
+        private int _length;
 
         private Dictionary<byte, Func<IProcessor, int>> _instructions = [];
         private Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
 
         public CPURegisters Registers { get => _registers; set => _registers = value; }
-        public byte IR;
-        public int Length = 0;
 
         public bool CB { get => _cb; set => _cb = value; }
         public bool DoubleSpeed { get => _doubleSpeed; set => _doubleSpeed = value; }
@@ -156,7 +156,7 @@ namespace Atem.Core.Processing
                         _bus.Write(0xFF0F, IF.ClearBit(i));
                         _instructionFinished = false;
                         _interruptType = i;
-                        Length = 5;
+                        _length = 5;
                         PushWord(Registers.PC);
                         Registers.PC = _interruptJumps[_interruptType];
                         _tick++;
@@ -164,22 +164,22 @@ namespace Atem.Core.Processing
                     }
                 }
 
-                IR = ReadByte();
+                _instruction = ReadByte();
                 if (!CB)
                 {
-                    Length = _instructions[IR](this);
+                    _length = _instructions[_instruction](this);
                 }
             }
 
             if (CB && _tick == 1)
             {
-                IR = ReadByte();
-                Length = _instructionsCB[IR](this);
+                _instruction = ReadByte();
+                _length = _instructionsCB[_instruction](this);
                 CB = false;
             }
 
             _tick++;
-            return _instructionFinished = _tick >= Length && !CB;
+            return _instructionFinished = _tick >= _length && !CB;
         }
 
         public void Halt()
@@ -209,8 +209,8 @@ namespace Atem.Core.Processing
             writer.Write(Registers.SP);
             writer.Write(Registers.PC);
             writer.Write(Registers.Flags.F);
-            writer.Write(IR);
-            writer.Write(Length);
+            writer.Write(_instruction);
+            writer.Write(_length);
             writer.Write(CB);
             writer.Write(IME);
             writer.Write(DoubleSpeed);
@@ -234,8 +234,8 @@ namespace Atem.Core.Processing
             Registers.SP = reader.ReadUInt16();
             Registers.PC = reader.ReadUInt16();
             Registers.Flags.F = reader.ReadByte();
-            IR = reader.ReadByte();
-            Length = reader.ReadInt32();
+            _instruction = reader.ReadByte();
+            _length = reader.ReadInt32();
             CB = reader.ReadBoolean();
             IME = reader.ReadBoolean();
             DoubleSpeed = reader.ReadBoolean();
