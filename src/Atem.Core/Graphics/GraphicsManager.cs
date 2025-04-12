@@ -2,6 +2,7 @@
 using Atem.Core.State;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Atem.Core.Graphics
 {
@@ -631,27 +632,20 @@ namespace Atem.Core.Graphics
 
         public void GetState(BinaryWriter writer)
         {
-            writer.Write(_spriteBuffer.Count);
-            foreach (Sprite sprite in _spriteBuffer)
-            {
-                writer.Write(sprite.X);
-                writer.Write(sprite.Y);
-                writer.Write(sprite.Tile);
-                writer.Write(sprite.Flags);
-            }
-
             writer.Write(_lineDotCount);
             writer.Write(_linePixel);
             writer.Write(_vram);
 
             foreach (GBColor pixel in _screen)
             {
-                writer.Write(pixel.Color);
+                pixel.GetState(writer);
             }
 
+            writer.Write(_spriteBuffer.Count);
             foreach (Sprite sprite in _objects)
             {
                 sprite.GetState(writer);
+                writer.Write(_spriteBuffer.IndexOf(sprite));
             }
 
             writer.Write(_objectIndex);
@@ -697,28 +691,32 @@ namespace Atem.Core.Graphics
 
         public void SetState(BinaryReader reader)
         {
-            _spriteBuffer.Clear();
-            int spriteBufferCount = reader.ReadInt32();
-            for (int i = 0; i < spriteBufferCount; i++)
-            {
-                Sprite sprite = new();
-                sprite.SetState(reader);
-                _spriteBuffer.Add(sprite);
-            }
-
             _lineDotCount = reader.ReadInt32();
             _linePixel = reader.ReadByte();
             _vram = reader.ReadBytes(_vram.Length);
 
             foreach (GBColor pixel in _screen)
             {
-                pixel.Color = reader.ReadUInt16();
+                pixel.SetState(reader);
             }
 
+            // GraphicsManager alters the sprites in _objects as requested by
+            // the game. _spriteBuffer is always a list constructed of
+            // references to Sprites in the _objects list. _spriteBuffer must
+            // therefore be references to Sprites in the _objects list when
+            // the state of the emulator gets reassembled
+            int spriteBufferCount = reader.ReadInt32();
+            Sprite[] spriteBufferArray = new Sprite[spriteBufferCount];
             foreach (Sprite sprite in _objects)
             {
                 sprite.SetState(reader);
+                int spriteBufferIndex = reader.ReadInt32();
+                if (spriteBufferIndex >= 0)
+                {
+                    spriteBufferArray[spriteBufferIndex] = sprite;
+                }
             }
+            _spriteBuffer = spriteBufferArray.ToList();
 
             _objectIndex = reader.ReadInt32();
             _windowWasTriggeredThisFrame = reader.ReadBoolean();
