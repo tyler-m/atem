@@ -14,18 +14,23 @@ namespace Atem.Saving
 
         public void Load(int slot, ICartridgeContext context)
         {
-            string stateSavePath = context.Id + ".ss" + slot;
+            string saveStatePath = context.Id + ".ss" + slot;
 
-            if (File.Exists(stateSavePath))
+            if (File.Exists(saveStatePath))
             {
-                byte[] saveStateData = File.ReadAllBytes(stateSavePath);
-                _atem.SetState(saveStateData);
+                using FileStream stream = new(saveStatePath, FileMode.Open);
+                using BinaryReader reader = new(stream);
+                _atem.SetState(reader);
             }
         }
 
         public void Save(int slot, ICartridgeContext context)
         {
-            File.WriteAllBytes(context.Id + ".ss" + slot, _atem.GetState());
+            string saveStatePath = context.Id + ".ss" + slot;
+
+            using FileStream stream = new(saveStatePath, FileMode.Create);
+            using BinaryWriter writer = new(stream);
+            _atem.GetState(writer);
         }
     }
 }
