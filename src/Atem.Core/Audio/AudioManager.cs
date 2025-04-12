@@ -19,7 +19,7 @@ namespace Atem.Core.Audio
         private int _sampleTimer = 0;
         private int _bufferIndex = 0;
         private float _sampleTimerRemainder = 0.0f;
-        private readonly float _samplePeriod = Processor.Frequency / SAMPLE_RATE;
+        private readonly float _samplePeriod = Processor.FREQUENCY / SAMPLE_RATE;
         private byte _leftChannelVolume = 0;
         private byte _rightChannelVolume = 0;
         private float _volumeFactor = 1.0f; // user-controlled volume

@@ -1,6 +1,6 @@
-﻿using Atem.Core.State;
-using System;
+﻿using System;
 using System.IO;
+using Atem.Core.State;
 
 namespace Atem.Core.Memory.Mapper
 {
@@ -8,9 +8,9 @@ namespace Atem.Core.Memory.Mapper
     {
         private int _seconds, _minutes, _hours, _day;
         private bool _halt, _dayCarry;
-        double _secondsElapsed = 0.0;
-        long _lastUnixTimestamp = 0;
-        public bool Latched = false;
+        private double _secondsElapsed;
+        private long _lastUnixTimestamp;
+        private bool _latched = false;
 
         public int Seconds
         {
@@ -90,6 +90,8 @@ namespace Atem.Core.Memory.Mapper
             }
         }
 
+        public bool Latched { get => _latched; set => _latched = value; }
+
         public RTC()
         {
             _lastUnixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -123,7 +125,7 @@ namespace Atem.Core.Memory.Mapper
 
         private void Update()
         {
-            if (!_halt && !Latched)
+            if (!_halt && !_latched)
             {
                 long _currentUnixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 _secondsElapsed += (_currentUnixTimestamp - _lastUnixTimestamp) / 1000.0;
@@ -165,7 +167,7 @@ namespace Atem.Core.Memory.Mapper
             writer.Write(_dayCarry);
             writer.Write(_secondsElapsed);
             writer.Write(_lastUnixTimestamp);
-            writer.Write(Latched);
+            writer.Write(_latched);
         }
 
         public void SetState(BinaryReader reader)
@@ -178,7 +180,7 @@ namespace Atem.Core.Memory.Mapper
             _dayCarry = reader.ReadBoolean();
             _secondsElapsed = reader.ReadDouble();
             _lastUnixTimestamp = reader.ReadInt64();
-            Latched = reader.ReadBoolean();
+            _latched = reader.ReadBoolean();
         }
     }
 }

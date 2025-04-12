@@ -1,5 +1,4 @@
-﻿
-using Atem.Core.State;
+﻿using Atem.Core.State;
 
 namespace Atem.Core.Memory.Mapper
 {

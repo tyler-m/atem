@@ -7,10 +7,10 @@ namespace Atem.Core.Processing
 {
     public class Processor : IProcessor
     {
-        public static int Frequency = 4194304;
+        public const int FREQUENCY = 4194304;
 
-        private CPURegisters _registers;
-        private IBus _bus;
+        private readonly CPURegisters _registers;
+        private readonly IBus _bus;
         private byte _instruction;
         private bool _cb;
         private bool _ime;
@@ -21,8 +21,7 @@ namespace Atem.Core.Processing
         private Dictionary<byte, Func<IProcessor, int>> _instructions = [];
         private Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
 
-        public CPURegisters Registers { get => _registers; set => _registers = value; }
-
+        public CPURegisters Registers { get => _registers; }
         public bool CB { get => _cb; set => _cb = value; }
         public bool DoubleSpeed { get => _doubleSpeed; set => _doubleSpeed = value; }
         public bool SpeedSwitchFlag { get => _speedSwitchFlag; set => _speedSwitchFlag = value; }
@@ -42,11 +41,10 @@ namespace Atem.Core.Processing
         }
 
         private bool _halted = false;
-        private bool _busHalted = false;
         private bool _instructionFinished = true;
         private int _tick = 0;
 
-        private ushort[] _interruptJumps = new ushort[5] { 0x0040, 0x0048, 0x0050, 0x0058, 0x0060 };
+        private readonly ushort[] _interruptJumps = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
         private int _interruptType;
 
         public ushort AddressOfNextInstruction
@@ -119,11 +117,6 @@ namespace Atem.Core.Processing
 
         public bool Clock()
         {
-            if (_busHalted)
-            {
-                return false;
-            }
-
             if (_halted)
             {
                 byte IE = _bus.Read(0xFFFF);
@@ -187,16 +180,6 @@ namespace Atem.Core.Processing
             _halted = true;
         }
 
-        internal void RequestHalt()
-        {
-            _busHalted = true;
-        }
-
-        internal void RequestUnhalt()
-        {
-            _busHalted = false;
-        }
-
         public void GetState(BinaryWriter writer)
         {
             writer.Write(Registers.A);
@@ -216,7 +199,6 @@ namespace Atem.Core.Processing
             writer.Write(DoubleSpeed);
             writer.Write(SpeedSwitchFlag);
             writer.Write(_halted);
-            writer.Write(_busHalted);
             writer.Write(_instructionFinished);
             writer.Write(_tick);
             writer.Write(_interruptType);
@@ -241,7 +223,6 @@ namespace Atem.Core.Processing
             DoubleSpeed = reader.ReadBoolean();
             SpeedSwitchFlag = reader.ReadBoolean();
             _halted = reader.ReadBoolean();
-            _busHalted = reader.ReadBoolean();
             _instructionFinished = reader.ReadBoolean();
             _tick = reader.ReadInt32();
             _interruptType = reader.ReadInt32();
