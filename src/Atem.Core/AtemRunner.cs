@@ -9,7 +9,7 @@ namespace Atem.Core
 {
     public class AtemRunner : IStateful
     {
-        private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
+        private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FRAME_RATE;
         private double _leftoverClocks = 0.0f;
         private readonly int _clockCost = 4;
         private readonly Bus _bus;

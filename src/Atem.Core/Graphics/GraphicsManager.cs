@@ -1,8 +1,8 @@
-﻿using Atem.Core.Processing;
-using Atem.Core.State;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core.Graphics
 {
@@ -18,15 +18,15 @@ namespace Atem.Core.Graphics
 
     public class GraphicsManager : IStateful
     {
-        public static float FrameRate = 59.73f;
+        public const float FRAME_RATE = 59.73f;
 
-        private IBus _bus;
-        private List<Sprite> _spriteBuffer = new List<Sprite>();
+        private readonly IBus _bus;
+        private List<Sprite> _spriteBuffer = [];
         private int _lineDotCount;
         private byte _linePixel;
         private byte[] _vram = new byte[0x4000];
-        private GBColor[] _screen = new GBColor[160 * 144];
-        private Sprite[] _objects = new Sprite[40];
+        private readonly GBColor[] _screen = new GBColor[160 * 144];
+        private readonly Sprite[] _objects = new Sprite[40];
         private int _objectIndex;
         private bool _windowWasTriggeredThisFrame;
         private bool _justEnteredHorizontalBlank;
@@ -55,9 +55,9 @@ namespace Atem.Core.Graphics
         public byte CurrentLine;
         public byte CurrentWindowLine;
         public int LineYToCompare;
-        public PaletteGroup TilePalettes = new PaletteGroup();
-        public PaletteGroup ObjectPalettes = new PaletteGroup();
-        public PaletteGroup DMGPalettes = new PaletteGroup();
+        public PaletteGroup TilePalettes = new();
+        public PaletteGroup ObjectPalettes = new();
+        public PaletteGroup DMGPalettes = new();
         public ushort SourceAddressDMA;
         public ushort DestAddressDMA;
         public byte TransferLengthRemaining;
@@ -150,7 +150,7 @@ namespace Atem.Core.Graphics
         {
             _bus = bus;
             Registers = new GraphicsRegisters(this);
-            TilePalettes[0] = new Palette(new GBColor[] { GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0) });
+            TilePalettes[0] = new Palette([GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0)]);
             for (int i = 0; i < _objects.Length; i++)
             {
                 _objects[i] = new Sprite();
