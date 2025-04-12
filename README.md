@@ -11,44 +11,41 @@ A cross-platform emulator for the Game Boy Color written in C#
 Status
 ---
 - **Processor**
-  - [X] Fully implemented Game Boy CPU instruction set
-  - [X] Passes Blargg's [cpu_instrs](https://github.com/libretro/testroms/blob/master/blargg-cpu-instrs/) test suite
+  - Fully implemented Game Boy CPU instruction set
+  - Passes Blargg's [cpu_instrs](https://github.com/libretro/testroms/blob/master/blargg-cpu-instrs/) test suite
   
 - **Graphics**
-  - [X] Per-pixel rendering
-  - [X] Passes [cgb-acid2](https://github.com/mattcurrie/cgb-acid2)
+  - Per-pixel rendering
+  - Passes [cgb-acid2](https://github.com/mattcurrie/cgb-acid2)
   
 - **Sound**
-  - [X] Synthesizes audio for Pulse, Wave, and Noise channels
-  - [X] Audio filters (high-pass, low-pass)
-  - [ ] Doesn't fully handle "obscure behavior" yet (see [Pan Docs](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior))
+  - Synthesizes audio for Pulse, Wave, and Noise channels
+  - Audio filters (high-pass, low-pass)
+  - Doesn't fully handle "obscure behavior" yet (see [Pan Docs](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior))
 
 - **Memory**
-  - [X] Loads MBC1, MBC3, MBC5 cartridges
-  - [X] Boot ROM support
-  - [X] Real-time Clock support for MBC3 cartridges
+  - Loads MBC1, MBC3, MBC5 cartridges
+  - Real-time Clock support for MBC3 cartridges
   
 - **Input**
-  - [X] Keyboard control rebinding
-  - [ ] Gamepad support
-  - [ ] Serial communication (simulated link cable)
+  - Keyboard control rebinding
+  - No Gamepad support yet
+  - No Serial communication yet (simulated link cable)
   
 - **Saving**
-  - [X] Save and load emulator states
-  - [X] Battery saves (persistent game saves)
+  - Save and load emulator states
+  - Battery saves (persistent game saves)
   
-- **Debug**
-  - [X] Step-through debugging
-  - [X] Memory view
-  - [X] CPU register view
-  - [X] Address-based breakpoints
+- **Debugging**
+  - Memory view
+  - CPU register view
+  - Address-based breakpoints
 
 Developing
 ---
 
 - SDK for .NET 8.0+ must be installed
 
-Grab the repo
 ```
 git clone https://github.com/tyler-m/atem.git
 cd atem
@@ -65,6 +62,22 @@ Build
 Test
 
 `dotnet test`
+
+Building for Release
+---
+
+- SDK for .NET 8.0+ must be installed
+
+In a Linux terminal or on Windows with Git Bash:
+
+```
+git clone https://github.com/tyler-m/atem.git
+cd atem
+```
+
+Run `./build.sh`
+
+Resulting binaries can be found in `/dist`
 
 Notes
 ---
