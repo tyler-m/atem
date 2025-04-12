@@ -103,7 +103,7 @@ OpenAL Soft
 ===========================
 Atem dynamically links to OpenAL Soft.
 
-OpenAL Soft is licenused under GNU LGPL v2.1
+OpenAL Soft is licensed under GNU LGPL v2.1
 You may obtain a copy of the License at:
 https://www.gnu.org/licenses/lgpl-2.1.en.html
 
