@@ -85,12 +85,16 @@ namespace Atem.Core.Graphics
 
         public void GetState(BinaryWriter writer)
         {
-            writer.Write(Color);
+            writer.Write(_red);
+            writer.Write(_green);
+            writer.Write(_blue);
         }
 
         public void SetState(BinaryReader reader)
         {
-            Color = reader.ReadUInt16();
+            _red = reader.ReadByte();
+            _green = reader.ReadByte();
+            _blue = reader.ReadByte();
         }
     }
 }

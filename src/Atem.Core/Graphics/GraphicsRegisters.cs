@@ -84,7 +84,7 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.CurrentLine;
+                return _manager.CurrentLine;
             }
             set {  }
         }
