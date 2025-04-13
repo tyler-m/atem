@@ -249,7 +249,7 @@ namespace Atem.Core.Graphics
             }
             set
             {
-                _manager.SourceAddressDMA = _manager.SourceAddressDMA.SetHighByte(value);
+                _manager.HDMA.SourceAddress = _manager.HDMA.SourceAddress.SetHighByte(value);
             }
         }
 
@@ -262,7 +262,7 @@ namespace Atem.Core.Graphics
             set
             {
                 // bottom 4 bits are ignored
-                _manager.SourceAddressDMA = _manager.SourceAddressDMA.SetLowByte((byte)(value & 0xF0));
+                _manager.HDMA.SourceAddress = _manager.HDMA.SourceAddress.SetLowByte((byte)(value & 0xF0));
             }
         }
 
@@ -275,7 +275,7 @@ namespace Atem.Core.Graphics
             set
             {
                 // ensure address begins at 0x8000 (start of VRAM). top 3 bits are ignored
-                _manager.DestAddressDMA = _manager.DestAddressDMA.SetHighByte((byte)((value & 0x1F) | 0x80));
+                _manager.HDMA.DestAddress = _manager.HDMA.DestAddress.SetHighByte((byte)((value & 0x1F) | 0x80));
             }
         }
 
@@ -287,7 +287,7 @@ namespace Atem.Core.Graphics
             }
             set
             {
-                _manager.DestAddressDMA = _manager.DestAddressDMA.SetLowByte((byte)(value & 0xF0));
+                _manager.HDMA.DestAddress = _manager.HDMA.DestAddress.SetLowByte((byte)(value & 0xF0));
             }
         }
 
@@ -295,11 +295,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((((!_manager.TransferActive).Int()) << 7) | (_manager.TransferLengthRemaining & 0x7F));
+                return (byte)((((!_manager.HDMA.TransferActive).Int()) << 7) | (_manager.HDMA.TransferLengthRemaining & 0x7F));
             }
             set
             {
-                _manager.StartTransfer(value);
+                _manager.HDMA.StartTransfer(value);
             }
         }
     }
