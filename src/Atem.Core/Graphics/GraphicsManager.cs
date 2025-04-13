@@ -13,6 +13,7 @@ namespace Atem.Core.Graphics
         public const float FRAME_RATE = 59.73f;
 
         private readonly IBus _bus;
+        private readonly HDMA _hdma;
         private List<Sprite> _spriteBuffer = [];
         private int _lineDotCount;
         private byte _linePixel;
@@ -50,12 +51,6 @@ namespace Atem.Core.Graphics
         public PaletteGroup TilePalettes = new();
         public PaletteGroup ObjectPalettes = new();
         public PaletteGroup DMGPalettes = new();
-        public ushort SourceAddressDMA;
-        public ushort DestAddressDMA;
-        public byte TransferLengthRemaining;
-        public bool TransferActive;
-        public bool HorizontalBlankTransferActive;
-        public bool HorizontalBlankTransfer;
 
         public byte Bank { get; set; }
 
@@ -75,6 +70,8 @@ namespace Atem.Core.Graphics
                 _currentlyOnLineY = value;
             }
         }
+
+        public HDMA HDMA { get => _hdma; }
 
         public byte ODMA
         {
@@ -141,6 +138,7 @@ namespace Atem.Core.Graphics
         public GraphicsManager(IBus bus)
         {
             _bus = bus;
+            _hdma = new(bus);
             Registers = new GraphicsRegisters(this);
             TilePalettes[0] = new Palette([GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0)]);
             for (int i = 0; i < _objects.Length; i++)
@@ -154,7 +152,7 @@ namespace Atem.Core.Graphics
         {
             address -= 0x8000;
 
-            if (Mode == RenderMode.Draw & !ignoreRenderMode)
+            if (Mode == RenderMode.Draw && !ignoreRenderMode)
             {
                 return;
             }
@@ -458,7 +456,7 @@ namespace Atem.Core.Graphics
                 return;
             }
 
-            ClockTransfer();
+            _hdma.ClockTransfer();
 
             if (Mode == RenderMode.OAM)
             {
@@ -547,77 +545,7 @@ namespace Atem.Core.Graphics
                     }
 
                     _windowWasTriggeredThisFrame = false;
-                    _justEnteredHorizontalBlank = true;
-                }
-            }
-        }
-
-        private void ClockTransfer()
-        {
-            if(TransferActive && _justEnteredHorizontalBlank && HorizontalBlankTransfer)
-            {
-                HorizontalBlankTransferActive = true;
-            }
-
-            // this condition is satisfied only once per horizontal blank
-            if (HorizontalBlankTransferActive)
-            {
-                for (int i = 0; i < 16; i++)
-                {
-                    WriteVRAM(DestAddressDMA, _bus.Read(SourceAddressDMA), true);
-                    DestAddressDMA++;
-                    SourceAddressDMA++;
-                }
-
-                TransferLengthRemaining--;
-                HorizontalBlankTransferActive = false;
-
-                if (TransferLengthRemaining == 0xFF)
-                {
-                    TransferActive = false;
-                }
-            }
-
-            if (_justEnteredHorizontalBlank)
-            {
-                _justEnteredHorizontalBlank = false;
-            }
-        }
-
-        public void StartTransfer(byte value)
-        {
-            if (TransferActive && !value.GetBit(7))
-            {
-                // cancel current horizontal blank transfer
-                TransferActive = false;
-            }
-            else
-            {
-                HorizontalBlankTransfer = value.GetBit(7);
-
-                // number of bytes to transfer divided by 16, minus 1
-                // e.g. a length of 0 means 16 bytes to transfer
-                TransferLengthRemaining = (byte)(value & 0x7F);
-
-                if (HorizontalBlankTransfer)
-                {
-                    TransferActive = true;
-                }
-                else
-                {
-                    // because we aren't waiting for horizontal blank
-                    // we fulfill the transfer request in-place
-                    while (TransferLengthRemaining != 0xFF)
-                    {
-                        WriteVRAM(DestAddressDMA, _bus.Read(SourceAddressDMA), true);
-                        DestAddressDMA++;
-                        SourceAddressDMA++;
-
-                        if ((DestAddressDMA & 0xF) == 0)
-                        {
-                            TransferLengthRemaining--;
-                        }
-                    }
+                    _hdma.JustEnteredHorizontalBlank = true;
                 }
             }
         }
@@ -668,12 +596,7 @@ namespace Atem.Core.Graphics
             ObjectPalettes.GetState(writer);
             DMGPalettes.GetState(writer);
 
-            writer.Write(SourceAddressDMA);
-            writer.Write(DestAddressDMA);
-            writer.Write(TransferLengthRemaining);
-            writer.Write(TransferActive);
-            writer.Write(HorizontalBlankTransferActive);
-            writer.Write(HorizontalBlankTransfer);
+            _hdma.GetState(writer);
 
             writer.Write(_currentlyOnLineY);
             writer.Write(_odma);
@@ -738,12 +661,7 @@ namespace Atem.Core.Graphics
             ObjectPalettes.SetState(reader);
             DMGPalettes.SetState(reader);
 
-            SourceAddressDMA = reader.ReadUInt16();
-            DestAddressDMA = reader.ReadUInt16();
-            TransferLengthRemaining = reader.ReadByte();
-            TransferActive = reader.ReadBoolean();
-            HorizontalBlankTransferActive = reader.ReadBoolean();
-            HorizontalBlankTransfer = reader.ReadBoolean();
+            _hdma.SetState(reader);
 
             _currentlyOnLineY = reader.ReadBoolean();
             _odma = reader.ReadByte();
