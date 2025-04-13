@@ -19,8 +19,8 @@ namespace Atem.Core.Graphics
                     | (_manager.WindowEnabled.Int() << 5)
                     | (_manager.TileDataArea << 4)
                     | (_manager.BackgroundTileMapArea << 3)
-                    | (_manager.LargeObjects.Int() << 2)
-                    | (_manager.ObjectsEnabled.Int() << 1)
+                    | (_manager.ObjectManager.LargeObjects.Int() << 2)
+                    | (_manager.ObjectManager.ObjectsEnabled.Int() << 1)
                     | _manager.BackgroundAndWindowEnabledOrPriority.Int());
             }
             set
@@ -30,8 +30,8 @@ namespace Atem.Core.Graphics
                 _manager.WindowEnabled = value.GetBit(5);
                 _manager.TileDataArea = value.GetBit(4).Int();
                 _manager.BackgroundTileMapArea = value.GetBit(3).Int();
-                _manager.LargeObjects = value.GetBit(2);
-                _manager.ObjectsEnabled = value.GetBit(1);
+                _manager.ObjectManager.LargeObjects = value.GetBit(2);
+                _manager.ObjectManager.ObjectsEnabled = value.GetBit(1);
                 _manager.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
             }
         }
@@ -105,11 +105,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.ODMA;
+                return _manager.ObjectManager.ODMA;
             }
             set
             {
-                _manager.ODMA = value;
+                _manager.ObjectManager.ODMA = value;
             }
         }
 
@@ -221,11 +221,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.ObjectPalettes.Increment.Int() << 7) | _manager.ObjectPalettes.Address);
+                return (byte)((_manager.ObjectManager.Palettes.Increment.Int() << 7) | _manager.ObjectManager.Palettes.Address);
             }
             set
             {
-                _manager.ObjectPalettes.SetAddress(value.GetBit(7), value & 0b111111);
+                _manager.ObjectManager.Palettes.SetAddress(value.GetBit(7), value & 0b111111);
             }
         }
 
@@ -233,11 +233,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.ObjectPalettes.ReadAtAddress();
+                return _manager.ObjectManager.Palettes.ReadAtAddress();
             }
             set
             {
-                _manager.ObjectPalettes.WriteAtAddress(value);
+                _manager.ObjectManager.Palettes.WriteAtAddress(value);
             }
         }
 

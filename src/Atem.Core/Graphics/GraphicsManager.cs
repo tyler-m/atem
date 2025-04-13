@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using Atem.Core.Processing;
 using Atem.Core.State;
 
@@ -10,21 +8,20 @@ namespace Atem.Core.Graphics
 
     public class GraphicsManager : IStateful
     {
+        private readonly ObjectManager _objectManager;
+        public ObjectManager ObjectManager { get => _objectManager; }
+
         public const float FRAME_RATE = 59.73f;
 
         private readonly IBus _bus;
         private readonly HDMA _hdma;
-        private List<Sprite> _spriteBuffer = [];
         private int _lineDotCount;
         private byte _linePixel;
         private byte[] _vram = new byte[0x4000];
         private readonly GBColor[] _screen = new GBColor[160 * 144];
-        private readonly Sprite[] _objects = new Sprite[40];
-        private int _objectIndex;
         private bool _windowWasTriggeredThisFrame;
         private bool _justEnteredHorizontalBlank;
         private bool _currentlyOnLineY;
-        private byte _odma;
         RenderMode _mode;
 
         public GraphicsRegisters Registers;
@@ -34,8 +31,6 @@ namespace Atem.Core.Graphics
         public int BackgroundTileMapArea;
         public int TileDataArea;
         public bool WindowEnabled;
-        public bool LargeObjects;
-        public bool ObjectsEnabled;
         public bool BackgroundAndWindowEnabledOrPriority;
         public bool InterruptOnLineY;
         public bool InterruptOnOAM;
@@ -49,7 +44,6 @@ namespace Atem.Core.Graphics
         public byte CurrentWindowLine;
         public int LineYToCompare;
         public PaletteGroup TilePalettes = new();
-        public PaletteGroup ObjectPalettes = new();
         public PaletteGroup DMGPalettes = new();
 
         public byte Bank { get; set; }
@@ -73,28 +67,6 @@ namespace Atem.Core.Graphics
 
         public HDMA HDMA { get => _hdma; }
 
-        public byte ODMA
-        {
-            get
-            {
-                return _odma;
-            }
-            set
-            {
-                int address = value << 8;
-
-                for (int i = 0; i < 40; i++)
-                {
-                    _objects[i].Populate(
-                        _bus.Read((ushort)(address + 4*i)),
-                        _bus.Read((ushort)(address + 4*i + 1)),
-                        _bus.Read((ushort)(address + 4*i + 2)),
-                        _bus.Read((ushort)(address + 4*i + 3)));
-                }
-
-                _odma = value;
-            }
-        }
 
         public RenderMode Mode
         {
@@ -108,8 +80,7 @@ namespace Atem.Core.Graphics
 
                 if (value == RenderMode.OAM)
                 {
-                    _objectIndex = 0;
-                    _spriteBuffer.Clear();
+                    _objectManager.ResetScanline();
 
                     if (prevMode != RenderMode.OAM && InterruptOnOAM)
                     {
@@ -139,12 +110,9 @@ namespace Atem.Core.Graphics
         {
             _bus = bus;
             _hdma = new(bus);
+            _objectManager = new ObjectManager(bus);
             Registers = new GraphicsRegisters(this);
             TilePalettes[0] = new Palette([GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0)]);
-            for (int i = 0; i < _objects.Length; i++)
-            {
-                _objects[i] = new Sprite();
-            }
             Mode = RenderMode.OAM;
         }
 
@@ -179,25 +147,7 @@ namespace Atem.Core.Graphics
                 return;
             }
 
-            int adjustedAddress = address & 0xFF;
-            int index = adjustedAddress / 4;
-
-            if (adjustedAddress % 4 == 0)
-            {
-                _objects[index].Y = value;
-            }
-            else if (adjustedAddress % 4 == 1)
-            {
-                _objects[index].X = value;
-            }
-            else if (adjustedAddress % 4 == 2)
-            {
-                _objects[index].Tile = value;
-            }
-            else
-            {
-                _objects[index].Flags = value;
-            }
+            _objectManager.WriteOAM(address, value);
         }
 
         public byte ReadOAM(ushort address)
@@ -207,25 +157,7 @@ namespace Atem.Core.Graphics
                 return 0xFF;
             }
 
-            int adjustedAddress = address & 0xFF;
-            int index = adjustedAddress / 4;
-
-            if (adjustedAddress % 4 == 0)
-            {
-                return _objects[index].Y;
-            }
-            else if (adjustedAddress % 4 == 1)
-            {
-                return _objects[index].X;
-            }
-            else if (adjustedAddress % 4 == 2)
-            {
-                return _objects[index].Tile;
-            }
-            else
-            {
-                return _objects[index].Flags;
-            }
+            return _objectManager.ReadOAM(address);
         }
 
         private ushort GetBackgroundTileMapAddress()
@@ -277,10 +209,10 @@ namespace Atem.Core.Graphics
                 tileColor = new GBColor(0xFFFF);
             }
 
-            (GBColor spriteColor, int spriteId, Sprite sprite) = GetSpriteInfo(pixelX, pixelY);
+            (GBColor spriteColor, int spriteId, Sprite sprite) = _objectManager.GetSpritePixelInfo(pixelX, pixelY, DMGPalettes);
 
             GBColor pixelColor = tileColor;
-            if (sprite != null && spriteId != 0 && ObjectsEnabled)
+            if (sprite != null && spriteId != 0 && _objectManager.ObjectsEnabled)
             {
                 if (!sprite.Priority || tileId == 0)
                 {
@@ -314,35 +246,6 @@ namespace Atem.Core.Graphics
             byte low = _vram[tileDataAddress + offsetY * 2];
             byte high = _vram[tileDataAddress + offsetY * 2 + 1];
             return ((low >> (7 - offsetX)) & 1) | (((high >> (7 - offsetX)) & 1) << 1);
-        }
-
-        public int GetSpriteId(Sprite sprite, int pixelX, int pixelY)
-        {
-            int offsetX = pixelX - (sprite.X - 8); // coordinates of pixel inside tile at (x, y)
-            int offsetY = pixelY - (sprite.Y - 16);
-            int spriteTile = sprite.Tile;
-
-            if (LargeObjects)
-            {
-                // ignore first bit of tile with 8x16 objects
-                spriteTile &= 0b11111110;
-
-                if (sprite.FlipY)
-                {
-                    offsetY = 15 - offsetY;
-                }
-            }
-            else
-            {
-                if (sprite.FlipY)
-                {
-                    offsetY = 7 - offsetY;
-                }
-            }
-
-            int tileDataAddress = spriteTile * 16 + (_bus.ColorMode ? 0x2000 * sprite.Bank : 0);
-            int id = GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
-            return id;
         }
 
         public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfo(int pixelX, int pixelY, bool window)
@@ -392,63 +295,6 @@ namespace Atem.Core.Graphics
             return (tilePalette[tileId], tileId, tilePriority);
         }
 
-        public (GBColor spriteColor, int spriteId, Sprite sprite) GetSpriteInfo(int pixelX, int pixelY)
-        {
-            GBColor spriteColor = null;
-            Sprite sprite = null;
-            int spriteId = 0;
-
-            for (int j = 0; j < _spriteBuffer.Count; j++)
-            {
-                Sprite tempSprite = _spriteBuffer[j];
-
-                if (tempSprite.X > pixelX && tempSprite.X <= pixelX + 8)
-                {
-                    int id = GetSpriteId(tempSprite, pixelX, pixelY);
-
-                    if (id == 0)
-                    {
-                        continue;
-                    }
-
-                    if (_bus.ColorMode)
-                    {
-                        // in color mode object locations in OAM determines priority
-                        // (the object list is populated in order of OAM location, so we
-                        // just take the first visible object we encounter in the list)
-                        if (sprite == null)
-                        {
-                            spriteColor = ObjectPalettes[tempSprite.ColorPalette][id];
-                            sprite = tempSprite;
-                            spriteId = id;
-                        }
-                    }
-                    else
-                    {
-                        // in no-color mode, object X coordinates determine priority.
-                        // if X coordinates between objects are identical, the object
-                        // earliest in OAM is prioritized
-                        if (sprite == null || tempSprite.X < sprite.X)
-                        {
-                            if (tempSprite.Palette)
-                            {
-                                spriteColor = DMGPalettes[2][id];
-                            }
-                            else
-                            {
-                                spriteColor = DMGPalettes[1][id];
-                            }
-
-                            sprite = tempSprite;
-                            spriteId = id;
-                        }
-                    }
-                }
-            }
-
-            return (spriteColor, spriteId, sprite);
-        }
-
         public void Clock()
         {
             if (!Enabled)
@@ -460,19 +306,7 @@ namespace Atem.Core.Graphics
 
             if (Mode == RenderMode.OAM)
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    // find object to add to the object buffer for the current line
-                    if (_spriteBuffer.Count < 10)
-                    {
-                        Sprite sprite = _objects[_objectIndex++];
-
-                        if (sprite.X > 0 && CurrentLine + 16 >= sprite.Y && CurrentLine + 16 < sprite.Y + 8 + (LargeObjects ? 8 : 0))
-                        {
-                            _spriteBuffer.Add(sprite);
-                        }
-                    }
-                }
+                _objectManager.CollectObjectsForScanline(CurrentLine);
             }
             else if (Mode == RenderMode.Draw)
             {
@@ -561,14 +395,8 @@ namespace Atem.Core.Graphics
                 pixel.GetState(writer);
             }
 
-            writer.Write(_spriteBuffer.Count);
-            foreach (Sprite sprite in _objects)
-            {
-                sprite.GetState(writer);
-                writer.Write(_spriteBuffer.IndexOf(sprite));
-            }
+            _objectManager.GetState(writer);
 
-            writer.Write(_objectIndex);
             writer.Write(_windowWasTriggeredThisFrame);
             writer.Write(_justEnteredHorizontalBlank);
 
@@ -577,8 +405,6 @@ namespace Atem.Core.Graphics
             writer.Write(BackgroundTileMapArea);
             writer.Write(TileDataArea);
             writer.Write(WindowEnabled);
-            writer.Write(LargeObjects);
-            writer.Write(ObjectsEnabled);
             writer.Write(BackgroundAndWindowEnabledOrPriority);
             writer.Write(InterruptOnLineY);
             writer.Write(InterruptOnOAM);
@@ -593,13 +419,11 @@ namespace Atem.Core.Graphics
             writer.Write(LineYToCompare);
 
             TilePalettes.GetState(writer);
-            ObjectPalettes.GetState(writer);
             DMGPalettes.GetState(writer);
 
             _hdma.GetState(writer);
 
             writer.Write(_currentlyOnLineY);
-            writer.Write(_odma);
             writer.Write((byte)_mode);
             writer.Write(Bank);
         }
@@ -615,25 +439,8 @@ namespace Atem.Core.Graphics
                 pixel.SetState(reader);
             }
 
-            // GraphicsManager alters the sprites in _objects as requested by
-            // the game. _spriteBuffer is always a list constructed of
-            // references to Sprites in the _objects list. _spriteBuffer must
-            // therefore be references to Sprites in the _objects list when
-            // the state of the emulator gets reassembled
-            int spriteBufferCount = reader.ReadInt32();
-            Sprite[] spriteBufferArray = new Sprite[spriteBufferCount];
-            foreach (Sprite sprite in _objects)
-            {
-                sprite.SetState(reader);
-                int spriteBufferIndex = reader.ReadInt32();
-                if (spriteBufferIndex >= 0)
-                {
-                    spriteBufferArray[spriteBufferIndex] = sprite;
-                }
-            }
-            _spriteBuffer = spriteBufferArray.ToList();
+            _objectManager.SetState(reader);
 
-            _objectIndex = reader.ReadInt32();
             _windowWasTriggeredThisFrame = reader.ReadBoolean();
             _justEnteredHorizontalBlank = reader.ReadBoolean();
 
@@ -642,8 +449,6 @@ namespace Atem.Core.Graphics
             BackgroundTileMapArea = reader.ReadInt32();
             TileDataArea = reader.ReadInt32();
             WindowEnabled = reader.ReadBoolean();
-            LargeObjects = reader.ReadBoolean();
-            ObjectsEnabled = reader.ReadBoolean();
             BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
             InterruptOnLineY = reader.ReadBoolean();
             InterruptOnOAM = reader.ReadBoolean();
@@ -658,13 +463,11 @@ namespace Atem.Core.Graphics
             LineYToCompare = reader.ReadInt32();
 
             TilePalettes.SetState(reader);
-            ObjectPalettes.SetState(reader);
             DMGPalettes.SetState(reader);
 
             _hdma.SetState(reader);
 
             _currentlyOnLineY = reader.ReadBoolean();
-            _odma = reader.ReadByte();
             _mode = (RenderMode)reader.ReadByte();
             Bank = reader.ReadByte();
         }
