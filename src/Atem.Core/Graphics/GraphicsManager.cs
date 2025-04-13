@@ -8,20 +8,24 @@ namespace Atem.Core.Graphics
 
     public class GraphicsManager : IStateful
     {
-        private readonly ObjectManager _objectManager;
-        public ObjectManager ObjectManager { get => _objectManager; }
-
-        private readonly TileManager _tileManager;
-        public TileManager TileManager { get => _tileManager; }
-
         public const float FRAME_RATE = 59.73f;
 
-        private readonly IBus _bus;
+        private readonly ObjectManager _objectManager;
+        private readonly TileManager _tileManager;
+        private readonly ScreenManager _screenManager;
         private readonly HDMA _hdma;
+
+        public ObjectManager ObjectManager { get => _objectManager; }
+        public TileManager TileManager { get => _tileManager; }
+        public ScreenManager ScreenManager { get => _screenManager; }
+        public HDMA HDMA { get => _hdma; }
+
+        private readonly IBus _bus;
         private int _lineDotCount;
         private byte _linePixel;
-        private readonly GBColor[] _screen = new GBColor[160 * 144];
+        public byte LinePixel { get => _linePixel; set => _linePixel = value; }
         private bool _windowWasTriggeredThisFrame;
+        public bool WindowWasTriggeredThisFrame { get => _windowWasTriggeredThisFrame; set => _windowWasTriggeredThisFrame = value; }
         private bool _justEnteredHorizontalBlank;
         private bool _currentlyOnLineY;
         RenderMode _mode;
@@ -61,9 +65,6 @@ namespace Atem.Core.Graphics
             }
         }
 
-        public HDMA HDMA { get => _hdma; }
-
-
         public RenderMode Mode
         {
             get
@@ -85,7 +86,7 @@ namespace Atem.Core.Graphics
                 }
                 else if (value == RenderMode.VerticalBlank)
                 {
-                    OnVerticalBlank?.Invoke(_screen);
+                    OnVerticalBlank?.Invoke(_screenManager.Screen);
                     _bus.RequestInterrupt(InterruptType.VerticalBlank);
                     
                     if (prevMode != RenderMode.VerticalBlank && InterruptOnVerticalBlank)
@@ -108,6 +109,7 @@ namespace Atem.Core.Graphics
             _hdma = new(bus);
             _objectManager = new ObjectManager(bus);
             _tileManager = new TileManager(bus);
+            _screenManager = new ScreenManager(bus);
             Registers = new GraphicsRegisters(this);
             Mode = RenderMode.OAM;
         }
@@ -142,40 +144,6 @@ namespace Atem.Core.Graphics
             return _objectManager.ReadOAM(address);
         }
 
-        private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
-        {
-            bool window = WindowEnabled && pixelX > WindowX - 8 && WindowY <= pixelY;
-            _windowWasTriggeredThisFrame |= window;
-
-            (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfo(pixelX, window ? CurrentWindowLine : pixelY, window);
-
-            if (!_bus.ColorMode && !BackgroundAndWindowEnabledOrPriority)
-            {
-                tileColor = new GBColor(0xFFFF);
-            }
-
-            (GBColor spriteColor, int spriteId, Sprite sprite) = _objectManager.GetSpritePixelInfo(pixelX, pixelY, DMGPalettes);
-
-            GBColor pixelColor = tileColor;
-            if (sprite != null && spriteId != 0 && _objectManager.ObjectsEnabled)
-            {
-                if (!sprite.Priority || tileId == 0)
-                {
-                    pixelColor = spriteColor;
-                }
-            }
-
-            if (_bus.ColorMode)
-            {
-                if (tilePriority && tileId != 0 && BackgroundAndWindowEnabledOrPriority)
-                {
-                    pixelColor = tileColor;
-                }
-            }
-
-            return pixelColor;
-        }
-
         public void Clock()
         {
             if (!Enabled)
@@ -191,11 +159,7 @@ namespace Atem.Core.Graphics
             }
             else if (Mode == RenderMode.Draw)
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    _screen[CurrentLine * 160 + _linePixel] = GetColorOfScreenPixel(_linePixel, CurrentLine);
-                    _linePixel++;
-                }
+                _screenManager.Clock();
             }
 
             _lineDotCount += 4;
@@ -271,10 +235,7 @@ namespace Atem.Core.Graphics
             writer.Write(_linePixel);
             writer.Write(_tileManager.VRAM);
 
-            foreach (GBColor pixel in _screen)
-            {
-                pixel.GetState(writer);
-            }
+            _screenManager.GetState(writer);
 
             _objectManager.GetState(writer);
 
@@ -315,10 +276,7 @@ namespace Atem.Core.Graphics
             _linePixel = reader.ReadByte();
             _tileManager.VRAM = reader.ReadBytes(_tileManager.VRAM.Length);
 
-            foreach (GBColor pixel in _screen)
-            {
-                pixel.SetState(reader);
-            }
+            _screenManager.SetState(reader);
 
             _objectManager.SetState(reader);
 
