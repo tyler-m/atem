@@ -11,13 +11,15 @@ namespace Atem.Core.Graphics
         private readonly ObjectManager _objectManager;
         public ObjectManager ObjectManager { get => _objectManager; }
 
+        private readonly TileManager _tileManager;
+        public TileManager TileManager { get => _tileManager; }
+
         public const float FRAME_RATE = 59.73f;
 
         private readonly IBus _bus;
         private readonly HDMA _hdma;
         private int _lineDotCount;
         private byte _linePixel;
-        private byte[] _vram = new byte[0x4000];
         private readonly GBColor[] _screen = new GBColor[160 * 144];
         private bool _windowWasTriggeredThisFrame;
         private bool _justEnteredHorizontalBlank;
@@ -27,9 +29,6 @@ namespace Atem.Core.Graphics
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
         public bool Enabled;
-        public int WindowTileMapArea;
-        public int BackgroundTileMapArea;
-        public int TileDataArea;
         public bool WindowEnabled;
         public bool BackgroundAndWindowEnabledOrPriority;
         public bool InterruptOnLineY;
@@ -43,10 +42,7 @@ namespace Atem.Core.Graphics
         public byte CurrentLine;
         public byte CurrentWindowLine;
         public int LineYToCompare;
-        public PaletteGroup TilePalettes = new();
         public PaletteGroup DMGPalettes = new();
-
-        public byte Bank { get; set; }
 
         public bool CurrentlyOnLineY
         {
@@ -111,33 +107,19 @@ namespace Atem.Core.Graphics
             _bus = bus;
             _hdma = new(bus);
             _objectManager = new ObjectManager(bus);
+            _tileManager = new TileManager(bus);
             Registers = new GraphicsRegisters(this);
-            TilePalettes[0] = new Palette([GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0)]);
             Mode = RenderMode.OAM;
         }
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
         {
-            address -= 0x8000;
-
-            if (Mode == RenderMode.Draw && !ignoreRenderMode)
-            {
-                return;
-            }
-
-            _vram[address + 0x2000 * Bank] = value;
+            _tileManager.WriteVRAM(address, value, ignoreRenderMode);
         }
 
         public byte ReadVRAM(ushort address)
         {
-            address -= 0x8000;
-
-            if (Mode == RenderMode.Draw)
-            {
-                return 0xFF;
-            }
-
-            return _vram[address + 0x2000 * Bank];
+            return _tileManager.ReadVRAM(address);
         }
 
         public void WriteOAM(ushort address, byte value)
@@ -160,49 +142,12 @@ namespace Atem.Core.Graphics
             return _objectManager.ReadOAM(address);
         }
 
-        private ushort GetBackgroundTileMapAddress()
-        {
-            if (BackgroundTileMapArea == 1)
-            {
-                return 0x1C00;
-            }
-            else
-            {
-                return 0x1800;
-            }
-        }
-
-        private ushort GetWindowTileMapAddress()
-        {
-            if (WindowTileMapArea == 1)
-            {
-                return 0x1C00;
-            }
-            else
-            {
-                return 0x1800;
-            }
-        }
-
-        private ushort GetTileDataAddress(int tileIndex, int bank = 0)
-        {
-            if (TileDataArea == 1)
-            {
-                return (ushort)((0x0000 + tileIndex * 16) + bank * 0x2000);
-            }
-            else
-            {
-                sbyte offset = (sbyte)tileIndex;
-                return (ushort)((0x1000 + offset * 16) + bank * 0x2000);
-            }
-        }
-
         private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
         {
             bool window = WindowEnabled && pixelX > WindowX - 8 && WindowY <= pixelY;
             _windowWasTriggeredThisFrame |= window;
 
-            (GBColor tileColor, int tileId, bool tilePriority) = GetTileInfo(pixelX, window ? CurrentWindowLine : pixelY, window);
+            (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfo(pixelX, window ? CurrentWindowLine : pixelY, window);
 
             if (!_bus.ColorMode && !BackgroundAndWindowEnabledOrPriority)
             {
@@ -229,70 +174,6 @@ namespace Atem.Core.Graphics
             }
 
             return pixelColor;
-        }
-
-        public int GetTileId(int tileDataAddress, int offsetX, int offsetY, bool flipX = false, bool flipY = false)
-        {
-            if (flipX)
-            {
-                offsetX = 7 - offsetX;
-            }
-
-            if (flipY)
-            {
-                offsetY = 7 - offsetY;
-            }
-
-            byte low = _vram[tileDataAddress + offsetY * 2];
-            byte high = _vram[tileDataAddress + offsetY * 2 + 1];
-            return ((low >> (7 - offsetX)) & 1) | (((high >> (7 - offsetX)) & 1) << 1);
-        }
-
-        public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfo(int pixelX, int pixelY, bool window)
-        {
-            int tileMapX, tileMapY, tileMapAddress, tileId, tileIndex;
-            Palette tilePalette;
-            bool tilePriority;
-
-            if (window)
-            {
-                tileMapX = pixelX - (WindowX - 7);
-                tileMapY = pixelY;
-                int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
-                tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
-            }
-            else
-            {
-                tileMapX = (ScreenX + pixelX) % 256;
-                tileMapY = (ScreenY + pixelY) % 256;
-                int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
-                tileMapAddress = GetBackgroundTileMapAddress() + tileMapOffset;
-
-            }
-
-            tileIndex = _vram[tileMapAddress]; // the index of the tile that the pixel at (x, y) belongs to
-
-            if (_bus.ColorMode)
-            {
-                byte bgMapAttributes = _vram[tileMapAddress + 0x2000];
-                int paletteIndex = bgMapAttributes & 0b111;
-                int bank = bgMapAttributes.GetBit(3).Int();
-                bool flipX = bgMapAttributes.GetBit(5);
-                bool flipY = bgMapAttributes.GetBit(6);
-                tilePriority = bgMapAttributes.GetBit(7);
-                tilePalette = TilePalettes[paletteIndex];
-                int tileDataAddress = GetTileDataAddress(tileIndex, bank);
-                tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8, flipX, flipY);
-            }
-            else
-            {
-                tilePalette = DMGPalettes[0];
-                int tileDataAddress = GetTileDataAddress(tileIndex);
-                tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8);
-                tilePriority = false;
-            }
-
-            return (tilePalette[tileId], tileId, tilePriority);
         }
 
         public void Clock()
@@ -388,7 +269,7 @@ namespace Atem.Core.Graphics
         {
             writer.Write(_lineDotCount);
             writer.Write(_linePixel);
-            writer.Write(_vram);
+            writer.Write(_tileManager.VRAM);
 
             foreach (GBColor pixel in _screen)
             {
@@ -401,9 +282,9 @@ namespace Atem.Core.Graphics
             writer.Write(_justEnteredHorizontalBlank);
 
             writer.Write(Enabled);
-            writer.Write(WindowTileMapArea);
-            writer.Write(BackgroundTileMapArea);
-            writer.Write(TileDataArea);
+            writer.Write(_tileManager.WindowTileMapArea);
+            writer.Write(_tileManager.BackgroundTileMapArea);
+            writer.Write(_tileManager.TileDataArea);
             writer.Write(WindowEnabled);
             writer.Write(BackgroundAndWindowEnabledOrPriority);
             writer.Write(InterruptOnLineY);
@@ -418,21 +299,21 @@ namespace Atem.Core.Graphics
             writer.Write(CurrentWindowLine);
             writer.Write(LineYToCompare);
 
-            TilePalettes.GetState(writer);
+            _tileManager.TilePalettes.GetState(writer);
             DMGPalettes.GetState(writer);
 
             _hdma.GetState(writer);
 
             writer.Write(_currentlyOnLineY);
             writer.Write((byte)_mode);
-            writer.Write(Bank);
+            writer.Write(_tileManager.Bank);
         }
 
         public void SetState(BinaryReader reader)
         {
             _lineDotCount = reader.ReadInt32();
             _linePixel = reader.ReadByte();
-            _vram = reader.ReadBytes(_vram.Length);
+            _tileManager.VRAM = reader.ReadBytes(_tileManager.VRAM.Length);
 
             foreach (GBColor pixel in _screen)
             {
@@ -445,9 +326,9 @@ namespace Atem.Core.Graphics
             _justEnteredHorizontalBlank = reader.ReadBoolean();
 
             Enabled = reader.ReadBoolean();
-            WindowTileMapArea = reader.ReadInt32();
-            BackgroundTileMapArea = reader.ReadInt32();
-            TileDataArea = reader.ReadInt32();
+            _tileManager.WindowTileMapArea = reader.ReadInt32();
+            _tileManager.BackgroundTileMapArea = reader.ReadInt32();
+            _tileManager.TileDataArea = reader.ReadInt32();
             WindowEnabled = reader.ReadBoolean();
             BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
             InterruptOnLineY = reader.ReadBoolean();
@@ -462,14 +343,14 @@ namespace Atem.Core.Graphics
             CurrentWindowLine = reader.ReadByte();
             LineYToCompare = reader.ReadInt32();
 
-            TilePalettes.SetState(reader);
+            _tileManager.TilePalettes.SetState(reader);
             DMGPalettes.SetState(reader);
 
             _hdma.SetState(reader);
 
             _currentlyOnLineY = reader.ReadBoolean();
             _mode = (RenderMode)reader.ReadByte();
-            Bank = reader.ReadByte();
+            _tileManager.Bank = reader.ReadByte();
         }
     }
 }

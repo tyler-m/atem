@@ -112,12 +112,11 @@ namespace Atem.Core.Graphics
             }
 
             int tileDataAddress = spriteTile * 16 + (_bus.ColorMode ? 0x2000 * sprite.Bank : 0);
-            int id = _bus.Graphics.GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
+            int id = _bus.Graphics.TileManager.GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
             return id;
         }
 
-        public (GBColor color, int spriteId, Sprite sprite) GetSpritePixelInfo(
-            int x, int y, PaletteGroup dmgPalettes)
+        public (GBColor color, int spriteId, Sprite sprite) GetSpritePixelInfo(int x, int y, PaletteGroup dmgPalettes)
         {
             GBColor spriteColor = null;
             Sprite sprite = null;

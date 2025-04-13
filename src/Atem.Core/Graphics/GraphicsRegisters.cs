@@ -15,10 +15,10 @@ namespace Atem.Core.Graphics
             get
             {
                 return (byte)((_manager.Enabled.Int() << 7)
-                    | (_manager.WindowTileMapArea << 6)
+                    | (_manager.TileManager.WindowTileMapArea << 6)
                     | (_manager.WindowEnabled.Int() << 5)
-                    | (_manager.TileDataArea << 4)
-                    | (_manager.BackgroundTileMapArea << 3)
+                    | (_manager.TileManager.TileDataArea << 4)
+                    | (_manager.TileManager.BackgroundTileMapArea << 3)
                     | (_manager.ObjectManager.LargeObjects.Int() << 2)
                     | (_manager.ObjectManager.ObjectsEnabled.Int() << 1)
                     | _manager.BackgroundAndWindowEnabledOrPriority.Int());
@@ -26,10 +26,10 @@ namespace Atem.Core.Graphics
             set
             {
                 _manager.Enabled = value.GetBit(7);
-                _manager.WindowTileMapArea = value.GetBit(6).Int();
+                _manager.TileManager.WindowTileMapArea = value.GetBit(6).Int();
                 _manager.WindowEnabled = value.GetBit(5);
-                _manager.TileDataArea = value.GetBit(4).Int();
-                _manager.BackgroundTileMapArea = value.GetBit(3).Int();
+                _manager.TileManager.TileDataArea = value.GetBit(4).Int();
+                _manager.TileManager.BackgroundTileMapArea = value.GetBit(3).Int();
                 _manager.ObjectManager.LargeObjects = value.GetBit(2);
                 _manager.ObjectManager.ObjectsEnabled = value.GetBit(1);
                 _manager.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
@@ -177,11 +177,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.Bank;
+                return _manager.TileManager.Bank;
             }
             set
             {
-                _manager.Bank = (byte)(value & 0b1);
+                _manager.TileManager.Bank = (byte)(value & 0b1);
             }
         }
 
@@ -189,11 +189,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.TilePalettes.Increment.Int() << 7) | _manager.TilePalettes.Address);
+                return (byte)((_manager.TileManager.TilePalettes.Increment.Int() << 7) | _manager.TileManager.TilePalettes.Address);
             }
             set
             {
-                _manager.TilePalettes.SetAddress(value.GetBit(7), value & 0b111111);
+                _manager.TileManager.TilePalettes.SetAddress(value.GetBit(7), value & 0b111111);
             }
         }
 
@@ -203,7 +203,7 @@ namespace Atem.Core.Graphics
             {
                 if (_manager.Mode != RenderMode.Draw)
                 {
-                    return _manager.TilePalettes.ReadAtAddress();
+                    return _manager.TileManager.TilePalettes.ReadAtAddress();
                 }
 
                 return 0xFF;
@@ -212,7 +212,7 @@ namespace Atem.Core.Graphics
             {
                 if (_manager.Mode != RenderMode.Draw)
                 {
-                    _manager.TilePalettes.WriteAtAddress(value);
+                    _manager.TileManager.TilePalettes.WriteAtAddress(value);
                 }
             }
         }
