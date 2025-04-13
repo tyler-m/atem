@@ -8,14 +8,6 @@ namespace Atem.Core.Graphics
 {
     public delegate void VerticalBlankEvent(GBColor[] screen);
 
-    public enum RenderMode
-    {
-        HorizontalBlank,
-        VerticalBlank,
-        OAM,
-        Draw
-    }
-
     public class GraphicsManager : IStateful
     {
         public const float FRAME_RATE = 59.73f;
