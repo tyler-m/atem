@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Atem.Core.Graphics.Interrupts
 {
-    public class StatInterruptManager : IStateful
+    public class StatInterruptManager : IStatInterruptManager
     {
         private readonly IBus _bus;
         private readonly RenderModeScheduler _scheduler;
