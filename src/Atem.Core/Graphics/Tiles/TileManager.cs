@@ -7,14 +7,12 @@ namespace Atem.Core.Graphics.Tiles
     public class TileManager : IStateful
     {
         private readonly IBus _bus;
-        private readonly PaletteGroup _tilePalettes;
         private byte[] _vram;
         private byte _bank;
         private int _windowTileMapArea;
         private int _backgroundTileMapArea;
         private int _tileDataArea;
 
-        public PaletteGroup TilePalettes => _tilePalettes;
         public byte[] VRAM { get => _vram; set => _vram = value; }
         public byte Bank { get => _bank; set => _bank = value; }
         public int WindowTileMapArea { get => _windowTileMapArea; set => _windowTileMapArea = value; }
@@ -25,8 +23,6 @@ namespace Atem.Core.Graphics.Tiles
         {
             _bus = bus;
             _vram = new byte[0x4000];
-            _tilePalettes = new PaletteGroup();
-            _tilePalettes[0] = new Palette([GBColor.FromValue(0x1F), GBColor.FromValue(0), GBColor.FromValue(0), GBColor.FromValue(0)]);
         }
 
         public byte ReadVRAM(ushort address)
@@ -135,13 +131,13 @@ namespace Atem.Core.Graphics.Tiles
                 bool flipX = bgMapAttributes.GetBit(5);
                 bool flipY = bgMapAttributes.GetBit(6);
                 tilePriority = bgMapAttributes.GetBit(7);
-                tilePalette = TilePalettes[paletteIndex];
+                tilePalette = _bus.Graphics.PaletteProvider.TilePalettes[paletteIndex];
                 int tileDataAddress = GetTileDataAddress(tileIndex, bank);
                 tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8, flipX, flipY);
             }
             else
             {
-                tilePalette = _bus.Graphics.DMGPalettes[0];
+                tilePalette = _bus.Graphics.PaletteProvider.DMGPalettes[0];
                 int tileDataAddress = GetTileDataAddress(tileIndex);
                 tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8);
                 tilePriority = false;
@@ -156,7 +152,6 @@ namespace Atem.Core.Graphics.Tiles
             writer.Write(_windowTileMapArea);
             writer.Write(_backgroundTileMapArea);
             writer.Write(_tileDataArea);
-            _tilePalettes.GetState(writer);
             writer.Write(_bank);
         }
 
@@ -166,7 +161,6 @@ namespace Atem.Core.Graphics.Tiles
             _windowTileMapArea = reader.ReadInt32();
             _backgroundTileMapArea = reader.ReadInt32();
             _tileDataArea = reader.ReadInt32();
-            _tilePalettes.SetState(reader);
             _bank = reader.ReadByte();
         }
     }

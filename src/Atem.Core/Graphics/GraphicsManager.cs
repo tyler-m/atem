@@ -23,11 +23,11 @@ namespace Atem.Core.Graphics
         private readonly HDMA _hdma;
         private readonly RenderModeScheduler _renderModeScheduler;
         private readonly StatInterruptManager _statInterruptManager;
+        private readonly PaletteProvider _paletteProvider;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
         public bool Enabled { get; set; }
-        public PaletteGroup DMGPalettes = new();
 
         public ObjectManager ObjectManager => _objectManager;
         public TileManager TileManager => _tileManager;
@@ -35,6 +35,7 @@ namespace Atem.Core.Graphics
         public RenderModeScheduler RenderModeScheduler => _renderModeScheduler;
         public StatInterruptManager StatInterruptManager => _statInterruptManager;
         public ScreenManager ScreenManager => _screenManager;
+        public PaletteProvider PaletteProvider => _paletteProvider;
 
         public GraphicsManager(IBus bus)
         {
@@ -46,6 +47,7 @@ namespace Atem.Core.Graphics
             _hdma = new(bus, _renderModeScheduler);
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
             _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
+            _paletteProvider = new PaletteProvider();
             Registers = new GraphicsRegisters(this);
         }
 
@@ -103,7 +105,6 @@ namespace Atem.Core.Graphics
         public void GetState(BinaryWriter writer)
         {
             writer.Write(Enabled);
-            DMGPalettes.GetState(writer);
 
             _renderModeScheduler.GetState(writer);
             _statInterruptManager.GetState(writer);
@@ -111,12 +112,12 @@ namespace Atem.Core.Graphics
             _objectManager.GetState(writer);
             _hdma.GetState(writer);
             _tileManager.GetState(writer);
+            _paletteProvider.GetState(writer);
         }
 
         public void SetState(BinaryReader reader)
         {
             Enabled = reader.ReadBoolean();
-            DMGPalettes.SetState(reader);
 
             _renderModeScheduler.SetState(reader);
             _statInterruptManager.SetState(reader);
@@ -124,6 +125,7 @@ namespace Atem.Core.Graphics
             _objectManager.SetState(reader);
             _hdma.SetState(reader);
             _tileManager.SetState(reader);
+            _paletteProvider.SetState(reader);
         }
     }
 }

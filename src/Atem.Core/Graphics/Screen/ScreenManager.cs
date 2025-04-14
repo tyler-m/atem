@@ -65,7 +65,7 @@ namespace Atem.Core.Graphics.Screen
                 tileColor = new GBColor(0xFFFF);
             }
 
-            (GBColor spriteColor, int spriteId, Sprite sprite) = _bus.Graphics.ObjectManager.GetSpritePixelInfo(pixelX, pixelY, _bus.Graphics.DMGPalettes);
+            (GBColor spriteColor, int spriteId, Sprite sprite) = _bus.Graphics.ObjectManager.GetSpritePixelInfo(pixelX, pixelY, _bus.Graphics.PaletteProvider.DMGPalettes);
 
             GBColor pixelColor = tileColor;
             if (sprite != null && spriteId != 0 && _bus.Graphics.ObjectManager.ObjectsEnabled)
