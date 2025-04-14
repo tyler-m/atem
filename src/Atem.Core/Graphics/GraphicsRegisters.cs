@@ -62,11 +62,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.ScreenManager.ScreenY;
+                return (byte)_manager.TileManager.ScreenY;
             }
             set
             {
-                _manager.ScreenManager.ScreenY = value;
+                _manager.TileManager.ScreenY = value;
             }
         }
 
@@ -74,11 +74,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.ScreenManager.ScreenX;
+                return (byte)_manager.TileManager.ScreenX;
             }
             set
             {
-                _manager.ScreenManager.ScreenX = value;
+                _manager.TileManager.ScreenX = value;
             }
         }
 
@@ -152,11 +152,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return ((byte)_manager.ScreenManager.WindowY);
+                return ((byte)_manager.TileManager.WindowY);
             }
             set
             {
-                _manager.ScreenManager.WindowY = value;
+                _manager.TileManager.WindowY = value;
             }
         }
 
@@ -164,11 +164,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.ScreenManager.WindowX;
+                return (byte)_manager.TileManager.WindowX;
             }
             set
             {
-                _manager.ScreenManager.WindowX = value;
+                _manager.TileManager.WindowX = value;
             }
         }
 
