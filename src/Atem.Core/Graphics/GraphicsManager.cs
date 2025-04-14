@@ -24,7 +24,6 @@ namespace Atem.Core.Graphics
         private readonly RenderModeScheduler _renderModeScheduler;
         private readonly StatInterruptManager _statInterruptManager;
         private bool _windowWasTriggeredThisFrame;
-        private bool _justEnteredHorizontalBlank;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
@@ -156,72 +155,44 @@ namespace Atem.Core.Graphics
 
         public void GetState(BinaryWriter writer)
         {
-            _renderModeScheduler.GetState(writer);
-
-            _statInterruptManager.GetState(writer);
-
-            writer.Write(_tileManager.VRAM);
-
-            _screenManager.GetState(writer);
-
-            _objectManager.GetState(writer);
-
-            writer.Write(_windowWasTriggeredThisFrame);
-            writer.Write(_justEnteredHorizontalBlank);
-
             writer.Write(Enabled);
-            writer.Write(_tileManager.WindowTileMapArea);
-            writer.Write(_tileManager.BackgroundTileMapArea);
-            writer.Write(_tileManager.TileDataArea);
             writer.Write(WindowEnabled);
             writer.Write(BackgroundAndWindowEnabledOrPriority);
-            writer.Write(ScreenX);
-            writer.Write(ScreenY);
+            writer.Write(_windowWasTriggeredThisFrame);
+            writer.Write(CurrentWindowLine);
             writer.Write(WindowX);
             writer.Write(WindowY);
-            writer.Write(CurrentWindowLine);
-
-            _tileManager.TilePalettes.GetState(writer);
+            writer.Write(ScreenX);
+            writer.Write(ScreenY);
             DMGPalettes.GetState(writer);
 
+            _renderModeScheduler.GetState(writer);
+            _statInterruptManager.GetState(writer);
+            _screenManager.GetState(writer);
+            _objectManager.GetState(writer);
             _hdma.GetState(writer);
-
-            writer.Write(_tileManager.Bank);
+            _tileManager.GetState(writer);
         }
 
         public void SetState(BinaryReader reader)
         {
-            _renderModeScheduler.SetState(reader);
-
-            _statInterruptManager.SetState(reader);
-
-            _tileManager.VRAM = reader.ReadBytes(_tileManager.VRAM.Length);
-
-            _screenManager.SetState(reader);
-
-            _objectManager.SetState(reader);
-
-            _windowWasTriggeredThisFrame = reader.ReadBoolean();
-            _justEnteredHorizontalBlank = reader.ReadBoolean();
-
             Enabled = reader.ReadBoolean();
-            _tileManager.WindowTileMapArea = reader.ReadInt32();
-            _tileManager.BackgroundTileMapArea = reader.ReadInt32();
-            _tileManager.TileDataArea = reader.ReadInt32();
             WindowEnabled = reader.ReadBoolean();
             BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
-            ScreenX = reader.ReadInt32();
-            ScreenY = reader.ReadInt32();
+            _windowWasTriggeredThisFrame = reader.ReadBoolean();
+            CurrentWindowLine = reader.ReadByte();
             WindowX = reader.ReadInt32();
             WindowY = reader.ReadInt32();
-            CurrentWindowLine = reader.ReadByte();
-
-            _tileManager.TilePalettes.SetState(reader);
+            ScreenX = reader.ReadInt32();
+            ScreenY = reader.ReadInt32();
             DMGPalettes.SetState(reader);
 
+            _renderModeScheduler.SetState(reader);
+            _statInterruptManager.SetState(reader);
+            _screenManager.SetState(reader);
+            _objectManager.SetState(reader);
             _hdma.SetState(reader);
-
-            _tileManager.Bank = reader.ReadByte();
+            _tileManager.SetState(reader);
         }
     }
 }
