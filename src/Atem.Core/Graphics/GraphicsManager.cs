@@ -37,16 +37,19 @@ namespace Atem.Core.Graphics
         public IScreenManager ScreenManager => _screenManager;
         public IPaletteProvider PaletteProvider => _paletteProvider;
 
-        public GraphicsManager(IBus bus)
+        public GraphicsManager(
+            IBus bus, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, IHDMA hdma,
+            IStatInterruptManager statInterruptManager, ITileManager tileManager, IObjectManager objectManager,
+            IScreenManager screenManager)
         {
             _bus = bus;
-            _renderModeScheduler = new RenderModeScheduler();
-            _paletteProvider = new PaletteProvider();
-            _hdma = new HDMA(bus, _renderModeScheduler);
-            _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
-            _tileManager = new TileManager(bus, _renderModeScheduler, _paletteProvider);
-            _objectManager = new ObjectManager(bus, _renderModeScheduler, _tileManager, _paletteProvider);
-            _screenManager = new ScreenManager(bus, _renderModeScheduler, _tileManager, _objectManager);
+            _renderModeScheduler = renderModeScheduler;
+            _paletteProvider = paletteProvider;
+            _hdma = hdma;
+            _statInterruptManager = statInterruptManager;
+            _tileManager = tileManager;
+            _objectManager = objectManager;
+            _screenManager = screenManager;
 
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
 
