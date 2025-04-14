@@ -30,7 +30,7 @@ namespace Atem.Core.Graphics
 
         public byte ReadVRAM(ushort address)
         {
-            if (_bus.Graphics.Mode == RenderMode.Draw)
+            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
                 return 0xFF;
 
             return _vram[(address - 0x8000) + _bank * 0x2000];
@@ -38,7 +38,7 @@ namespace Atem.Core.Graphics
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
         {
-            if (_bus.Graphics.Mode == RenderMode.Draw && !ignoreRenderMode)
+            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw && !ignoreRenderMode)
             {
                 return;
             }

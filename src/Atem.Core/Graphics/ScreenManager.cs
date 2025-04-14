@@ -1,5 +1,5 @@
-﻿using Atem.Core.State;
-using System.IO;
+﻿using System.IO;
+using Atem.Core.State;
 
 namespace Atem.Core.Graphics
 {
@@ -7,6 +7,7 @@ namespace Atem.Core.Graphics
     {
         private readonly IBus _bus;
         private GBColor[] _screen = new GBColor[160 * 144];
+        private byte _linePixel;
 
         public GBColor[] Screen { get => _screen; set => _screen = value; }
 
@@ -51,15 +52,24 @@ namespace Atem.Core.Graphics
 
         public void Clock()
         {
-            for (int i = 0; i < 4; i++)
+            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
             {
-                _screen[_bus.Graphics.CurrentLine * 160 + _bus.Graphics.LinePixel] = GetColorOfScreenPixel(_bus.Graphics.LinePixel, _bus.Graphics.CurrentLine);
-                _bus.Graphics.LinePixel++;
+                for (int i = 0; i < 4; i++)
+                {
+                    _screen[_bus.Graphics.RenderModeScheduler.CurrentLine * 160 + _linePixel] = GetColorOfScreenPixel(_linePixel, _bus.Graphics.RenderModeScheduler.CurrentLine);
+                    _linePixel++;
+                }
+            }
+            else
+            {
+                _linePixel = 0;
             }
         }
 
         public void GetState(BinaryWriter writer)
         {
+            writer.Write(_linePixel);
+
             foreach (GBColor pixel in _screen)
             {
                 pixel.GetState(writer);
@@ -68,6 +78,8 @@ namespace Atem.Core.Graphics
 
         public void SetState(BinaryReader reader)
         {
+            _linePixel = reader.ReadByte();
+
             foreach (GBColor pixel in _screen)
             {
                 pixel.SetState(reader);
