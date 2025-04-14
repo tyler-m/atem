@@ -58,7 +58,7 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public void TriggerODMA(byte value)
+        private void TriggerODMA(byte value)
         {
             int address = value << 8;
 
@@ -121,7 +121,7 @@ namespace Atem.Core.Graphics.Objects
             return id;
         }
 
-        public (GBColor color, int spriteId, Sprite sprite) GetSpritePixelInfo(int x, int y, PaletteGroup dmgPalettes)
+        public (GBColor color, int spriteId, Sprite sprite) GetSpritePixelInfo(int x, int y)
         {
             GBColor spriteColor = null;
             Sprite sprite = null;
@@ -161,11 +161,11 @@ namespace Atem.Core.Graphics.Objects
                         {
                             if (tempSprite.Palette)
                             {
-                                spriteColor = dmgPalettes[2][id];
+                                spriteColor = _bus.Graphics.PaletteProvider.DMGPalettes[2][id];
                             }
                             else
                             {
-                                spriteColor = dmgPalettes[1][id];
+                                spriteColor = _bus.Graphics.PaletteProvider.DMGPalettes[1][id];
                             }
 
                             sprite = tempSprite;
