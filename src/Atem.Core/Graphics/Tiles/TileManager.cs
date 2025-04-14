@@ -9,7 +9,6 @@ namespace Atem.Core.Graphics.Tiles
         private readonly IBus _bus;
         private readonly PaletteGroup _tilePalettes;
         private byte[] _vram;
-
         private byte _bank;
         private int _windowTileMapArea;
         private int _backgroundTileMapArea;
@@ -17,7 +16,6 @@ namespace Atem.Core.Graphics.Tiles
 
         public PaletteGroup TilePalettes => _tilePalettes;
         public byte[] VRAM { get => _vram; set => _vram = value; }
-
         public byte Bank { get => _bank; set => _bank = value; }
         public int WindowTileMapArea { get => _windowTileMapArea; set => _windowTileMapArea = value; }
         public int BackgroundTileMapArea { get => _backgroundTileMapArea; set => _backgroundTileMapArea = value; }
