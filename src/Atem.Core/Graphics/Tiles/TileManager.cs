@@ -111,15 +111,15 @@ namespace Atem.Core.Graphics.Tiles
 
             if (window)
             {
-                tileMapX = pixelX - (_bus.Graphics.WindowX - 7);
+                tileMapX = pixelX - (_bus.Graphics.ScreenManager.WindowX - 7);
                 tileMapY = pixelY;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
             }
             else
             {
-                tileMapX = (_bus.Graphics.ScreenX + pixelX) % 256;
-                tileMapY = (_bus.Graphics.ScreenY + pixelY) % 256;
+                tileMapX = (_bus.Graphics.ScreenManager.ScreenX + pixelX) % 256;
+                tileMapY = (_bus.Graphics.ScreenManager.ScreenY + pixelY) % 256;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetBackgroundTileMapAddress() + tileMapOffset;
 

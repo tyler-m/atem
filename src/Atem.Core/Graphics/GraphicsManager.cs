@@ -26,20 +26,15 @@ namespace Atem.Core.Graphics
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
-        public bool Enabled;
-        public bool WindowEnabled;
-        public bool BackgroundAndWindowEnabledOrPriority;
-        public int ScreenX;
-        public int ScreenY;
-        public int WindowX;
-        public int WindowY;
+        public bool Enabled { get; set; }
         public PaletteGroup DMGPalettes = new();
 
-        public ObjectManager ObjectManager { get => _objectManager; }
-        public TileManager TileManager { get => _tileManager; }
-        public HDMA HDMA { get => _hdma; }
-        public RenderModeScheduler RenderModeScheduler { get => _renderModeScheduler; }
-        public StatInterruptManager StatInterruptManager { get => _statInterruptManager; }
+        public ObjectManager ObjectManager => _objectManager;
+        public TileManager TileManager => _tileManager;
+        public HDMA HDMA => _hdma;
+        public RenderModeScheduler RenderModeScheduler => _renderModeScheduler;
+        public StatInterruptManager StatInterruptManager => _statInterruptManager;
+        public ScreenManager ScreenManager => _screenManager;
 
         public GraphicsManager(IBus bus)
         {
@@ -108,12 +103,6 @@ namespace Atem.Core.Graphics
         public void GetState(BinaryWriter writer)
         {
             writer.Write(Enabled);
-            writer.Write(WindowEnabled);
-            writer.Write(BackgroundAndWindowEnabledOrPriority);
-            writer.Write(WindowX);
-            writer.Write(WindowY);
-            writer.Write(ScreenX);
-            writer.Write(ScreenY);
             DMGPalettes.GetState(writer);
 
             _renderModeScheduler.GetState(writer);
@@ -127,12 +116,6 @@ namespace Atem.Core.Graphics
         public void SetState(BinaryReader reader)
         {
             Enabled = reader.ReadBoolean();
-            WindowEnabled = reader.ReadBoolean();
-            BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
-            WindowX = reader.ReadInt32();
-            WindowY = reader.ReadInt32();
-            ScreenX = reader.ReadInt32();
-            ScreenY = reader.ReadInt32();
             DMGPalettes.SetState(reader);
 
             _renderModeScheduler.SetState(reader);
