@@ -143,7 +143,7 @@ namespace Atem.Core.Graphics
 
             if (_renderModeScheduler.Mode == RenderMode.OAM)
             {
-                _objectManager.CollectObjectsForScanline(_renderModeScheduler.CurrentLine);
+                _objectManager.CollectObjectsForScanline();
             }
             
             _screenManager.Clock();
