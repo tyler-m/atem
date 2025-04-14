@@ -32,7 +32,9 @@ namespace Atem.Core.Graphics.Tiles
         public byte ReadVRAM(ushort address)
         {
             if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
+            {
                 return 0xFF;
+            }
 
             return _vram[address - 0x8000 + _bank * 0x2000];
         }

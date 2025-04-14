@@ -55,7 +55,8 @@ namespace Atem.Core.Graphics.Objects
         {
             if (e.CurrentMode == RenderMode.OAM)
             {
-                ResetScanline();
+                _spriteBuffer.Clear();
+                _objectIndex = 0;
             }
         }
 
@@ -71,12 +72,6 @@ namespace Atem.Core.Graphics.Objects
                     _bus.Read((ushort)(address + 4 * i + 2)),
                     _bus.Read((ushort)(address + 4 * i + 3)));
             }
-        }
-
-        private void ResetScanline()
-        {
-            _spriteBuffer.Clear();
-            _objectIndex = 0;
         }
 
         public void CollectObjectsForScanline(int scanline)

@@ -58,7 +58,8 @@ namespace Atem.Core.Graphics.Screen
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    _screen[_bus.Graphics.RenderModeScheduler.CurrentLine * 160 + _linePixel] = GetColorOfScreenPixel(_linePixel, _bus.Graphics.RenderModeScheduler.CurrentLine);
+                    int index = _bus.Graphics.RenderModeScheduler.CurrentLine * 160 + _linePixel;
+                    _screen[index] = GetColorOfScreenPixel(_linePixel, _bus.Graphics.RenderModeScheduler.CurrentLine);
                     _linePixel++;
                 }
             }
