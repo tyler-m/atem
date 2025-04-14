@@ -40,19 +40,19 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.InterruptOnLineY.Int() << 6) 
-                    | (_manager.InterruptOnOAM.Int() << 5)
-                    | (_manager.InterruptOnVerticalBlank.Int() << 4)
-                    | (_manager.InterruptOnHorizontalBlank.Int() << 3)
-                    | (_manager.CurrentlyOnLineY.Int() << 2)
+                return (byte)((_manager.StatInterruptManager.InterruptOnLineY.Int() << 6) 
+                    | (_manager.StatInterruptManager.InterruptOnOAM.Int() << 5)
+                    | (_manager.StatInterruptManager.InterruptOnVerticalBlank.Int() << 4)
+                    | (_manager.StatInterruptManager.InterruptOnHorizontalBlank.Int() << 3)
+                    | (_manager.StatInterruptManager.CurrentlyOnLineY.Int() << 2)
                     | (int)_manager.RenderModeScheduler.Mode);
             }
             set
             {
-                _manager.InterruptOnLineY = value.GetBit(6);
-                _manager.InterruptOnOAM = value.GetBit(5);
-                _manager.InterruptOnVerticalBlank = value.GetBit(4);
-                _manager.InterruptOnHorizontalBlank = value.GetBit(3);
+                _manager.StatInterruptManager.InterruptOnLineY = value.GetBit(6);
+                _manager.StatInterruptManager.InterruptOnOAM = value.GetBit(5);
+                _manager.StatInterruptManager.InterruptOnVerticalBlank = value.GetBit(4);
+                _manager.StatInterruptManager.InterruptOnHorizontalBlank = value.GetBit(3);
                 // CurrentlyOnLineY and Render Mode are read-only
             }
         }
@@ -91,11 +91,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.LineYToCompare;
+                return (byte)_manager.StatInterruptManager.LineYToCompare;
             }
             set
             {
-                _manager.LineYToCompare = value;
+                _manager.StatInterruptManager.LineYToCompare = value;
             }
         }
 
