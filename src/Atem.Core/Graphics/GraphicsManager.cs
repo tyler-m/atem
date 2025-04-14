@@ -22,7 +22,7 @@ namespace Atem.Core.Graphics
         private readonly IScreenManager _screenManager;
         private readonly IHDMA _hdma;
         private readonly IRenderModeScheduler _renderModeScheduler;
-        private readonly StatInterruptManager _statInterruptManager;
+        private readonly IStatInterruptManager _statInterruptManager;
         private readonly IPaletteProvider _paletteProvider;
 
         public GraphicsRegisters Registers;
