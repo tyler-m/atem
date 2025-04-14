@@ -16,12 +16,7 @@ namespace Atem.Core.Graphics
         private readonly ScreenManager _screenManager;
         private readonly HDMA _hdma;
         private readonly RenderModeScheduler _renderModeScheduler;
-        private int _lineYToCompare;
-        private bool _currentlyOnLineY;
-        private bool _interruptOnLineY;
-        private bool _interruptOnOAM;
-        private bool _interruptOnVerticalBlank;
-        private bool _interruptOnHorizontalBlank;
+        private readonly StatInterruptManager _statInterruptManager;
         private bool _windowWasTriggeredThisFrame;
         private bool _justEnteredHorizontalBlank;
 
@@ -42,25 +37,8 @@ namespace Atem.Core.Graphics
         public ScreenManager ScreenManager { get => _screenManager; }
         public HDMA HDMA { get => _hdma; }
         public RenderModeScheduler RenderModeScheduler { get => _renderModeScheduler; }
-        public int LineYToCompare { get => _lineYToCompare; set => _lineYToCompare = value; }
-        public bool CurrentlyOnLineY
-        {
-            get => _currentlyOnLineY;
-            set
-            {
-                if (InterruptOnLineY && value && !_currentlyOnLineY)
-                {
-                    _bus.RequestInterrupt(InterruptType.STAT);
-                }
-
-                _currentlyOnLineY = value;
-            }
-        }
-        public bool InterruptOnLineY { get => _interruptOnLineY; set => _interruptOnLineY = value; }
-        public bool InterruptOnOAM { get => _interruptOnOAM; set => _interruptOnOAM = value; }
-        public bool InterruptOnVerticalBlank { get => _interruptOnVerticalBlank; set => _interruptOnVerticalBlank = value; }
-        public bool InterruptOnHorizontalBlank { get => _interruptOnHorizontalBlank; set => _interruptOnHorizontalBlank = value; }
         public bool WindowWasTriggeredThisFrame { get => _windowWasTriggeredThisFrame; set => _windowWasTriggeredThisFrame = value; }
+        public StatInterruptManager StatInterruptManager { get => _statInterruptManager; }
 
         public GraphicsManager(IBus bus)
         {
@@ -71,6 +49,7 @@ namespace Atem.Core.Graphics
             _screenManager = new ScreenManager(bus);
             _renderModeScheduler = new RenderModeScheduler();
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
+            _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
             Registers = new GraphicsRegisters(this);
         }
 
@@ -102,11 +81,6 @@ namespace Atem.Core.Graphics
                 _windowWasTriggeredThisFrame = false;
                 _hdma.JustEnteredHorizontalBlank = true;
             }
-
-            if (previousMode != RenderMode.HorizontalBlank && _interruptOnHorizontalBlank)
-            {
-                _bus.RequestInterrupt(InterruptType.STAT);
-            }
         }
 
         private void OnOAMStart(RenderMode previousMode)
@@ -117,11 +91,6 @@ namespace Atem.Core.Graphics
             {
                 CurrentWindowLine = 0;
             }
-
-            if (previousMode != RenderMode.OAM && _interruptOnOAM)
-            {
-                _bus.RequestInterrupt(InterruptType.STAT);
-            }
         }
 
         private void OnVerticalBlankStart(RenderMode previousMode)
@@ -129,11 +98,6 @@ namespace Atem.Core.Graphics
             OnVerticalBlank?.Invoke(_screenManager.Screen);
 
             _bus.RequestInterrupt(InterruptType.VerticalBlank);
-
-            if (previousMode != RenderMode.VerticalBlank && _interruptOnVerticalBlank)
-            {
-                _bus.RequestInterrupt(InterruptType.STAT);
-            }
         }
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
@@ -184,19 +148,14 @@ namespace Atem.Core.Graphics
 
             _renderModeScheduler.Clock();
 
-            CurrentlyOnLineY = LineYToCompare == _renderModeScheduler.CurrentLine;
+            _statInterruptManager.UpdateLineYCompare();
         }
 
         public void GetState(BinaryWriter writer)
         {
             _renderModeScheduler.GetState(writer);
 
-            writer.Write(_lineYToCompare);
-            writer.Write(_currentlyOnLineY);
-            writer.Write(_interruptOnLineY);
-            writer.Write(_interruptOnOAM);
-            writer.Write(_interruptOnVerticalBlank);
-            writer.Write(_interruptOnHorizontalBlank);
+            _statInterruptManager.GetState(writer);
 
             writer.Write(_tileManager.VRAM);
 
@@ -231,12 +190,7 @@ namespace Atem.Core.Graphics
         {
             _renderModeScheduler.SetState(reader);
 
-            _lineYToCompare = reader.ReadInt32();
-            _currentlyOnLineY = reader.ReadBoolean();
-            _interruptOnLineY = reader.ReadBoolean();
-            _interruptOnOAM = reader.ReadBoolean();
-            _interruptOnVerticalBlank = reader.ReadBoolean();
-            _interruptOnHorizontalBlank = reader.ReadBoolean();
+            _statInterruptManager.SetState(reader);
 
             _tileManager.VRAM = reader.ReadBytes(_tileManager.VRAM.Length);
 
