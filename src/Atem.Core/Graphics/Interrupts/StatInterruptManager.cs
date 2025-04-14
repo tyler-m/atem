@@ -1,8 +1,9 @@
-﻿using Atem.Core.Processing;
+﻿using Atem.Core.Graphics.Timing;
+using Atem.Core.Processing;
 using Atem.Core.State;
 using System.IO;
 
-namespace Atem.Core.Graphics.Timing
+namespace Atem.Core.Graphics.Interrupts
 {
     public class StatInterruptManager : IStateful
     {

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Atem.Core.Graphics.Interrupts;
 using Atem.Core.Graphics.Objects;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Screen;
