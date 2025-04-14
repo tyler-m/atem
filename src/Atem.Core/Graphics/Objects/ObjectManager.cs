@@ -15,6 +15,7 @@ namespace Atem.Core.Graphics.Objects
         private readonly Sprite[] _objects = new Sprite[MAX_SPRITES];
         private readonly List<Sprite> _spriteBuffer = [];
         private readonly PaletteGroup _palettes;
+        private readonly RenderModeScheduler _renderModeScheduler;
         private bool _objectsEnabled;
         private int _objectIndex;
         private bool _largeObjects;
@@ -40,6 +41,7 @@ namespace Atem.Core.Graphics.Objects
         public ObjectManager(IBus bus, RenderModeScheduler renderModeScheduler)
         {
             _bus = bus;
+            _renderModeScheduler = renderModeScheduler;
 
             for (int i = 0; i < MAX_SPRITES; i++)
             {
@@ -48,7 +50,7 @@ namespace Atem.Core.Graphics.Objects
 
             _palettes = new PaletteGroup();
 
-            renderModeScheduler.RenderModeChanged += RenderModeChanged;
+            _renderModeScheduler.RenderModeChanged += RenderModeChanged;
         }
 
         private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)
@@ -74,7 +76,7 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public void CollectObjectsForScanline(int scanline)
+        public void CollectObjectsForScanline()
         {
             // process 2 sprites per tick to spread OAM search across scanline,
             // emulating real hardware behavior
@@ -86,7 +88,7 @@ namespace Atem.Core.Graphics.Objects
                     Sprite sprite = _objects[_objectIndex++];
 
                     int spriteHeight = _largeObjects ? 16 : 8;
-                    if (sprite.X > 0 && scanline + 16 >= sprite.Y && scanline + 16 < sprite.Y + spriteHeight)
+                    if (sprite.X > 0 && _renderModeScheduler.CurrentLine + 16 >= sprite.Y && _renderModeScheduler.CurrentLine + 16 < sprite.Y + spriteHeight)
                     {
                         _spriteBuffer.Add(sprite);
                     }
