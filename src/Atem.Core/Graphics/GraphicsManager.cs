@@ -17,37 +17,39 @@ namespace Atem.Core.Graphics
         public const float FrameRate = 59.73f;
 
         private readonly IBus _bus;
-        private readonly ObjectManager _objectManager;
-        private readonly TileManager _tileManager;
-        private readonly ScreenManager _screenManager;
-        private readonly HDMA _hdma;
-        private readonly RenderModeScheduler _renderModeScheduler;
+        private readonly IObjectManager _objectManager;
+        private readonly ITileManager _tileManager;
+        private readonly IScreenManager _screenManager;
+        private readonly IHDMA _hdma;
+        private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly StatInterruptManager _statInterruptManager;
-        private readonly PaletteProvider _paletteProvider;
+        private readonly IPaletteProvider _paletteProvider;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
         public bool Enabled { get; set; }
 
-        public ObjectManager ObjectManager => _objectManager;
-        public TileManager TileManager => _tileManager;
-        public HDMA HDMA => _hdma;
-        public RenderModeScheduler RenderModeScheduler => _renderModeScheduler;
-        public StatInterruptManager StatInterruptManager => _statInterruptManager;
-        public ScreenManager ScreenManager => _screenManager;
-        public PaletteProvider PaletteProvider => _paletteProvider;
+        public IObjectManager ObjectManager => _objectManager;
+        public ITileManager TileManager => _tileManager;
+        public IHDMA HDMA => _hdma;
+        public IRenderModeScheduler RenderModeScheduler => _renderModeScheduler;
+        public IStatInterruptManager StatInterruptManager => _statInterruptManager;
+        public IScreenManager ScreenManager => _screenManager;
+        public IPaletteProvider PaletteProvider => _paletteProvider;
 
         public GraphicsManager(IBus bus)
         {
             _bus = bus;
-            _tileManager = new TileManager(bus);
             _renderModeScheduler = new RenderModeScheduler();
-            _screenManager = new ScreenManager(bus, _renderModeScheduler);
-            _objectManager = new ObjectManager(bus, _renderModeScheduler);
-            _hdma = new(bus, _renderModeScheduler);
-            _renderModeScheduler.RenderModeChanged += RenderModeChanged;
-            _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
             _paletteProvider = new PaletteProvider();
+            _hdma = new HDMA(bus, _renderModeScheduler);
+            _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
+            _tileManager = new TileManager(bus, _renderModeScheduler, _paletteProvider);
+            _objectManager = new ObjectManager(bus, _renderModeScheduler, _tileManager, _paletteProvider);
+            _screenManager = new ScreenManager(bus, _renderModeScheduler, _tileManager, _objectManager);
+
+            _renderModeScheduler.RenderModeChanged += RenderModeChanged;
+
             Registers = new GraphicsRegisters(this);
         }
 

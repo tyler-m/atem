@@ -1,6 +1,5 @@
 ﻿using Atem.Core.Graphics.Timing;
 using Atem.Core.Processing;
-using Atem.Core.State;
 using System.IO;
 
 namespace Atem.Core.Graphics.Interrupts
@@ -8,7 +7,7 @@ namespace Atem.Core.Graphics.Interrupts
     public class StatInterruptManager : IStatInterruptManager
     {
         private readonly IBus _bus;
-        private readonly RenderModeScheduler _scheduler;
+        private readonly IRenderModeScheduler _scheduler;
         private bool _interruptOnOAM;
         private bool _interruptOnVerticalBlank;
         private bool _interruptOnHorizontalBlank;
@@ -23,7 +22,7 @@ namespace Atem.Core.Graphics.Interrupts
         public byte LineYToCompare { get => _lineYToCompare; set => _lineYToCompare = value; }
         public bool CurrentlyOnLineY => _currentlyOnLineY;
 
-        public StatInterruptManager(IBus bus, RenderModeScheduler scheduler)
+        public StatInterruptManager(IBus bus, IRenderModeScheduler scheduler)
         {
             _bus = bus;
             _scheduler = scheduler;

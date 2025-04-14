@@ -1,32 +1,46 @@
 ﻿using System.IO;
 using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Timing;
 
 namespace Atem.Core.Graphics.Tiles
 {
     public class TileManager : ITileManager
     {
-        private readonly IBus _bus;
         private byte[] _vram;
         private byte _bank;
         private int _windowTileMapArea;
         private int _backgroundTileMapArea;
         private int _tileDataArea;
+        private int _screenX;
+        private int _screenY;
+        private int _windowX;
+        private int _windowY;
+        private readonly IBus _bus;
+        private readonly IRenderModeScheduler _renderModeScheduler;
+        private readonly IPaletteProvider _paletteProvider;
 
         public byte[] VRAM { get => _vram; set => _vram = value; }
         public byte Bank { get => _bank; set => _bank = value; }
         public int WindowTileMapArea { get => _windowTileMapArea; set => _windowTileMapArea = value; }
         public int BackgroundTileMapArea { get => _backgroundTileMapArea; set => _backgroundTileMapArea = value; }
         public int TileDataArea { get => _tileDataArea; set => _tileDataArea = value; }
+        public int ScreenX { get => _screenX; set => _screenX = value; }
+        public int ScreenY { get => _screenY; set => _screenY = value; }
+        public int WindowX { get => _windowX; set => _windowX = value; }
+        public int WindowY { get => _windowY; set => _windowY = value; }
 
-        public TileManager(IBus bus)
+        public TileManager(IBus bus, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider)
         {
             _bus = bus;
+            _renderModeScheduler = renderModeScheduler;
+            _paletteProvider = paletteProvider;
+
             _vram = new byte[0x4000];
         }
 
         public byte ReadVRAM(ushort address)
         {
-            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
+            if (_renderModeScheduler.Mode == RenderMode.Draw)
             {
                 return 0xFF;
             }
@@ -36,7 +50,7 @@ namespace Atem.Core.Graphics.Tiles
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
         {
-            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw && !ignoreRenderMode)
+            if (_renderModeScheduler.Mode == RenderMode.Draw && !ignoreRenderMode)
             {
                 return;
             }
@@ -106,15 +120,15 @@ namespace Atem.Core.Graphics.Tiles
 
             if (window)
             {
-                tileMapX = pixelX - (_bus.Graphics.ScreenManager.WindowX - 7);
+                tileMapX = pixelX - (_windowX - 7);
                 tileMapY = pixelY;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetWindowTileMapAddress() + tileMapOffset;
             }
             else
             {
-                tileMapX = (_bus.Graphics.ScreenManager.ScreenX + pixelX) % 256;
-                tileMapY = (_bus.Graphics.ScreenManager.ScreenY + pixelY) % 256;
+                tileMapX = (_screenX + pixelX) % 256;
+                tileMapY = (_screenY + pixelY) % 256;
                 int tileMapOffset = tileMapY / 8 * 32 + tileMapX / 8;
                 tileMapAddress = GetBackgroundTileMapAddress() + tileMapOffset;
 
@@ -130,13 +144,13 @@ namespace Atem.Core.Graphics.Tiles
                 bool flipX = bgMapAttributes.GetBit(5);
                 bool flipY = bgMapAttributes.GetBit(6);
                 tilePriority = bgMapAttributes.GetBit(7);
-                tilePalette = _bus.Graphics.PaletteProvider.TilePalettes[paletteIndex];
+                tilePalette = _paletteProvider.TilePalettes[paletteIndex];
                 int tileDataAddress = GetTileDataAddress(tileIndex, bank);
                 tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8, flipX, flipY);
             }
             else
             {
-                tilePalette = _bus.Graphics.PaletteProvider.DMGPalettes[0];
+                tilePalette = _paletteProvider.DMGPalettes[0];
                 int tileDataAddress = GetTileDataAddress(tileIndex);
                 tileId = GetTileId(tileDataAddress, tileMapX % 8, tileMapY % 8);
                 tilePriority = false;
@@ -152,6 +166,10 @@ namespace Atem.Core.Graphics.Tiles
             writer.Write(_backgroundTileMapArea);
             writer.Write(_tileDataArea);
             writer.Write(_bank);
+            writer.Write(_windowX);
+            writer.Write(_windowY);
+            writer.Write(_screenX);
+            writer.Write(_screenY);
         }
 
         public void SetState(BinaryReader reader)
@@ -161,6 +179,10 @@ namespace Atem.Core.Graphics.Tiles
             _backgroundTileMapArea = reader.ReadInt32();
             _tileDataArea = reader.ReadInt32();
             _bank = reader.ReadByte();
+            _windowX = reader.ReadInt32();
+            _windowY = reader.ReadInt32();
+            _screenX = reader.ReadInt32();
+            _screenY = reader.ReadInt32();
         }
     }
 }

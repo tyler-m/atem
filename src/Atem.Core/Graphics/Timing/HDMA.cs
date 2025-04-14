@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Timing
 {
@@ -24,9 +23,10 @@ namespace Atem.Core.Graphics.Timing
         public ushort DestAddress { get => _destAddress; set => _destAddress = value; }
         public byte TransferLengthRemaining { get => _transferLengthRemaining; set => _transferLengthRemaining = value; }
 
-        public HDMA(IBus bus, RenderModeScheduler renderModeScheduler)
+        public HDMA(IBus bus, IRenderModeScheduler renderModeScheduler)
         {
             _bus = bus;
+
             renderModeScheduler.RenderModeChanged += RenderModeChanged;
         }
 

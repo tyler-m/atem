@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Atem.Core.Graphics.Objects;
 using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Tiles;
 using Atem.Core.Graphics.Timing;
 
 namespace Atem.Core.Graphics.Screen
@@ -8,30 +9,26 @@ namespace Atem.Core.Graphics.Screen
     public class ScreenManager : IScreenManager
     {
         private readonly IBus _bus;
-        private readonly RenderModeScheduler _renderModeScheduler;
+        private readonly IRenderModeScheduler _renderModeScheduler;
+        private readonly ITileManager _tileManager;
+        private readonly IObjectManager _objectManager;
         private GBColor[] _screen = new GBColor[160 * 144];
         private byte _linePixel;
         private bool _windowWasTriggeredThisFrame;
         private byte _currentWindowLine;
         private bool _windowEnabled;
         private bool _backgroundAndWindowEnabledOrPriority;
-        private int _screenX;
-        private int _screenY;
-        private int _windowX;
-        private int _windowY;
 
         public bool WindowEnabled { get => _windowEnabled; set => _windowEnabled = value; }
         public bool BackgroundAndWindowEnabledOrPriority { get => _backgroundAndWindowEnabledOrPriority; set => _backgroundAndWindowEnabledOrPriority = value; }
-        public int ScreenX { get => _screenX; set => _screenX = value; }
-        public int ScreenY { get => _screenY; set => _screenY = value; }
-        public int WindowX { get => _windowX; set => _windowX = value; }
-        public int WindowY { get => _windowY; set => _windowY = value; }
         public GBColor[] Screen { get => _screen; set => _screen = value; }
 
-        public ScreenManager(IBus bus, RenderModeScheduler renderModeScheduler)
+        public ScreenManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager)
         {
             _bus = bus;
             _renderModeScheduler = renderModeScheduler;
+            _tileManager = tileManager;
+            _objectManager = objectManager;
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
         }
 
@@ -54,20 +51,20 @@ namespace Atem.Core.Graphics.Screen
 
         private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
         {
-            bool window = _windowEnabled && pixelX > _windowX - 8 && _windowY <= pixelY;
+            bool window = _windowEnabled && pixelX > _tileManager.WindowX - 8 && _tileManager.WindowY <= pixelY;
             _windowWasTriggeredThisFrame |= window;
 
-            (GBColor tileColor, int tileId, bool tilePriority) = _bus.Graphics.TileManager.GetTileInfo(pixelX, window ? _currentWindowLine : pixelY, window);
+            (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfo(pixelX, window ? _currentWindowLine : pixelY, window);
 
             if (!_bus.ColorMode && !_backgroundAndWindowEnabledOrPriority)
             {
                 tileColor = new GBColor(0xFFFF);
             }
 
-            (GBColor spriteColor, int spriteId, Sprite sprite) = _bus.Graphics.ObjectManager.GetSpritePixelInfo(pixelX, pixelY);
+            (GBColor spriteColor, int spriteId, Sprite sprite) = _objectManager.GetSpritePixelInfo(pixelX, pixelY);
 
             GBColor pixelColor = tileColor;
-            if (sprite != null && spriteId != 0 && _bus.Graphics.ObjectManager.ObjectsEnabled)
+            if (sprite != null && spriteId != 0 && _objectManager.ObjectsEnabled)
             {
                 if (!sprite.Priority || tileId == 0)
                 {
@@ -88,12 +85,12 @@ namespace Atem.Core.Graphics.Screen
 
         public void Clock()
         {
-            if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
+            if (_renderModeScheduler.Mode == RenderMode.Draw)
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    int index = _bus.Graphics.RenderModeScheduler.CurrentLine * 160 + _linePixel;
-                    _screen[index] = GetColorOfScreenPixel(_linePixel, _bus.Graphics.RenderModeScheduler.CurrentLine);
+                    int index = _renderModeScheduler.CurrentLine * 160 + _linePixel;
+                    _screen[index] = GetColorOfScreenPixel(_linePixel, _renderModeScheduler.CurrentLine);
                     _linePixel++;
                 }
             }
@@ -110,10 +107,6 @@ namespace Atem.Core.Graphics.Screen
             writer.Write(_currentWindowLine);
             writer.Write(_windowEnabled);
             writer.Write(_backgroundAndWindowEnabledOrPriority);
-            writer.Write(_windowX);
-            writer.Write(_windowY);
-            writer.Write(_screenX);
-            writer.Write(_screenY);
 
             foreach (GBColor pixel in _screen)
             {
@@ -128,10 +121,6 @@ namespace Atem.Core.Graphics.Screen
             _currentWindowLine = reader.ReadByte();
             _windowEnabled = reader.ReadBoolean();
             _backgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
-            _windowX = reader.ReadInt32();
-            _windowY = reader.ReadInt32();
-            _screenX = reader.ReadInt32();
-            _screenY = reader.ReadInt32();
 
             foreach (GBColor pixel in _screen)
             {
