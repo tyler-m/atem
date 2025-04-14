@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using Atem.Core.Graphics.Palettes;
-using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Tiles
 {
-    public class TileManager : IStateful
+    public class TileManager : ITileManager
     {
         private readonly IBus _bus;
         private byte[] _vram;

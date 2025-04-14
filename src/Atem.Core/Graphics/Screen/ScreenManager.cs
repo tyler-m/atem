@@ -2,11 +2,10 @@
 using Atem.Core.Graphics.Objects;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Timing;
-using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Screen
 {
-    public class ScreenManager : IStateful
+    public class ScreenManager : IScreenManager
     {
         private readonly IBus _bus;
         private readonly RenderModeScheduler _renderModeScheduler;

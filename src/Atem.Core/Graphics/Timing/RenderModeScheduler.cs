@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Timing
 {
@@ -16,7 +15,7 @@ namespace Atem.Core.Graphics.Timing
         }
     }
 
-    public class RenderModeScheduler : IStateful
+    public class RenderModeScheduler : IRenderModeScheduler
     {
         private const int DotsPerScanline = 456;
         private const int OAMDuration = 80;
@@ -31,7 +30,6 @@ namespace Atem.Core.Graphics.Timing
         public event EventHandler<RenderModeChangedEventArgs> RenderModeChanged;
 
         public byte CurrentLine => _currentLine;
-
         public RenderMode Mode => _mode;
 
         public void Clock()

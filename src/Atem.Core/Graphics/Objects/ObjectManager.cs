@@ -2,11 +2,10 @@
 using System.IO;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Timing;
-using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Objects
 {
-    public class ObjectManager : IStateful
+    public class ObjectManager : IObjectManager
     {
         private const int MAX_SPRITES = 40;
         private const int SPRITE_BUFFER_LIMIT = 10;
