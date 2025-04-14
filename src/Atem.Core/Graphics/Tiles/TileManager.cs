@@ -1,8 +1,10 @@
-﻿using Atem.Core.Graphics.Palettes;
+﻿using System.IO;
+using Atem.Core.Graphics.Palettes;
+using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Tiles
 {
-    public class TileManager
+    public class TileManager : IStateful
     {
         private readonly IBus _bus;
         private readonly PaletteGroup _tilePalettes;
@@ -148,6 +150,26 @@ namespace Atem.Core.Graphics.Tiles
             }
 
             return (tilePalette[tileId], tileId, tilePriority);
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(_vram);
+            writer.Write(_windowTileMapArea);
+            writer.Write(_backgroundTileMapArea);
+            writer.Write(_tileDataArea);
+            _tilePalettes.GetState(writer);
+            writer.Write(_bank);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            _vram = reader.ReadBytes(_vram.Length);
+            _windowTileMapArea = reader.ReadInt32();
+            _backgroundTileMapArea = reader.ReadInt32();
+            _tileDataArea = reader.ReadInt32();
+            _tilePalettes.SetState(reader);
+            _bank = reader.ReadByte();
         }
     }
 }
