@@ -2,6 +2,12 @@
 using System.IO;
 using Atem.Core.Audio;
 using Atem.Core.Graphics;
+using Atem.Core.Graphics.Interrupts;
+using Atem.Core.Graphics.Objects;
+using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Screen;
+using Atem.Core.Graphics.Tiles;
+using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
@@ -42,7 +48,16 @@ namespace Atem.Core
             _processor = new Processor(this);
             _timer = new Timer(this);
             _audio = new AudioManager();
-            _graphics = new GraphicsManager(this);
+
+            RenderModeScheduler renderModeScheduler = new();
+            PaletteProvider paletteProvider = new();
+            HDMA hdma = new(this, renderModeScheduler);
+            StatInterruptManager statInterruptManager = new(this, renderModeScheduler);
+            TileManager tileManager = new TileManager(this, renderModeScheduler, paletteProvider);
+            ObjectManager objectManager = new ObjectManager(this, renderModeScheduler, tileManager, paletteProvider);
+            ScreenManager screenManager = new ScreenManager(this, renderModeScheduler, tileManager, objectManager);
+            _graphics = new GraphicsManager(this, renderModeScheduler, paletteProvider, hdma, statInterruptManager, tileManager, objectManager, screenManager);
+
             _joypad = new Joypad(this);
             _serial = new Serial();
             _interrupt = new Interrupt();
