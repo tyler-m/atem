@@ -23,7 +23,6 @@ namespace Atem.Core.Graphics
         private readonly HDMA _hdma;
         private readonly RenderModeScheduler _renderModeScheduler;
         private readonly StatInterruptManager _statInterruptManager;
-        private bool _windowWasTriggeredThisFrame;
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
@@ -34,23 +33,20 @@ namespace Atem.Core.Graphics
         public int ScreenY;
         public int WindowX;
         public int WindowY;
-        public byte CurrentWindowLine;
         public PaletteGroup DMGPalettes = new();
 
         public ObjectManager ObjectManager { get => _objectManager; }
         public TileManager TileManager { get => _tileManager; }
-        public ScreenManager ScreenManager { get => _screenManager; }
         public HDMA HDMA { get => _hdma; }
         public RenderModeScheduler RenderModeScheduler { get => _renderModeScheduler; }
-        public bool WindowWasTriggeredThisFrame { get => _windowWasTriggeredThisFrame; set => _windowWasTriggeredThisFrame = value; }
         public StatInterruptManager StatInterruptManager { get => _statInterruptManager; }
 
         public GraphicsManager(IBus bus)
         {
             _bus = bus;
             _tileManager = new TileManager(bus);
-            _screenManager = new ScreenManager(bus);
             _renderModeScheduler = new RenderModeScheduler();
+            _screenManager = new ScreenManager(bus, _renderModeScheduler);
             _objectManager = new ObjectManager(bus, _renderModeScheduler);
             _hdma = new(bus, _renderModeScheduler);
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
@@ -60,46 +56,12 @@ namespace Atem.Core.Graphics
 
         private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)
         {
-            if (e.CurrentMode == RenderMode.HorizontalBlank)
+            if (e.CurrentMode == RenderMode.VerticalBlank)
             {
-                OnHorizontalBlankStart(e.PreviousMode);
-            }
-            else if (e.CurrentMode == RenderMode.OAM)
-            {
-                OnOAMStart(e.PreviousMode);
-            }
-            else if (e.CurrentMode == RenderMode.VerticalBlank)
-            {
-                OnVerticalBlankStart(e.PreviousMode);
-            }
-        }
+                OnVerticalBlank?.Invoke(_screenManager.Screen);
 
-        private void OnHorizontalBlankStart(RenderMode previousMode)
-        {
-            if (previousMode == RenderMode.Draw)
-            {
-                if (_windowWasTriggeredThisFrame)
-                {
-                    CurrentWindowLine++;
-                }
-
-                _windowWasTriggeredThisFrame = false;
+                _bus.RequestInterrupt(InterruptType.VerticalBlank);
             }
-        }
-
-        private void OnOAMStart(RenderMode previousMode)
-        {
-            if (previousMode == RenderMode.VerticalBlank)
-            {
-                CurrentWindowLine = 0;
-            }
-        }
-
-        private void OnVerticalBlankStart(RenderMode previousMode)
-        {
-            OnVerticalBlank?.Invoke(_screenManager.Screen);
-
-            _bus.RequestInterrupt(InterruptType.VerticalBlank);
         }
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
@@ -148,8 +110,6 @@ namespace Atem.Core.Graphics
             writer.Write(Enabled);
             writer.Write(WindowEnabled);
             writer.Write(BackgroundAndWindowEnabledOrPriority);
-            writer.Write(_windowWasTriggeredThisFrame);
-            writer.Write(CurrentWindowLine);
             writer.Write(WindowX);
             writer.Write(WindowY);
             writer.Write(ScreenX);
@@ -169,8 +129,6 @@ namespace Atem.Core.Graphics
             Enabled = reader.ReadBoolean();
             WindowEnabled = reader.ReadBoolean();
             BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
-            _windowWasTriggeredThisFrame = reader.ReadBoolean();
-            CurrentWindowLine = reader.ReadByte();
             WindowX = reader.ReadInt32();
             WindowY = reader.ReadInt32();
             ScreenX = reader.ReadInt32();
