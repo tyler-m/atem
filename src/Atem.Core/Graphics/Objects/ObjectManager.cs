@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Timing;
 using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Objects
@@ -36,7 +37,7 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public ObjectManager(IBus bus)
+        public ObjectManager(IBus bus, RenderModeScheduler renderModeScheduler)
         {
             _bus = bus;
 
@@ -46,6 +47,16 @@ namespace Atem.Core.Graphics.Objects
             }
 
             _palettes = new PaletteGroup();
+
+            renderModeScheduler.RenderModeChanged += RenderModeChanged;
+        }
+
+        private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)
+        {
+            if (e.CurrentMode == RenderMode.OAM)
+            {
+                ResetScanline();
+            }
         }
 
         public void TriggerODMA(byte value)
@@ -62,7 +73,7 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public void ResetScanline()
+        private void ResetScanline()
         {
             _spriteBuffer.Clear();
             _objectIndex = 0;

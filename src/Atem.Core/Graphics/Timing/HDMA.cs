@@ -19,15 +19,23 @@ namespace Atem.Core.Graphics.Timing
         private ushort _destAddress;
         private byte _transferLengthRemaining;
 
-        public bool JustEnteredHorizontalBlank { get => _justEnteredHorizontalBlank; set => _justEnteredHorizontalBlank = value; }
         public bool TransferActive { get => _transferActive; set => _transferActive = value; }
         public ushort SourceAddress { get => _sourceAddress; set => _sourceAddress = value; }
         public ushort DestAddress { get => _destAddress; set => _destAddress = value; }
         public byte TransferLengthRemaining { get => _transferLengthRemaining; set => _transferLengthRemaining = value; }
 
-        public HDMA(IBus bus)
+        public HDMA(IBus bus, RenderModeScheduler renderModeScheduler)
         {
             _bus = bus;
+            renderModeScheduler.RenderModeChanged += RenderModeChanged;
+        }
+
+        private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)
+        {
+            if (e.CurrentMode == RenderMode.HorizontalBlank)
+            {
+                _justEnteredHorizontalBlank = true;
+            }
         }
 
         public void ClockTransfer()
