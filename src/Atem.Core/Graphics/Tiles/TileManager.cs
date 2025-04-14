@@ -1,5 +1,6 @@
-﻿
-namespace Atem.Core.Graphics
+﻿using Atem.Core.Graphics.Palettes;
+
+namespace Atem.Core.Graphics.Tiles
 {
     public class TileManager
     {
@@ -33,7 +34,7 @@ namespace Atem.Core.Graphics
             if (_bus.Graphics.RenderModeScheduler.Mode == RenderMode.Draw)
                 return 0xFF;
 
-            return _vram[(address - 0x8000) + _bank * 0x2000];
+            return _vram[address - 0x8000 + _bank * 0x2000];
         }
 
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode = false)
@@ -43,7 +44,7 @@ namespace Atem.Core.Graphics
                 return;
             }
 
-            _vram[(address - 0x8000) + _bank * 0x2000] = value;
+            _vram[address - 0x8000 + _bank * 0x2000] = value;
         }
 
         private ushort GetWindowTileMapAddress()
@@ -74,12 +75,12 @@ namespace Atem.Core.Graphics
         {
             if (_tileDataArea == 1)
             {
-                return (ushort)((0x0000 + tileIndex * 16) + bank * 0x2000);
+                return (ushort)(0x0000 + tileIndex * 16 + bank * 0x2000);
             }
             else
             {
                 sbyte offset = (sbyte)tileIndex;
-                return (ushort)((0x1000 + offset * 16) + bank * 0x2000);
+                return (ushort)(0x1000 + offset * 16 + bank * 0x2000);
             }
         }
 
@@ -97,7 +98,7 @@ namespace Atem.Core.Graphics
 
             byte low = _vram[tileDataAddress + offsetY * 2];
             byte high = _vram[tileDataAddress + offsetY * 2 + 1];
-            return ((low >> (7 - offsetX)) & 1) | (((high >> (7 - offsetX)) & 1) << 1);
+            return low >> 7 - offsetX & 1 | (high >> 7 - offsetX & 1) << 1;
         }
 
         public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfo(int pixelX, int pixelY, bool window)
