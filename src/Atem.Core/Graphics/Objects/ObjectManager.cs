@@ -184,6 +184,11 @@ namespace Atem.Core.Graphics.Objects
 
         public void WriteOAM(ushort address, byte value)
         {
+            if (_renderModeScheduler.Mode == RenderMode.OAM || _renderModeScheduler.Mode == RenderMode.Draw)
+            {
+                return;
+            }
+
             int adjustedAddress = address & 0xFF;
             int index = adjustedAddress / 4;
 
@@ -207,6 +212,11 @@ namespace Atem.Core.Graphics.Objects
 
         public byte ReadOAM(ushort address)
         {
+            if (_renderModeScheduler.Mode == RenderMode.OAM || _renderModeScheduler.Mode == RenderMode.Draw)
+            {
+                return 0xFF;
+            }
+
             int adjustedAddress = address & 0xFF;
             int index = adjustedAddress / 4;
 

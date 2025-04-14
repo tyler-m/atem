@@ -114,21 +114,11 @@ namespace Atem.Core.Graphics
 
         public void WriteOAM(ushort address, byte value)
         {
-            if (_renderModeScheduler.Mode == RenderMode.OAM || _renderModeScheduler.Mode == RenderMode.Draw)
-            {
-                return;
-            }
-
             _objectManager.WriteOAM(address, value);
         }
 
         public byte ReadOAM(ushort address)
         {
-            if (_renderModeScheduler.Mode == RenderMode.OAM || _renderModeScheduler.Mode == RenderMode.Draw)
-            {
-                return 0xFF;
-            }
-
             return _objectManager.ReadOAM(address);
         }
 
