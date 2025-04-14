@@ -14,14 +14,12 @@ namespace Atem.Core.Graphics.Objects
         private readonly IBus _bus;
         private readonly Sprite[] _objects = new Sprite[MAX_SPRITES];
         private readonly List<Sprite> _spriteBuffer = [];
-        private readonly PaletteGroup _palettes;
         private readonly RenderModeScheduler _renderModeScheduler;
         private bool _objectsEnabled;
         private int _objectIndex;
         private bool _largeObjects;
         private byte _odma;
 
-        public PaletteGroup Palettes => _palettes;
         public bool ObjectsEnabled { get => _objectsEnabled; set => _objectsEnabled = value; }
         public bool LargeObjects { get => _largeObjects; set => _largeObjects = value; }
 
@@ -47,8 +45,6 @@ namespace Atem.Core.Graphics.Objects
             {
                 _objects[i] = new Sprite();
             }
-
-            _palettes = new PaletteGroup();
 
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
         }
@@ -151,7 +147,7 @@ namespace Atem.Core.Graphics.Objects
                         // just take the first visible object we encounter in the list)
                         if (sprite == null)
                         {
-                            spriteColor = _palettes[tempSprite.ColorPalette][id];
+                            spriteColor = _bus.Graphics.PaletteProvider.ObjectPalettes[tempSprite.ColorPalette][id];
                             sprite = tempSprite;
                             spriteId = id;
                         }
@@ -247,8 +243,6 @@ namespace Atem.Core.Graphics.Objects
                 writer.Write(_spriteBuffer.IndexOf(sprite));
             }
 
-            _palettes.GetState(writer);
-
             writer.Write(_objectsEnabled);
             writer.Write(_objectIndex);
             writer.Write(_largeObjects);
@@ -275,8 +269,6 @@ namespace Atem.Core.Graphics.Objects
             }
             _spriteBuffer.Clear();
             _spriteBuffer.AddRange(spriteBufferArray);
-
-            _palettes.SetState(reader);
 
             _objectsEnabled = reader.ReadBoolean();
             _objectIndex = reader.ReadInt32();

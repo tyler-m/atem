@@ -116,11 +116,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.DMGPalettes[0].ToDMGPalette();
+                return _manager.PaletteProvider.DMGPalettes[0].ToDMGPalette();
             }
             set
             {
-                _manager.DMGPalettes[0] = Palette.FromDMGPalette(value);
+                _manager.PaletteProvider.DMGPalettes[0] = Palette.FromDMGPalette(value);
             }
         }
 
@@ -128,11 +128,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.DMGPalettes[1].ToDMGPalette();
+                return _manager.PaletteProvider.DMGPalettes[1].ToDMGPalette();
             }
             set
             {
-                _manager.DMGPalettes[1] = Palette.FromDMGPalette(value);
+                _manager.PaletteProvider.DMGPalettes[1] = Palette.FromDMGPalette(value);
             }
         }
 
@@ -140,11 +140,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.DMGPalettes[2].ToDMGPalette();
+                return _manager.PaletteProvider.DMGPalettes[2].ToDMGPalette();
             }
             set
             {
-                _manager.DMGPalettes[2] = Palette.FromDMGPalette(value);
+                _manager.PaletteProvider.DMGPalettes[2] = Palette.FromDMGPalette(value);
             }
         }
 
@@ -188,11 +188,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.TileManager.TilePalettes.Increment.Int() << 7) | _manager.TileManager.TilePalettes.Address);
+                return (byte)((_manager.PaletteProvider.TilePalettes.Increment.Int() << 7) | _manager.PaletteProvider.TilePalettes.Address);
             }
             set
             {
-                _manager.TileManager.TilePalettes.SetAddress(value.GetBit(7), value & 0b111111);
+                _manager.PaletteProvider.TilePalettes.SetAddress(value.GetBit(7), value & 0b111111);
             }
         }
 
@@ -202,7 +202,7 @@ namespace Atem.Core.Graphics
             {
                 if (_manager.RenderModeScheduler.Mode != RenderMode.Draw)
                 {
-                    return _manager.TileManager.TilePalettes.ReadAtAddress();
+                    return _manager.PaletteProvider.TilePalettes.ReadAtAddress();
                 }
 
                 return 0xFF;
@@ -211,7 +211,7 @@ namespace Atem.Core.Graphics
             {
                 if (_manager.RenderModeScheduler.Mode != RenderMode.Draw)
                 {
-                    _manager.TileManager.TilePalettes.WriteAtAddress(value);
+                    _manager.PaletteProvider.TilePalettes.WriteAtAddress(value);
                 }
             }
         }
@@ -220,11 +220,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.ObjectManager.Palettes.Increment.Int() << 7) | _manager.ObjectManager.Palettes.Address);
+                return (byte)((_manager.PaletteProvider.ObjectPalettes.Increment.Int() << 7) | _manager.PaletteProvider.ObjectPalettes.Address);
             }
             set
             {
-                _manager.ObjectManager.Palettes.SetAddress(value.GetBit(7), value & 0b111111);
+                _manager.PaletteProvider.ObjectPalettes.SetAddress(value.GetBit(7), value & 0b111111);
             }
         }
 
@@ -232,11 +232,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return _manager.ObjectManager.Palettes.ReadAtAddress();
+                return _manager.PaletteProvider.ObjectPalettes.ReadAtAddress();
             }
             set
             {
-                _manager.ObjectManager.Palettes.WriteAtAddress(value);
+                _manager.PaletteProvider.ObjectPalettes.WriteAtAddress(value);
             }
         }
 
