@@ -14,7 +14,19 @@ namespace Atem.Core.Graphics.Screen
         private byte _linePixel;
         private bool _windowWasTriggeredThisFrame;
         private byte _currentWindowLine;
+        private bool _windowEnabled;
+        private bool _backgroundAndWindowEnabledOrPriority;
+        private int _screenX;
+        private int _screenY;
+        private int _windowX;
+        private int _windowY;
 
+        public bool WindowEnabled { get => _windowEnabled; set => _windowEnabled = value; }
+        public bool BackgroundAndWindowEnabledOrPriority { get => _backgroundAndWindowEnabledOrPriority; set => _backgroundAndWindowEnabledOrPriority = value; }
+        public int ScreenX { get => _screenX; set => _screenX = value; }
+        public int ScreenY { get => _screenY; set => _screenY = value; }
+        public int WindowX { get => _windowX; set => _windowX = value; }
+        public int WindowY { get => _windowY; set => _windowY = value; }
         public GBColor[] Screen { get => _screen; set => _screen = value; }
 
         public ScreenManager(IBus bus, RenderModeScheduler renderModeScheduler)
@@ -43,12 +55,12 @@ namespace Atem.Core.Graphics.Screen
 
         private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
         {
-            bool window = _bus.Graphics.WindowEnabled && pixelX > _bus.Graphics.WindowX - 8 && _bus.Graphics.WindowY <= pixelY;
+            bool window = _windowEnabled && pixelX > _windowX - 8 && _windowY <= pixelY;
             _windowWasTriggeredThisFrame |= window;
 
             (GBColor tileColor, int tileId, bool tilePriority) = _bus.Graphics.TileManager.GetTileInfo(pixelX, window ? _currentWindowLine : pixelY, window);
 
-            if (!_bus.ColorMode && !_bus.Graphics.BackgroundAndWindowEnabledOrPriority)
+            if (!_bus.ColorMode && !_backgroundAndWindowEnabledOrPriority)
             {
                 tileColor = new GBColor(0xFFFF);
             }
@@ -66,7 +78,7 @@ namespace Atem.Core.Graphics.Screen
 
             if (_bus.ColorMode)
             {
-                if (tilePriority && tileId != 0 && _bus.Graphics.BackgroundAndWindowEnabledOrPriority)
+                if (tilePriority && tileId != 0 && _backgroundAndWindowEnabledOrPriority)
                 {
                     pixelColor = tileColor;
                 }
@@ -97,6 +109,12 @@ namespace Atem.Core.Graphics.Screen
             writer.Write(_linePixel);
             writer.Write(_windowWasTriggeredThisFrame);
             writer.Write(_currentWindowLine);
+            writer.Write(_windowEnabled);
+            writer.Write(_backgroundAndWindowEnabledOrPriority);
+            writer.Write(_windowX);
+            writer.Write(_windowY);
+            writer.Write(_screenX);
+            writer.Write(_screenY);
 
             foreach (GBColor pixel in _screen)
             {
@@ -109,6 +127,12 @@ namespace Atem.Core.Graphics.Screen
             _linePixel = reader.ReadByte();
             _windowWasTriggeredThisFrame = reader.ReadBoolean();
             _currentWindowLine = reader.ReadByte();
+            _windowEnabled = reader.ReadBoolean();
+            _backgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
+            _windowX = reader.ReadInt32();
+            _windowY = reader.ReadInt32();
+            _screenX = reader.ReadInt32();
+            _screenY = reader.ReadInt32();
 
             foreach (GBColor pixel in _screen)
             {

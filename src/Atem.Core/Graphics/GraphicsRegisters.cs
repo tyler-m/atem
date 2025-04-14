@@ -17,23 +17,23 @@ namespace Atem.Core.Graphics
             {
                 return (byte)((_manager.Enabled.Int() << 7)
                     | (_manager.TileManager.WindowTileMapArea << 6)
-                    | (_manager.WindowEnabled.Int() << 5)
+                    | (_manager.ScreenManager.WindowEnabled.Int() << 5)
                     | (_manager.TileManager.TileDataArea << 4)
                     | (_manager.TileManager.BackgroundTileMapArea << 3)
                     | (_manager.ObjectManager.LargeObjects.Int() << 2)
                     | (_manager.ObjectManager.ObjectsEnabled.Int() << 1)
-                    | _manager.BackgroundAndWindowEnabledOrPriority.Int());
+                    | _manager.ScreenManager.BackgroundAndWindowEnabledOrPriority.Int());
             }
             set
             {
                 _manager.Enabled = value.GetBit(7);
                 _manager.TileManager.WindowTileMapArea = value.GetBit(6).Int();
-                _manager.WindowEnabled = value.GetBit(5);
+                _manager.ScreenManager.WindowEnabled = value.GetBit(5);
                 _manager.TileManager.TileDataArea = value.GetBit(4).Int();
                 _manager.TileManager.BackgroundTileMapArea = value.GetBit(3).Int();
                 _manager.ObjectManager.LargeObjects = value.GetBit(2);
                 _manager.ObjectManager.ObjectsEnabled = value.GetBit(1);
-                _manager.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
+                _manager.ScreenManager.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
             }
         }
 
@@ -62,11 +62,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.ScreenY;
+                return (byte)_manager.ScreenManager.ScreenY;
             }
             set
             {
-                _manager.ScreenY = value;
+                _manager.ScreenManager.ScreenY = value;
             }
         }
 
@@ -74,11 +74,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.ScreenX;
+                return (byte)_manager.ScreenManager.ScreenX;
             }
             set
             {
-                _manager.ScreenX = value;
+                _manager.ScreenManager.ScreenX = value;
             }
         }
 
@@ -152,11 +152,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return ((byte)_manager.WindowY);
+                return ((byte)_manager.ScreenManager.WindowY);
             }
             set
             {
-                _manager.WindowY = value;
+                _manager.ScreenManager.WindowY = value;
             }
         }
 
@@ -164,11 +164,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.WindowX;
+                return (byte)_manager.ScreenManager.WindowX;
             }
             set
             {
-                _manager.WindowX = value;
+                _manager.ScreenManager.WindowX = value;
             }
         }
 
