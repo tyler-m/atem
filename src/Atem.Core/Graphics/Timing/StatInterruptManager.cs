@@ -2,7 +2,7 @@
 using Atem.Core.State;
 using System.IO;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Timing
 {
     public class StatInterruptManager : IStateful
     {

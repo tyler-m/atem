@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Atem.Core.Graphics.Palettes;
 using Atem.Core.State;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Objects
 {
     public class ObjectManager : IStateful
     {
@@ -38,7 +39,7 @@ namespace Atem.Core.Graphics
         public ObjectManager(IBus bus)
         {
             _bus = bus;
-            
+
             for (int i = 0; i < MAX_SPRITES; i++)
             {
                 _objects[i] = new Sprite();

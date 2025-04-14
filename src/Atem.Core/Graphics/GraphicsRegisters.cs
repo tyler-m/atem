@@ -1,4 +1,5 @@
-﻿
+﻿using Atem.Core.Graphics.Palettes;
+
 namespace Atem.Core.Graphics
 {
     public class GraphicsRegisters

@@ -1,8 +1,7 @@
-﻿
+﻿using System.IO;
 using Atem.Core.State;
-using System.IO;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Objects
 {
     public class Sprite : IStateful
     {

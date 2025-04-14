@@ -1,7 +1,9 @@
 ﻿using System.IO;
+using Atem.Core.Graphics.Objects;
+using Atem.Core.Graphics.Palettes;
 using Atem.Core.State;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Screen
 {
     public class ScreenManager : IStateful
     {

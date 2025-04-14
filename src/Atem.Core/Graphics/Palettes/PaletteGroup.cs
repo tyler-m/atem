@@ -1,8 +1,7 @@
-﻿
+﻿using System.IO;
 using Atem.Core.State;
-using System.IO;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Palettes
 {
     public class PaletteGroup : IStateful
     {
@@ -42,8 +41,8 @@ namespace Atem.Core.Graphics
         public byte ReadAtAddress()
         {
             int paletteIndex = Address / 8;
-            int colorIndex = (Address % 8) / 2;
-            bool highByte = (Address % 8) % 2 != 0;
+            int colorIndex = Address % 8 / 2;
+            bool highByte = Address % 8 % 2 != 0;
 
             if (highByte)
             {
@@ -58,8 +57,8 @@ namespace Atem.Core.Graphics
         public void WriteAtAddress(byte value)
         {
             int paletteIndex = Address / 8;
-            int colorIndex = (Address % 8) / 2;
-            bool highByte = (Address % 8) % 2 != 0;
+            int colorIndex = Address % 8 / 2;
+            bool highByte = Address % 8 % 2 != 0;
 
             if (highByte)
             {

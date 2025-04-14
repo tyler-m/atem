@@ -1,4 +1,9 @@
 ﻿using System.IO;
+using Atem.Core.Graphics.Objects;
+using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Screen;
+using Atem.Core.Graphics.Tiles;
+using Atem.Core.Graphics.Timing;
 using Atem.Core.Processing;
 using Atem.Core.State;
 

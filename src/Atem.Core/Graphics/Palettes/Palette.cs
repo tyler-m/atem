@@ -1,8 +1,7 @@
-﻿
+﻿using System.IO;
 using Atem.Core.State;
-using System.IO;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Palettes
 {
     public class Palette : IStateful
     {
@@ -56,13 +55,13 @@ namespace Atem.Core.Graphics
 
         public byte ToDMGPalette()
         {
-            byte color = (byte)(3 - (_colors[3].Red / 31.0f * 3));
+            byte color = (byte)(3 - _colors[3].Red / 31.0f * 3);
             color <<= 2;
-            color |= (byte)(3 - (_colors[2].Red / 31.0f * 3));
+            color |= (byte)(3 - _colors[2].Red / 31.0f * 3);
             color <<= 2;
-            color |= (byte)(3 - (_colors[1].Red / 31.0f * 3));
+            color |= (byte)(3 - _colors[1].Red / 31.0f * 3);
             color <<= 2;
-            color |= (byte)(3 - (_colors[0].Red / 31.0f * 3));
+            color |= (byte)(3 - _colors[0].Red / 31.0f * 3);
             return color;
         }
 

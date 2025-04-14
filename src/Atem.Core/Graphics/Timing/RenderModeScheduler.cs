@@ -2,7 +2,7 @@
 using System.IO;
 using Atem.Core.State;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Timing
 {
     public class RenderModeChangedEventArgs : EventArgs
     {

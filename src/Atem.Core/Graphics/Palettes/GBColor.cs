@@ -1,7 +1,7 @@
-﻿using Atem.Core.State;
-using System.IO;
+﻿using System.IO;
+using Atem.Core.State;
 
-namespace Atem.Core.Graphics
+namespace Atem.Core.Graphics.Palettes
 {
     public class GBColor : IStateful
     {
@@ -39,11 +39,11 @@ namespace Atem.Core.Graphics
             get
             {
                 ushort color = 0;
-                color |= (ushort)(Blue);
+                color |= (ushort)Blue;
                 color <<= 5;
-                color |= (ushort)(Green);
+                color |= (ushort)Green;
                 color <<= 5;
-                color |= (ushort)(Red);
+                color |= (ushort)Red;
                 return color;
             }
             set

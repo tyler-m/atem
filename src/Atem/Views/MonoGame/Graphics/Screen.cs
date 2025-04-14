@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Atem.Core;
-using Atem.Core.Graphics;
+using Atem.Core.Graphics.Palettes;
 using Atem.Graphics;
 
 namespace Atem.Views.MonoGame.Graphics
