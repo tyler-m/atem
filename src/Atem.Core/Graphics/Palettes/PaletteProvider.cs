@@ -1,12 +1,11 @@
-﻿using Atem.Core.State;
-using System.IO;
+﻿using System.IO;
 
 namespace Atem.Core.Graphics.Palettes
 {
     /// <summary>
     /// Provides palettes for Graphics classes.
     /// </summary>
-    public class PaletteProvider : IStateful
+    public class PaletteProvider : IPaletteProvider
     {
         private readonly PaletteGroup _objectPalettes;
         private readonly PaletteGroup _tilePalettes;

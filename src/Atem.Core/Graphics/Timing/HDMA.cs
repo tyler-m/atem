@@ -8,7 +8,7 @@ namespace Atem.Core.Graphics.Timing
     /// HDMA allows data to be transferred from ROM or RAM to VRAM during the H-Blank
     /// rendering period between scanlines without hogging the CPU. This is used by
     /// games to dynamically update tiles or palettes during frame rendering.
-    public class HDMA : IStateful
+    public class HDMA : IHDMA
     {
         private readonly IBus _bus;
         private bool _justEnteredHorizontalBlank;
