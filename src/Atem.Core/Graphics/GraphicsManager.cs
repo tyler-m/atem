@@ -49,11 +49,11 @@ namespace Atem.Core.Graphics
         public GraphicsManager(IBus bus)
         {
             _bus = bus;
-            _hdma = new(bus);
-            _objectManager = new ObjectManager(bus);
             _tileManager = new TileManager(bus);
             _screenManager = new ScreenManager(bus);
             _renderModeScheduler = new RenderModeScheduler();
+            _objectManager = new ObjectManager(bus, _renderModeScheduler);
+            _hdma = new(bus, _renderModeScheduler);
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
             _statInterruptManager = new StatInterruptManager(bus, _renderModeScheduler);
             Registers = new GraphicsRegisters(this);
@@ -85,14 +85,11 @@ namespace Atem.Core.Graphics
                 }
 
                 _windowWasTriggeredThisFrame = false;
-                _hdma.JustEnteredHorizontalBlank = true;
             }
         }
 
         private void OnOAMStart(RenderMode previousMode)
         {
-            _objectManager.ResetScanline();
-
             if (previousMode == RenderMode.VerticalBlank)
             {
                 CurrentWindowLine = 0;
