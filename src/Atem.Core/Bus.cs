@@ -53,9 +53,9 @@ namespace Atem.Core
             PaletteProvider paletteProvider = new();
             HDMA hdma = new(this, renderModeScheduler);
             StatInterruptManager statInterruptManager = new(this, renderModeScheduler);
-            TileManager tileManager = new TileManager(this, renderModeScheduler, paletteProvider);
-            ObjectManager objectManager = new ObjectManager(this, renderModeScheduler, tileManager, paletteProvider);
-            ScreenManager screenManager = new ScreenManager(this, renderModeScheduler, tileManager, objectManager);
+            TileManager tileManager = new(this, renderModeScheduler, paletteProvider);
+            ObjectManager objectManager = new(this, renderModeScheduler, tileManager, paletteProvider);
+            ScreenManager screenManager = new(this, renderModeScheduler, tileManager, objectManager);
             _graphics = new GraphicsManager(this, renderModeScheduler, paletteProvider, hdma, statInterruptManager, tileManager, objectManager, screenManager);
 
             _joypad = new Joypad(this);
