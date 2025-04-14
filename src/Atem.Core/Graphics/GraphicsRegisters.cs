@@ -45,7 +45,7 @@ namespace Atem.Core.Graphics
                     | (_manager.InterruptOnVerticalBlank.Int() << 4)
                     | (_manager.InterruptOnHorizontalBlank.Int() << 3)
                     | (_manager.CurrentlyOnLineY.Int() << 2)
-                    | (int)_manager.Mode);
+                    | (int)_manager.RenderModeScheduler.Mode);
             }
             set
             {
@@ -53,6 +53,7 @@ namespace Atem.Core.Graphics
                 _manager.InterruptOnOAM = value.GetBit(5);
                 _manager.InterruptOnVerticalBlank = value.GetBit(4);
                 _manager.InterruptOnHorizontalBlank = value.GetBit(3);
+                // CurrentlyOnLineY and Render Mode are read-only
             }
         }
 
@@ -82,10 +83,7 @@ namespace Atem.Core.Graphics
 
         public byte LY
         {
-            get
-            {
-                return _manager.CurrentLine;
-            }
+            get => _manager.RenderModeScheduler.CurrentLine;
             set {  }
         }
 
@@ -201,7 +199,7 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                if (_manager.Mode != RenderMode.Draw)
+                if (_manager.RenderModeScheduler.Mode != RenderMode.Draw)
                 {
                     return _manager.TileManager.TilePalettes.ReadAtAddress();
                 }
@@ -210,7 +208,7 @@ namespace Atem.Core.Graphics
             }
             set
             {
-                if (_manager.Mode != RenderMode.Draw)
+                if (_manager.RenderModeScheduler.Mode != RenderMode.Draw)
                 {
                     _manager.TileManager.TilePalettes.WriteAtAddress(value);
                 }
