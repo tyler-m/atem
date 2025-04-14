@@ -3,6 +3,10 @@ using System.IO;
 
 namespace Atem.Core.Graphics.Timing
 {
+    /// <summary>
+    /// Provides data for the <see cref="RenderModeScheduler.RenderModeChanged"/>
+    /// event, indicating a transition between two render modes.
+    /// </summary>
     public class RenderModeChangedEventArgs : EventArgs
     {
         public RenderMode PreviousMode { get; }
@@ -15,6 +19,13 @@ namespace Atem.Core.Graphics.Timing
         }
     }
 
+    /// <summary>
+    /// Schedules and manages transitions between the Game Boy's render modes
+    /// (OAM, Draw, HorizontalBlank, and VerticalBlank). Rendering operates on
+    /// a cycle-by-cycle basis ("dots"), and this class keeps track of the
+    /// current scanline and dot count, determining when mode transitions
+    /// should occur. It raises an event whenever the render mode changes.
+    /// </summary>
     public class RenderModeScheduler : IRenderModeScheduler
     {
         private const int DotsPerScanline = 456;
