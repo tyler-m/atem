@@ -17,6 +17,7 @@ namespace Atem.Views.MonoGame.UI.Window
         private bool _screenSizeLocked;
         private float _volume;
         private int _selectedScreenSizeFactor;
+        private readonly bool[] _enableChannel;
 
         public bool Active
         {
@@ -37,6 +38,11 @@ namespace Atem.Views.MonoGame.UI.Window
             _volume = _audioManager.VolumeFactor * 100;
             _screenSizeLocked = _screen.SizeLocked;
             _selectedScreenSizeFactor = Math.Clamp(_screen.SizeFactor - 1, 0, 5);
+            
+            for (int i = 0; i < _enableChannel.Length; i++)
+            {
+                _enableChannel[i] = !_audioManager.Channels[i].UserMute;
+            }
         }
 
         public OptionsWindow(IScreen screen, IAudioManager audioManager, InputManager inputManager)
@@ -44,6 +50,7 @@ namespace Atem.Views.MonoGame.UI.Window
             _screen = screen;
             _inputManager = inputManager;
             _audioManager = audioManager;
+            _enableChannel = new bool[_audioManager.Channels.Count];
         }
 
         public void Draw()
@@ -127,6 +134,16 @@ namespace Atem.Views.MonoGame.UI.Window
                 {
                     _audioManager.VolumeFactor = _volume / 100;
                     UpdateOptionsValues();
+                }
+
+                for (int i = 0; i < _enableChannel.Length; i++)
+                {
+                    if (ImGui.Checkbox("##EnableChannel" + i, ref _enableChannel[i]))
+                    {
+                        _audioManager.Channels[i].UserMute = !_enableChannel[i];
+                    }
+                    ImGui.SameLine();
+                    ImGui.Text("Channel " + (i + 1));
                 }
 
                 ImGui.EndChild();

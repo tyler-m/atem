@@ -50,8 +50,11 @@ namespace Atem.Core.Audio.Channel
             foreach (AudioChannel channel in _channels)
             {
                 float sample = channel.Sample();
-                leftMix += sample * (channel.LeftChannel ? 1 : 0);
-                rightMix += sample * (channel.RightChannel ? 1 : 0);
+                if (!channel.UserMute)
+                {
+                    leftMix += sample * (channel.LeftChannel ? 1 : 0);
+                    rightMix += sample * (channel.RightChannel ? 1 : 0);
+                }
             }
 
             foreach (IAudioFilter filter in _mixerFilters)

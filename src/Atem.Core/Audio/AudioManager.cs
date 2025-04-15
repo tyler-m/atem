@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Atem.Core.Audio.Channel;
 using Atem.Core.Audio.Filter;
@@ -33,20 +34,27 @@ namespace Atem.Core.Audio
             }
         }
 
-        public readonly PulseChannel Channel1 = new(true);
-        public readonly PulseChannel Channel2 = new();
-        public readonly WaveChannel Channel3 = new();
-        public readonly NoiseChannel Channel4 = new();
+        public PulseChannel Channel1 { get; }
+        public PulseChannel Channel2 { get; }
+        public WaveChannel Channel3 { get; }
+        public NoiseChannel Channel4 { get; }
 
-        public AudioRegisters Registers;
+        public AudioRegisters Registers { get; }
         public event Action<byte[]> OnFullAudioBuffer;
 
         public byte LeftChannelVolume { get => _leftChannelVolume; set => _leftChannelVolume = value; }
         public byte RightChannelVolume { get => _rightChannelVolume; set => _rightChannelVolume = value; }
         public bool On { get; set; }
 
+        public IList<IAudioChannel> Channels { get; }
+
         public AudioManager()
         {
+            Channel1 = new PulseChannel(true);
+            Channel2 = new PulseChannel();
+            Channel3 = new WaveChannel();
+            Channel4 = new NoiseChannel();
+            Channels = [Channel1, Channel2, Channel3, Channel4];
             Registers = new(this);
             _mixer.AddChannel(Channel1);
             _mixer.AddChannel(Channel2);

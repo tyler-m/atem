@@ -30,6 +30,7 @@ namespace Atem.Core.Audio.Channel
         private bool _leftChannel;
         private bool _rightChannel;
         private bool _trigger;
+        private bool _userMute;
 
         private static float NormalizeSample(byte volume) => (float)volume / MAX_CHANNEL_VOLUME;
 
@@ -45,6 +46,7 @@ namespace Atem.Core.Audio.Channel
         public byte InitialLengthTimer { get => _initialLengthTimer; set => _initialLengthTimer = value; }
         public bool LeftChannel { get => _leftChannel; set => _leftChannel = value; }
         public bool RightChannel { get => _rightChannel; set => _rightChannel = value; }
+        public bool UserMute { get => _userMute; set => _userMute = value; }
 
         public bool Trigger
         {
