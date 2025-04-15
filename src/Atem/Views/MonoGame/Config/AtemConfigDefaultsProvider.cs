@@ -12,9 +12,10 @@ namespace Atem.Views.MonoGame.Config
         {
             return new AtemConfig()
             {
-                ScreenWidth = 160,
-                ScreenHeight = 144,
-                ScreenSizeFactor = 2.0f,
+                WindowWidth = 640,
+                WindowHeight = 480,
+                ScreenSizeFactor = 2,
+                ScreenSizeLocked = true,
                 Keybinds = GetKeybinds(),
                 UserVolumeFactor = 1.0f,
             };

@@ -7,7 +7,7 @@ namespace Atem.Test.Config
         public AtemConfig GetDefaults()
         {
             return new AtemConfig() {
-                ScreenWidth = int.MaxValue
+                WindowWidth = int.MaxValue
             };
         }
     }

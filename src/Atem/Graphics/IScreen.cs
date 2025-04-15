@@ -3,8 +3,7 @@ namespace Atem.Graphics
 {
     public interface IScreen
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public float SizeFactor { get; set; }
+        public bool SizeLocked { get; set; }
+        public int SizeFactor { get; set; }
     }
 }

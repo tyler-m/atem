@@ -8,6 +8,9 @@ namespace Atem.Core.Graphics.Screen
 {
     public class ScreenManager : IScreenManager
     {
+        public const int ScreenWidth = 160;
+        public const int ScreenHeight = 144;
+
         private readonly IBus _bus;
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly ITileManager _tileManager;

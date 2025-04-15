@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Atem.Config;
 using Atem.Core;
+using Atem.Graphics;
 using Atem.Input;
 using Atem.Input.Configure;
 using Atem.Saving;
@@ -38,15 +39,16 @@ namespace Atem.Views.MonoGame
             FileBatterySaveService batterySaveService = new(_atem);
             InputManager inputManager = new(new KeyProvider());
             ImGuiRenderer imGui = new();
-            Screen screen = new(_atem);
+            Window window = new();
+            Screen screen = new(_atem, window);
 
             AtemConfigDefaultsProvider atemConfigDefaultsProvider = new();
             FileConfigStore<AtemConfig> configStore = new(atemConfigDefaultsProvider, Directory.GetCurrentDirectory() + "/config.json");
-            AtemConfigService configService = new(configStore, screen, _atem.Bus.Audio, inputManager);
+            AtemConfigService configService = new(configStore, window, screen, _atem.Bus.Audio, inputManager);
             ViewUIManager viewUIManager = new(imGui, _atem, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager);
             AtemShutdownService shutdownService = new(_atem, configService, cartridgeLoader, batterySaveService);
 
-            _view = new View(viewUIManager, _atem, screen, soundService, inputManager, shutdownService);
+            _view = new View(viewUIManager, _atem, screen, window, soundService, inputManager, shutdownService);
             _view.OnInitialize += () => imGui.Initialize(_view); // link ImGuiRenderer and View instances
 
             // add commands to the input manager

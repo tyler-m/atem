@@ -1,6 +1,5 @@
 ﻿using Atem.Core.State;
 using System;
-using System.Xml.Linq;
 
 namespace Atem.Core.Graphics.Timing
 {

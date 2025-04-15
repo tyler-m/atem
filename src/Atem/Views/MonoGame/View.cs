@@ -1,11 +1,13 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Atem.Core;
-using Atem.Views.MonoGame.UI;
-using Atem.Shutdown;
 using Atem.Audio;
+using Atem.Core;
+using Atem.Core.Graphics.Screen;
+using Atem.Graphics;
 using Atem.Input;
+using Atem.Shutdown;
+using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.Graphics;
 
 namespace Atem.Views.MonoGame
@@ -20,13 +22,14 @@ namespace Atem.Views.MonoGame
         private readonly ISoundService _soundService;
         private readonly IShutdownService _shutdownService;
         private readonly Screen _screen;
+        private readonly Window _window;
         private readonly InputManager _inputManager;
         private readonly ViewUIManager _viewUIManager;
 
         public delegate void ViewInitializeEvent();
         public event ViewInitializeEvent OnInitialize;
 
-        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, ISoundService soundService, InputManager inputManager, IShutdownService shutdownService)
+        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, Window window, ISoundService soundService, InputManager inputManager, IShutdownService shutdownService)
         {
             _graphics = new GraphicsDeviceManager(this);
 
@@ -36,10 +39,11 @@ namespace Atem.Views.MonoGame
             _shutdownService = shutdownService;
             _inputManager = inputManager;
 
+            _window = window;
             _screen = screen;
             _screen.OnScreenSizeChange += UpdateWindowSize;
 
-            Window.AllowUserResizing = false;
+            Window.AllowUserResizing = true;
 
             _atem.Paused = true;
 
@@ -52,26 +56,35 @@ namespace Atem.Views.MonoGame
             _viewUIManager.OnUpdateWindowSize += UpdateWindowSize;
             _viewUIManager.OnExitRequest += Exit;
 
+            Window.ClientSizeChanged += Window_ClientSizeChanged;
+
             UpdateWindowSize();
+        }
+
+        private void Window_ClientSizeChanged(object sender, EventArgs e)
+        {
+            _window.SetSize(Window.ClientBounds.Width, Window.ClientBounds.Height);
         }
 
         public void UpdateWindowSize()
         {
-            if (_viewUIManager != null)
+            if (_viewUIManager == null)
             {
-                if (_viewUIManager.Debug)
-                {
-                    _graphics.PreferredBackBufferWidth = 960;
-                    _graphics.PreferredBackBufferHeight = 720;
-                    Window.AllowUserResizing = true;
-                }
-                else
-                {
-                    _graphics.PreferredBackBufferWidth = (int)(_screen.Width * _screen.SizeFactor);
-                    _graphics.PreferredBackBufferHeight = (int)(_screen.Height * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
-                    Window.AllowUserResizing = false;
-                }
+                return;
+            }
 
+            if (_screen.SizeLocked && !_viewUIManager.Debug)
+            {
+                Window.AllowUserResizing = false;
+                _graphics.PreferredBackBufferWidth = ScreenManager.ScreenWidth * _screen.SizeFactor;
+                _graphics.PreferredBackBufferHeight = (ScreenManager.ScreenHeight * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
+                _graphics.ApplyChanges();
+            }
+            else
+            {
+                Window.AllowUserResizing = true;
+                _graphics.PreferredBackBufferWidth = _window.Width;
+                _graphics.PreferredBackBufferHeight = _window.Height;
                 _graphics.ApplyChanges();
             }
         }

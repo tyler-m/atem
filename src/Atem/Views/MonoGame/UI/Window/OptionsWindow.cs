@@ -14,6 +14,7 @@ namespace Atem.Views.MonoGame.UI.Window
         private readonly IAudioManager _audioManager;
         private readonly InputManager _inputManager;
         private bool _active;
+        private bool _screenSizeLocked;
         private float _volume;
         private int _selectedScreenSizeFactor;
 
@@ -34,7 +35,8 @@ namespace Atem.Views.MonoGame.UI.Window
         private void UpdateOptionsValues()
         {
             _volume = _audioManager.VolumeFactor * 100;
-            _selectedScreenSizeFactor = Math.Clamp((int)_screen.SizeFactor - 1, 0, 5);
+            _screenSizeLocked = _screen.SizeLocked;
+            _selectedScreenSizeFactor = Math.Clamp(_screen.SizeFactor - 1, 0, 5);
         }
 
         public OptionsWindow(IScreen screen, IAudioManager audioManager, InputManager inputManager)
@@ -134,6 +136,14 @@ namespace Atem.Views.MonoGame.UI.Window
             if (ImGui.BeginTabItem("Video"))
             {
                 ImGui.BeginChild("VideoChild");
+
+                ImGui.Text("Screen Size Locked");
+                ImGui.SameLine();
+                if (ImGui.Checkbox("##ScreenSizeLocked", ref _screenSizeLocked))
+                {
+                    _screen.SizeLocked = _screenSizeLocked;
+                    UpdateOptionsValues();
+                }
 
                 ImGui.Text("Screen Size");
                 ImGui.SameLine();

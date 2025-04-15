@@ -8,9 +8,10 @@ namespace Atem.Config
     public class AtemConfig : IConfig<AtemConfig>
     {
         public Dictionary<CommandType, List<Keybind>> Keybinds { get; set; }
-        public int ScreenWidth { get; set; }
-        public int ScreenHeight { get; set; }
-        public float ScreenSizeFactor { get; set; }
+        public int WindowWidth { get; set; }
+        public int WindowHeight { get; set; }
+        public bool ScreenSizeLocked { get; set; }
+        public int ScreenSizeFactor { get; set; }
         public float UserVolumeFactor { get; set; }
 
         public bool Equals(AtemConfig otherConfig)
@@ -58,8 +59,9 @@ namespace Atem.Config
             }
 
             // TODO: consider floating point equality issues due to precision
-            return ScreenWidth == otherConfig.ScreenWidth
-                && ScreenHeight == otherConfig.ScreenHeight
+            return WindowWidth == otherConfig.WindowWidth
+                && WindowHeight == otherConfig.WindowHeight
+                && ScreenSizeLocked == otherConfig.ScreenSizeLocked
                 && ScreenSizeFactor == otherConfig.ScreenSizeFactor
                 && UserVolumeFactor == otherConfig.UserVolumeFactor;
         }
@@ -69,8 +71,9 @@ namespace Atem.Config
         public override int GetHashCode()
         {
             HashCode hash = new();
-            hash.Add(ScreenWidth);
-            hash.Add(ScreenHeight);
+            hash.Add(WindowWidth);
+            hash.Add(WindowHeight);
+            hash.Add(ScreenSizeLocked);
             hash.Add(ScreenSizeFactor);
             hash.Add(UserVolumeFactor);
 

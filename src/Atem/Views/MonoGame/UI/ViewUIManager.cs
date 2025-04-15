@@ -61,7 +61,7 @@ namespace Atem.Views.MonoGame.UI
         private void OnScreenTextureCreated(Texture2D texture)
         {
             nint screenTextureId = _imGui.BindTexture(_screen.Texture);
-            _gameDisplayWindow = new GameDisplayWindow(_screen, screenTextureId, _screen.Width, _screen.Height);
+            _gameDisplayWindow = new GameDisplayWindow(_screen, screenTextureId, texture.Width, texture.Height);
         }
 
         public int GetMenuBarHeight()
