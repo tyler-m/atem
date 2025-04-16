@@ -47,7 +47,7 @@ namespace Atem.Core.Graphics.Timing
             {
                 for (int i = 0; i < 16; i++)
                 {
-                    _bus.Graphics.WriteVRAM(_destAddress, _bus.Read(_sourceAddress), true);
+                    _bus.Write(_destAddress, _bus.Read(_sourceAddress), true);
                     _destAddress++;
                     _sourceAddress++;
                 }
@@ -94,7 +94,7 @@ namespace Atem.Core.Graphics.Timing
                     {
                         for (int i = 0; i < 16; i++)
                         {
-                            _bus.Graphics.WriteVRAM(_destAddress++, _bus.Read(_sourceAddress++), true);
+                            _bus.Write(_destAddress++, _bus.Read(_sourceAddress++), true);
                         }
 
                         _transferLengthRemaining--;

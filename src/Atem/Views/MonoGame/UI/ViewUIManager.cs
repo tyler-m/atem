@@ -56,7 +56,7 @@ namespace Atem.Views.MonoGame.UI
             _menuBar.OnOptions += OnOptions;
             _menuBar.OnSelectRecentFile += LoadFile;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
-            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
+            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Processor);
             _optionsWindow = new OptionsWindow(screen, _atem.Bus.Audio, inputManager);
             _screen.OnScreenTextureCreated += OnScreenTextureCreated;
         }

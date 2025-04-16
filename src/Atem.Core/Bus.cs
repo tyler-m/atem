@@ -2,12 +2,6 @@
 using System.IO;
 using Atem.Core.Audio;
 using Atem.Core.Graphics;
-using Atem.Core.Graphics.Interrupts;
-using Atem.Core.Graphics.Objects;
-using Atem.Core.Graphics.Palettes;
-using Atem.Core.Graphics.Screen;
-using Atem.Core.Graphics.Tiles;
-using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
@@ -17,44 +11,34 @@ namespace Atem.Core
 {
     public class Bus : IBus, IStateful
     {
-        private readonly IProcessor _processor;
-        private readonly GraphicsManager _graphics;
-        private readonly Timer _timer;
-        private readonly Interrupt _interrupt;
-        private readonly Joypad _joypad;
-        private readonly Serial _serial;
+        private IProcessor _processor;
+        private GraphicsManager _graphics;
+        private Timer _timer;
+        private Interrupt _interrupt;
+        private Joypad _joypad;
+        private Serial _serial;
         private BootROM _bootROM;
         private Cartridge _cartridge;
-        private readonly AudioManager _audio;
+        private AudioManager _audio;
         private readonly byte[] _hram = new byte[0x7F];
         private readonly byte[] _wram = new byte[0x2000 * 4];
         private byte _svbk;
 
         public byte SVBK { get => _svbk; set => _svbk = value; }
-        public IProcessor Processor { get => _processor; }
         public AudioManager Audio { get => _audio; }
-        public GraphicsManager Graphics { get => _graphics; }
         public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize => 0x10000;
 
-        public Bus(Interrupt interrupt, Joypad joypad, Timer timer, Serial serial)
+        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics)
         {
             _interrupt = interrupt;
             _joypad = joypad;
             _timer = timer;
             _serial = serial;
+            _graphics = graphics;
             _audio = new AudioManager();
             _cartridge = new Cartridge();
-            _processor = new Processor(this);
-
-            RenderModeScheduler renderModeScheduler = new();
-            PaletteProvider paletteProvider = new();
-            HDMA hdma = new(this, renderModeScheduler);
-            StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
-            TileManager tileManager = new(this, renderModeScheduler, paletteProvider);
-            ObjectManager objectManager = new(this, renderModeScheduler, tileManager, paletteProvider);
-            ScreenManager screenManager = new(this, renderModeScheduler, tileManager, objectManager);
-            _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
+            _processor = processor;
         }
 
         public bool ColorMode
@@ -618,7 +602,7 @@ namespace Atem.Core
             }
         }
 
-        public void Write(ushort address, byte value)
+        public void Write(ushort address, byte value, bool ignoreRenderMode = false)
         {
             byte block = address.GetHighByte();
             byte offset = address.GetLowByte();

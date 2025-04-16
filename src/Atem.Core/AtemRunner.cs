@@ -1,6 +1,12 @@
 ﻿using System.IO;
 using Atem.Core.Debugging;
 using Atem.Core.Graphics;
+using Atem.Core.Graphics.Interrupts;
+using Atem.Core.Graphics.Objects;
+using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Screen;
+using Atem.Core.Graphics.Tiles;
+using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
 using Atem.Core.Processing;
 using Atem.Core.State;
@@ -11,11 +17,13 @@ namespace Atem.Core
     {
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
 
+        private readonly Processor _processor;
         private readonly Bus _bus;
         private readonly Interrupt _interrupt;
         private readonly Joypad _joypad;
         private readonly Timer _timer;
         private readonly Serial _serial;
+        private readonly GraphicsManager _graphics;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -24,21 +32,36 @@ namespace Atem.Core
 
         public Debugger Debugger => _debugger;
         public Bus Bus =>  _bus;
+        public Processor Processor => _processor;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
         {
-            add => _bus.Graphics.OnVerticalBlank += value;
-            remove => _bus.Graphics.OnVerticalBlank -= value;
+            add => _graphics.OnVerticalBlank += value;
+            remove => _graphics.OnVerticalBlank -= value;
         }
 
         public AtemRunner()
         {
+            _bus = new Bus();
+
+            _processor = new Processor(_bus);
             _interrupt = new Interrupt();
             _joypad = new Joypad(_interrupt);
             _timer = new Timer(_interrupt);
             _serial = new Serial();
-            _bus = new Bus(_interrupt, _joypad, _timer, _serial);
+
+            RenderModeScheduler renderModeScheduler = new();
+            PaletteProvider paletteProvider = new();
+            HDMA hdma = new(_bus, renderModeScheduler);
+            StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
+            TileManager tileManager = new(_bus, renderModeScheduler, paletteProvider);
+            ObjectManager objectManager = new(_bus, renderModeScheduler, tileManager, paletteProvider);
+            ScreenManager screenManager = new(_bus, renderModeScheduler, tileManager, objectManager);
+            _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
+
+            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics);
+
             _debugger = new Debugger();
         }
 
@@ -53,16 +76,16 @@ namespace Atem.Core
             if (color)
             {
                 // CGB Mode
-                _bus.Processor.Registers.A = 0x11;
-                _bus.Processor.Registers.Flags.Z = true;
-                _bus.Processor.Registers.B = 0x00;
-                _bus.Processor.Registers.C = 0x00;
-                _bus.Processor.Registers.D = 0xFF;
-                _bus.Processor.Registers.E = 0x56;
-                _bus.Processor.Registers.H = 0x00;
-                _bus.Processor.Registers.L = 0x0D;
-                _bus.Processor.Registers.PC = 0x0100;
-                _bus.Processor.Registers.SP = 0xFFFE;
+                _processor.Registers.A = 0x11;
+                _processor.Registers.Flags.Z = true;
+                _processor.Registers.B = 0x00;
+                _processor.Registers.C = 0x00;
+                _processor.Registers.D = 0xFF;
+                _processor.Registers.E = 0x56;
+                _processor.Registers.H = 0x00;
+                _processor.Registers.L = 0x0D;
+                _processor.Registers.PC = 0x0100;
+                _processor.Registers.SP = 0xFFFE;
 
                 _joypad.P1 = 0xC7;
                 _serial.SB = 0x00;
@@ -93,29 +116,29 @@ namespace Atem.Core
                 _bus.Audio.Registers.NR50 = 0x77;
                 _bus.Audio.Registers.NR51 = 0xF3;
                 _bus.Audio.Registers.NR52 = 0xF1;
-                _bus.Graphics.Registers.LCDC = 0x91;
-                _bus.Graphics.Registers.SCY = 0x00;
-                _bus.Graphics.Registers.SCX = 0x00;
-                _bus.Graphics.Registers.LYC = 0x00;
-                _bus.Graphics.Registers.BGP = 0xFC;
-                _bus.Graphics.Registers.OBP0 = 0x00;
-                _bus.Graphics.Registers.OBP1 = 0x00;
-                _bus.Graphics.Registers.WY = 0x00;
-                _bus.Graphics.Registers.WX = 0x00;
+                _graphics.Registers.LCDC = 0x91;
+                _graphics.Registers.SCY = 0x00;
+                _graphics.Registers.SCX = 0x00;
+                _graphics.Registers.LYC = 0x00;
+                _graphics.Registers.BGP = 0xFC;
+                _graphics.Registers.OBP0 = 0x00;
+                _graphics.Registers.OBP1 = 0x00;
+                _graphics.Registers.WY = 0x00;
+                _graphics.Registers.WX = 0x00;
             }
             else
             {
                 // DMG mode
-                _bus.Processor.Registers.A = 0x01;
-                _bus.Processor.Registers.Flags.Z = true;
-                _bus.Processor.Registers.B = 0x00;
-                _bus.Processor.Registers.C = 0x13;
-                _bus.Processor.Registers.D = 0x00;
-                _bus.Processor.Registers.E = 0xD8;
-                _bus.Processor.Registers.H = 0x01;
-                _bus.Processor.Registers.L = 0x4D;
-                _bus.Processor.Registers.PC = 0x0100;
-                _bus.Processor.Registers.SP = 0xFFFE;
+                _processor.Registers.A = 0x01;
+                _processor.Registers.Flags.Z = true;
+                _processor.Registers.B = 0x00;
+                _processor.Registers.C = 0x13;
+                _processor.Registers.D = 0x00;
+                _processor.Registers.E = 0xD8;
+                _processor.Registers.H = 0x01;
+                _processor.Registers.L = 0x4D;
+                _processor.Registers.PC = 0x0100;
+                _processor.Registers.SP = 0xFFFE;
 
                 _joypad.P1 = 0xCF;
                 _serial.SB = 0x00;
@@ -146,16 +169,16 @@ namespace Atem.Core
                 _bus.Audio.Registers.NR50 = 0x77;
                 _bus.Audio.Registers.NR51 = 0xF3;
                 _bus.Audio.Registers.NR52 = 0xF1;
-                _bus.Graphics.Registers.LCDC = 0x91;
-                _bus.Graphics.Registers.SCY = 0x00;
-                _bus.Graphics.Registers.SCX = 0x00;
-                _bus.Graphics.Registers.LY = 0x00;
-                _bus.Graphics.Registers.LYC = 0x00;
-                _bus.Graphics.Registers.BGP = 0xFC;
-                _bus.Graphics.Registers.OBP0 = 0x00;
-                _bus.Graphics.Registers.OBP1 = 0x00;
-                _bus.Graphics.Registers.WY = 0x00;
-                _bus.Graphics.Registers.WX = 0x00;
+                _graphics.Registers.LCDC = 0x91;
+                _graphics.Registers.SCY = 0x00;
+                _graphics.Registers.SCX = 0x00;
+                _graphics.Registers.LY = 0x00;
+                _graphics.Registers.LYC = 0x00;
+                _graphics.Registers.BGP = 0xFC;
+                _graphics.Registers.OBP0 = 0x00;
+                _graphics.Registers.OBP1 = 0x00;
+                _graphics.Registers.WY = 0x00;
+                _graphics.Registers.WX = 0x00;
             }
         }
 
@@ -182,7 +205,7 @@ namespace Atem.Core
                 {
                     // we don't pause if we're forcing a clock
                     // this prevents breaking on the same breakpoint repeatedly
-                    if (!_forceClock && _debugger.CheckBreakpoints(_bus.Processor.Registers.PC))
+                    if (!_forceClock && _debugger.CheckBreakpoints(_processor.Registers.PC))
                     {
                         _paused = true;
                     }
@@ -205,16 +228,16 @@ namespace Atem.Core
         {
             _forceClock = false;
 
-            bool opFinished = _bus.Processor.Clock();
+            bool opFinished = _processor.Clock();
             _timer.Clock();
 
-            if (_bus.Processor.DoubleSpeed)
+            if (_processor.DoubleSpeed)
             {
-                opFinished |= _bus.Processor.Clock();
+                opFinished |= _processor.Clock();
                 _timer.Clock();
             }
 
-            _bus.Graphics.Clock();
+            _graphics.Clock();
             _bus.Audio.Clock();
             return opFinished;
         }
