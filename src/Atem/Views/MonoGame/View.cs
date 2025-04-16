@@ -14,8 +14,6 @@ namespace Atem.Views.MonoGame
 {
     public class View : Game, IAtemView
     {
-        private const float ScreenRefreshRate = 59.73f;
-
         private readonly GraphicsDeviceManager _graphics;
 
         private readonly Emulator _emulator;
@@ -49,7 +47,7 @@ namespace Atem.Views.MonoGame
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            TargetElapsedTime = TimeSpan.FromSeconds(1/ScreenRefreshRate);
+            TargetElapsedTime = TimeSpan.FromSeconds(1 / Emulator.ScreenRefreshRate);
 
             Exiting += OnExit;
 

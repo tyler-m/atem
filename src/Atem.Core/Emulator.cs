@@ -17,6 +17,8 @@ namespace Atem.Core
 {
     public class Emulator : IStateful
     {
+        public const float ScreenRefreshRate = 59.73f;
+
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
 
         private readonly Processor _processor;
