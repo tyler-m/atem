@@ -36,6 +36,11 @@ namespace Atem.Core.Graphics.Screen
             _objectManager = objectManager;
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
             _cartridge = cartridge;
+
+            for (int i = 0; i < _screen.Length; i++)
+            {
+                _screen[i] = new GBColor(0, 0, 0);
+            }
         }
 
         private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)

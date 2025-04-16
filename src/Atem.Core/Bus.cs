@@ -674,13 +674,5 @@ namespace Atem.Core
             Array.Copy(reader.ReadBytes(_hram.Length), _hram, _hram.Length);
             Array.Copy(reader.ReadBytes(_wram.Length), _wram, _wram.Length);
         }
-
-        public void Reset()
-        {
-            Array.Copy(new byte[_hram.Length], _hram, _hram.Length);
-            Array.Copy(new byte[_wram.Length], _wram, _wram.Length);
-            _svbk = 0;
-            _processor.Reset();
-        }
     }
 }

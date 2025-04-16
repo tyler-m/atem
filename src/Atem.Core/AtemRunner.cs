@@ -15,7 +15,7 @@ using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class AtemRunner : IResetable, IStateful
+    public class AtemRunner : IStateful
     {
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
 
@@ -33,6 +33,8 @@ namespace Atem.Core
         private double _leftoverClocks;
         private bool _forceClock;
         private bool _paused;
+
+        private byte[] _resetState = new byte[0x40000];
 
         public Debugger Debugger => _debugger;
         public Bus Bus => _bus;
@@ -71,6 +73,26 @@ namespace Atem.Core
             _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio, _cartridge);
 
             _debugger = new Debugger();
+
+            GetResetState();
+        }
+
+        private void GetResetState()
+        {
+            using MemoryStream stream = new(_resetState);
+            using BinaryWriter writer = new(stream);
+            GetState(writer);
+        }
+
+        private void SetResetState()
+        {
+            // before we restore the emulator to its reset state, we need
+            // to make sure the cartridge is using NullMap as its mapper
+            _cartridge.ResetMapper();
+
+            using MemoryStream stream = new(_resetState);
+            using BinaryReader reader = new(stream);
+            SetState(reader);
         }
 
         public void Continue()
@@ -192,7 +214,7 @@ namespace Atem.Core
 
         public bool LoadCartridge(byte[] data, bool color)
         {
-            Reset();
+            SetResetState();
 
             bool loaded = _cartridge.Load(data);
             if (loaded)
@@ -265,14 +287,6 @@ namespace Atem.Core
         {
             _leftoverClocks = reader.ReadDouble();
             _bus.SetState(reader);
-        }
-
-        public void Reset()
-        {
-            _leftoverClocks = 0;
-            _forceClock = false;
-            _paused = false;
-            _bus.Reset();
         }
     }
 }

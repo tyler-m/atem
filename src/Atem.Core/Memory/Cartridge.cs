@@ -17,6 +17,16 @@ namespace Atem.Core.Memory
         public string Title { get => _title; }
         public bool SupportsColor { get => _colorFlag == 0x80 || _colorFlag == 0xC0; }
 
+        public Cartridge()
+        {
+            ResetMapper();
+        }
+
+        public void ResetMapper()
+        {
+            _mbc = new NullMap();
+        }
+
         public byte[] GetBatterySave()
         {
             return _mbc.GetBatterySave();
