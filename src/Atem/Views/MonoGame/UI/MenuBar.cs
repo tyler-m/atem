@@ -1,5 +1,9 @@
-﻿using Atem.Saving;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 using ImGuiNET;
+using Atem.IO;
+using Atem.Saving;
 
 namespace Atem.Views.MonoGame.UI
 {
@@ -9,6 +13,7 @@ namespace Atem.Views.MonoGame.UI
         private bool _enableStates;
         private readonly ISaveStateService _saveStateService;
         private readonly ICartridgeLoader _cartridgeLoader;
+        private readonly IRecentFilesService _recentFilesService;
 
         public delegate void ExitEvent();
         public event ExitEvent OnExit;
@@ -18,15 +23,18 @@ namespace Atem.Views.MonoGame.UI
         public event OnOpenEvent OnOpen;
         public delegate void OnOptionsEvent();
         public event OnOptionsEvent OnOptions;
+        public delegate void OnSelectRecentFileEvent(FileInfo fileInfo);
+        public event OnSelectRecentFileEvent OnSelectRecentFile;
 
         public int Height { get => _height; }
 
         public bool EnableStates { get => _enableStates; set => _enableStates = value; }
 
-        public MenuBar(ISaveStateService saveStateService, ICartridgeLoader cartridgeLoader)
+        public MenuBar(ISaveStateService saveStateService, ICartridgeLoader cartridgeLoader, IRecentFilesService recentFilesService)
         {
             _saveStateService = saveStateService;
             _cartridgeLoader = cartridgeLoader;
+            _recentFilesService = recentFilesService;
         }
 
         public void Draw()
@@ -38,6 +46,21 @@ namespace Atem.Views.MonoGame.UI
                     if (ImGui.MenuItem("Open..."))
                     {
                         OnOpen?.Invoke();
+                    }
+
+                    ImGui.Separator();
+
+                    List<FileInfo> recentFiles = _recentFilesService.RecentFilesInfo.ToList();
+                    if (ImGui.BeginMenu("Recent Files", recentFiles.Count != 0))
+                    {
+                        for (int i = 0; i < recentFiles.Count; i++)
+                        {
+                            if (ImGui.MenuItem(recentFiles[i].Name.Truncate(20) + "##" + i))
+                            {
+                                OnSelectRecentFile?.Invoke(recentFiles[i]);
+                            }
+                        }
+                        ImGui.EndMenu();
                     }
 
                     ImGui.Separator();

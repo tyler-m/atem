@@ -13,6 +13,7 @@ namespace Atem.Config
         public bool ScreenSizeLocked { get; set; }
         public int ScreenSizeFactor { get; set; }
         public float UserVolumeFactor { get; set; }
+        public List<string> RecentFiles { get; set; }
 
         public bool Equals(AtemConfig otherConfig)
         {
@@ -58,6 +59,29 @@ namespace Atem.Config
                 }
             }
 
+            if (RecentFiles == null || otherConfig.RecentFiles == null)
+            {
+                if (RecentFiles != null || otherConfig.RecentFiles != null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (RecentFiles.Count != otherConfig.RecentFiles.Count)
+                {
+                    return false;
+                }
+
+                for (int i = 0; i < RecentFiles.Count; i++)
+                {
+                    if (RecentFiles[i] != otherConfig.RecentFiles[i])
+                    {
+                        return false;
+                    }
+                }
+            }
+
             // TODO: consider floating point equality issues due to precision
             return WindowWidth == otherConfig.WindowWidth
                 && WindowHeight == otherConfig.WindowHeight
@@ -87,6 +111,14 @@ namespace Atem.Config
                     {
                         hash.Add(keybind);
                     }
+                }
+            }
+
+            if (RecentFiles != null)
+            {
+                foreach (string filePath in RecentFiles)
+                {
+                    hash.Add(filePath);
                 }
             }
 

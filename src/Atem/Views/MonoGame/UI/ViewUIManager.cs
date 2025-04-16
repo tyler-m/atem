@@ -5,6 +5,7 @@ using ImGuiNET;
 using Atem.Core;
 using Atem.Views.MonoGame.UI.Window;
 using Atem.Input;
+using Atem.IO;
 using Atem.Saving;
 using Atem.Views.MonoGame.Graphics;
 
@@ -25,7 +26,7 @@ namespace Atem.Views.MonoGame.UI
         private readonly ProcessorRegistersWindow _processorRegistersWindow;
         private readonly MenuBar _menuBar;
         private readonly OptionsWindow _optionsWindow;
-        
+        private readonly IRecentFilesService _recentFilesService;
         private bool _debug;
 
         public delegate void UpdateWindowSizeEvent();
@@ -36,22 +37,24 @@ namespace Atem.Views.MonoGame.UI
 
         public bool Debug { get => _debug; }
 
-        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager)
+        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager, IRecentFilesService recentFilesService)
         {
             _imGui = imGui;
             _atem = atem;
             _batterySaveService = batterySaveService;
             _cartridgeLoader = cartridgeLoader;
             _screen = screen;
+            _recentFilesService = recentFilesService;
 
             _fileBrowserWindow = new FileBrowserWindow();
             _fileBrowserWindow.OnSelectFile += LoadFile;
             _memoryWindow = new MemoryWindow(_atem.Bus);
-            _menuBar = new MenuBar(saveStateService, cartridgeLoader);
+            _menuBar = new MenuBar(saveStateService, cartridgeLoader, recentFilesService);
             _menuBar.OnExit += () => OnExitRequest?.Invoke();
             _menuBar.OnDebug += ToggleDebug;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
+            _menuBar.OnSelectRecentFile += LoadFile;
             _breakpointWindow = new BreakpointWindow(_atem.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Bus.Processor);
             _optionsWindow = new OptionsWindow(screen, _atem.Bus.Audio, inputManager);
@@ -79,6 +82,7 @@ namespace Atem.Views.MonoGame.UI
                 _atem.Paused = false;
                 _fileBrowserWindow.Active = false;
                 _menuBar.EnableStates = true;
+                _recentFilesService.Add(fileInfo.FullName);
             }
         }
 

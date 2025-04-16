@@ -4,6 +4,7 @@ using Atem.Core;
 using Atem.Graphics;
 using Atem.Input;
 using Atem.Input.Configure;
+using Atem.IO;
 using Atem.Saving;
 using Atem.Shutdown;
 using Atem.Views.MonoGame.Audio;
@@ -41,11 +42,12 @@ namespace Atem.Views.MonoGame
             ImGuiRenderer imGui = new();
             Window window = new();
             Screen screen = new(_atem, window);
+            RecentFilesService recentFilesService = new();
 
             AtemConfigDefaultsProvider atemConfigDefaultsProvider = new();
             FileConfigStore<AtemConfig> configStore = new(atemConfigDefaultsProvider, Directory.GetCurrentDirectory() + "/config.json");
-            AtemConfigService configService = new(configStore, window, screen, _atem.Bus.Audio, inputManager);
-            ViewUIManager viewUIManager = new(imGui, _atem, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager);
+            AtemConfigService configService = new(configStore, window, screen, _atem.Bus.Audio, inputManager, recentFilesService);
+            ViewUIManager viewUIManager = new(imGui, _atem, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService);
             AtemShutdownService shutdownService = new(_atem, configService, cartridgeLoader, batterySaveService);
 
             _view = new View(viewUIManager, _atem, screen, window, soundService, inputManager, shutdownService);

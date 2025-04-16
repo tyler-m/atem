@@ -18,6 +18,7 @@ namespace Atem.Views.MonoGame.Config
                 ScreenSizeLocked = true,
                 Keybinds = GetKeybinds(),
                 UserVolumeFactor = 1.0f,
+                RecentFiles = [],
             };
         }
 

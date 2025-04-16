@@ -1,6 +1,8 @@
-﻿using Atem.Core.Audio;
+﻿using System.Linq;
+using Atem.Core.Audio;
 using Atem.Graphics;
 using Atem.Input;
+using Atem.IO;
 
 namespace Atem.Config
 {
@@ -12,10 +14,11 @@ namespace Atem.Config
         private readonly IScreen _screen;
         private readonly IAudioManager _audioManager;
         private readonly InputManager _inputManager;
+        private readonly IRecentFilesService _recentFilesService;
 
         public AtemConfig Config => _config;
 
-        public AtemConfigService(IConfigStore<AtemConfig> configStore, IWindow window, IScreen screen, IAudioManager audioManager, InputManager inputManager)
+        public AtemConfigService(IConfigStore<AtemConfig> configStore, IWindow window, IScreen screen, IAudioManager audioManager, InputManager inputManager, IRecentFilesService recentFilesService)
         {
             _config = new AtemConfig();
             _configStore = configStore;
@@ -23,6 +26,7 @@ namespace Atem.Config
             _screen = screen;
             _audioManager = audioManager;
             _inputManager = inputManager;
+            _recentFilesService = recentFilesService;
         }
 
         public void LoadValues()
@@ -53,6 +57,7 @@ namespace Atem.Config
             _config.ScreenSizeFactor = _screen.SizeFactor;
             _config.UserVolumeFactor = _audioManager.VolumeFactor;
             _config.Keybinds = _inputManager.Keybinds;
+            _config.RecentFiles = _recentFilesService.RecentFiles.ToList();
         }
 
         private void SetValuesFromConfig()
@@ -62,6 +67,7 @@ namespace Atem.Config
             _screen.SizeFactor = _config.ScreenSizeFactor;
             _audioManager.VolumeFactor = _config.UserVolumeFactor;
             _inputManager.Keybinds = _config.Keybinds;
+            _recentFilesService.RecentFiles = _config.RecentFiles;
         }
     }
 }
