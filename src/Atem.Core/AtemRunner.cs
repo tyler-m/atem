@@ -14,6 +14,7 @@ namespace Atem.Core
         private readonly Bus _bus;
         private readonly Interrupt _interrupt;
         private readonly Joypad _joypad;
+        private readonly Timer _timer;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -34,7 +35,8 @@ namespace Atem.Core
         {
             _interrupt = new Interrupt();
             _joypad = new Joypad(_interrupt);
-            _bus = new Bus(_interrupt, _joypad);
+            _timer = new Timer(_interrupt);
+            _bus = new Bus(_interrupt, _joypad, _timer);
             _debugger = new Debugger();
         }
 
@@ -63,9 +65,9 @@ namespace Atem.Core
                 _joypad.P1 = 0xC7;
                 _bus.Serial.SB = 0x00;
                 _bus.Serial.SC = 0x7F;
-                _bus.Timer.TIMA = 0x00;
-                _bus.Timer.TMA = 0x00;
-                _bus.Timer.TAC = 0xF8;
+                _timer.TIMA = 0x00;
+                _timer.TMA = 0x00;
+                _timer.TAC = 0xF8;
                 _interrupt.IF = 0xE1;
                 _interrupt.IE = 0x00;
                 _bus.Audio.Registers.NR10 = 0x80;
@@ -116,9 +118,9 @@ namespace Atem.Core
                 _joypad.P1 = 0xCF;
                 _bus.Serial.SB = 0x00;
                 _bus.Serial.SC = 0x7E;
-                _bus.Timer.TIMA = 0x00;
-                _bus.Timer.TMA = 0x00;
-                _bus.Timer.TAC = 0xF8;
+                _timer.TIMA = 0x00;
+                _timer.TMA = 0x00;
+                _timer.TAC = 0xF8;
                 _interrupt.IF = 0xE1;
                 _interrupt.IE = 0x00;
                 _bus.Audio.Registers.NR10 = 0x80;
@@ -202,12 +204,12 @@ namespace Atem.Core
             _forceClock = false;
 
             bool opFinished = _bus.Processor.Clock();
-            _bus.Timer.Clock();
+            _timer.Clock();
 
             if (_bus.Processor.DoubleSpeed)
             {
                 opFinished |= _bus.Processor.Clock();
-                _bus.Timer.Clock();
+                _timer.Clock();
             }
 
             _bus.Graphics.Clock();

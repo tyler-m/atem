@@ -32,22 +32,21 @@ namespace Atem.Core
 
         public byte SVBK { get => _svbk; set => _svbk = value; }
         public IProcessor Processor { get => _processor; }
-        public Timer Timer { get => _timer; }
         public AudioManager Audio { get => _audio; }
         public GraphicsManager Graphics { get => _graphics; }
         public Serial Serial { get => _serial; }
         public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize => 0x10000;
 
-        public Bus(Interrupt interrupt, Joypad joypad)
+        public Bus(Interrupt interrupt, Joypad joypad, Timer timer)
         {
             _interrupt = interrupt;
             _joypad = joypad;
+            _timer = timer;
             _audio = new AudioManager();
             _serial = new Serial();
             _cartridge = new Cartridge();
             _processor = new Processor(this);
-            _timer = new Timer(_interrupt);
 
             RenderModeScheduler renderModeScheduler = new();
             PaletteProvider paletteProvider = new();

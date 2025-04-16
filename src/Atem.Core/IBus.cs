@@ -12,7 +12,6 @@ namespace Atem.Core
         IProcessor Processor { get; }
         GraphicsManager Graphics { get; }
         Serial Serial { get; }
-        Timer Timer { get; }
          AudioManager Audio { get; }
         Cartridge Cartridge { get; }
         bool ColorMode { get; }
