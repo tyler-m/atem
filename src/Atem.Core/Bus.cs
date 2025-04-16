@@ -34,17 +34,16 @@ namespace Atem.Core
         public IProcessor Processor { get => _processor; }
         public AudioManager Audio { get => _audio; }
         public GraphicsManager Graphics { get => _graphics; }
-        public Serial Serial { get => _serial; }
         public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize => 0x10000;
 
-        public Bus(Interrupt interrupt, Joypad joypad, Timer timer)
+        public Bus(Interrupt interrupt, Joypad joypad, Timer timer, Serial serial)
         {
             _interrupt = interrupt;
             _joypad = joypad;
             _timer = timer;
+            _serial = serial;
             _audio = new AudioManager();
-            _serial = new Serial();
             _cartridge = new Cartridge();
             _processor = new Processor(this);
 

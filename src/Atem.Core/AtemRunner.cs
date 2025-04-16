@@ -15,6 +15,7 @@ namespace Atem.Core
         private readonly Interrupt _interrupt;
         private readonly Joypad _joypad;
         private readonly Timer _timer;
+        private readonly Serial _serial;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -36,7 +37,8 @@ namespace Atem.Core
             _interrupt = new Interrupt();
             _joypad = new Joypad(_interrupt);
             _timer = new Timer(_interrupt);
-            _bus = new Bus(_interrupt, _joypad, _timer);
+            _serial = new Serial();
+            _bus = new Bus(_interrupt, _joypad, _timer, _serial);
             _debugger = new Debugger();
         }
 
@@ -63,8 +65,8 @@ namespace Atem.Core
                 _bus.Processor.Registers.SP = 0xFFFE;
 
                 _joypad.P1 = 0xC7;
-                _bus.Serial.SB = 0x00;
-                _bus.Serial.SC = 0x7F;
+                _serial.SB = 0x00;
+                _serial.SC = 0x7F;
                 _timer.TIMA = 0x00;
                 _timer.TMA = 0x00;
                 _timer.TAC = 0xF8;
@@ -116,8 +118,8 @@ namespace Atem.Core
                 _bus.Processor.Registers.SP = 0xFFFE;
 
                 _joypad.P1 = 0xCF;
-                _bus.Serial.SB = 0x00;
-                _bus.Serial.SC = 0x7E;
+                _serial.SB = 0x00;
+                _serial.SC = 0x7E;
                 _timer.TIMA = 0x00;
                 _timer.TMA = 0x00;
                 _timer.TAC = 0xF8;
