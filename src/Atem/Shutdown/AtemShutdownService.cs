@@ -21,7 +21,7 @@ namespace Atem.Shutdown
 
         public void Shutdown()
         {
-            if (_atem.Bus.Cartridge.Loaded)
+            if (_atem.Cartridge.Loaded)
             {
                 _batterySaveService.Save(_cartridgeLoader.Context);
             }

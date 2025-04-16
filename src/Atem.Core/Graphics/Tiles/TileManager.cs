@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Timing;
+using Atem.Core.Memory;
 
 namespace Atem.Core.Graphics.Tiles
 {
@@ -15,9 +16,9 @@ namespace Atem.Core.Graphics.Tiles
         private int _screenY;
         private int _windowX;
         private int _windowY;
-        private readonly IBus _bus;
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly IPaletteProvider _paletteProvider;
+        private readonly Cartridge _cartridge;
 
         public byte[] VRAM { get => _vram; set => _vram = value; }
         public byte Bank { get => _bank; set => _bank = value; }
@@ -29,11 +30,11 @@ namespace Atem.Core.Graphics.Tiles
         public int WindowX { get => _windowX; set => _windowX = value; }
         public int WindowY { get => _windowY; set => _windowY = value; }
 
-        public TileManager(IBus bus, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider)
+        public TileManager(IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, Cartridge cartridge)
         {
-            _bus = bus;
             _renderModeScheduler = renderModeScheduler;
             _paletteProvider = paletteProvider;
+            _cartridge = cartridge;
 
             _vram = new byte[0x4000];
         }
@@ -136,7 +137,7 @@ namespace Atem.Core.Graphics.Tiles
 
             tileIndex = _vram[tileMapAddress]; // the index of the tile that the pixel at (x, y) belongs to
 
-            if (_bus.ColorMode)
+            if (_cartridge.SupportsColor)
             {
                 byte bgMapAttributes = _vram[tileMapAddress + 0x2000];
                 int paletteIndex = bgMapAttributes & 0b111;

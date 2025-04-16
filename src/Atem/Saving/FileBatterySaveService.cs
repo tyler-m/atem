@@ -19,13 +19,13 @@ namespace Atem.Saving
             if (File.Exists(savePath))
             {
                 byte[] saveData = File.ReadAllBytes(savePath);
-                _atem.Bus.Cartridge.LoadBatterySave(saveData);
+                _atem.Cartridge.LoadBatterySave(saveData);
             }
         }
 
         public void Save(ICartridgeContext context)
         {
-            File.WriteAllBytes(context.Id + ".sav", _atem.Bus.Cartridge.GetBatterySave());
+            File.WriteAllBytes(context.Id + ".sav", _atem.Cartridge.GetBatterySave());
         }
     }
 }

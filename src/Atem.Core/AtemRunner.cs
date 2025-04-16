@@ -9,6 +9,7 @@ using Atem.Core.Graphics.Screen;
 using Atem.Core.Graphics.Tiles;
 using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
+using Atem.Core.Memory;
 using Atem.Core.Processing;
 using Atem.Core.State;
 
@@ -26,6 +27,7 @@ namespace Atem.Core
         private readonly Serial _serial;
         private readonly GraphicsManager _graphics;
         private readonly AudioManager _audio;
+        private readonly Cartridge _cartridge;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -33,9 +35,10 @@ namespace Atem.Core
         private bool _paused;
 
         public Debugger Debugger => _debugger;
-        public Bus Bus =>  _bus;
+        public Bus Bus => _bus;
         public Processor Processor => _processor;
         public AudioManager Audio => _audio;
+        public Cartridge Cartridge => _cartridge;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
@@ -54,17 +57,18 @@ namespace Atem.Core
             _timer = new Timer(_interrupt);
             _serial = new Serial();
             _audio = new AudioManager();
+            _cartridge = new Cartridge();
 
             RenderModeScheduler renderModeScheduler = new();
             PaletteProvider paletteProvider = new();
             HDMA hdma = new(_bus, renderModeScheduler);
             StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
-            TileManager tileManager = new(_bus, renderModeScheduler, paletteProvider);
-            ObjectManager objectManager = new(_bus, renderModeScheduler, tileManager, paletteProvider);
-            ScreenManager screenManager = new(_bus, renderModeScheduler, tileManager, objectManager);
+            TileManager tileManager = new(renderModeScheduler, paletteProvider, _cartridge);
+            ObjectManager objectManager = new(_bus, renderModeScheduler, tileManager, paletteProvider, _cartridge);
+            ScreenManager screenManager = new(_bus, renderModeScheduler, tileManager, objectManager, _cartridge);
             _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
 
-            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio);
+            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio, _cartridge);
 
             _debugger = new Debugger();
         }
@@ -190,7 +194,7 @@ namespace Atem.Core
         {
             Reset();
 
-            bool loaded = _bus.LoadCartridge(data);
+            bool loaded = _cartridge.Load(data);
             if (loaded)
             {
                 PrepareForGameBoot(color);

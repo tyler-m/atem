@@ -3,6 +3,7 @@ using Atem.Core.Graphics.Objects;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Tiles;
 using Atem.Core.Graphics.Timing;
+using Atem.Core.Memory;
 
 namespace Atem.Core.Graphics.Screen
 {
@@ -15,6 +16,7 @@ namespace Atem.Core.Graphics.Screen
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly ITileManager _tileManager;
         private readonly IObjectManager _objectManager;
+        private readonly Cartridge _cartridge;
         private GBColor[] _screen = new GBColor[160 * 144];
         private byte _linePixel;
         private bool _windowWasTriggeredThisFrame;
@@ -26,13 +28,14 @@ namespace Atem.Core.Graphics.Screen
         public bool BackgroundAndWindowEnabledOrPriority { get => _backgroundAndWindowEnabledOrPriority; set => _backgroundAndWindowEnabledOrPriority = value; }
         public GBColor[] Screen { get => _screen; set => _screen = value; }
 
-        public ScreenManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager)
+        public ScreenManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
         {
             _bus = bus;
             _renderModeScheduler = renderModeScheduler;
             _tileManager = tileManager;
             _objectManager = objectManager;
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
+            _cartridge = cartridge;
         }
 
         private void RenderModeChanged(object sender, RenderModeChangedEventArgs e)
@@ -59,7 +62,7 @@ namespace Atem.Core.Graphics.Screen
 
             (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfo(pixelX, window ? _currentWindowLine : pixelY, window);
 
-            if (!_bus.ColorMode && !_backgroundAndWindowEnabledOrPriority)
+            if (!_cartridge.SupportsColor && !_backgroundAndWindowEnabledOrPriority)
             {
                 tileColor = new GBColor(0xFFFF);
             }
@@ -75,7 +78,7 @@ namespace Atem.Core.Graphics.Screen
                 }
             }
 
-            if (_bus.ColorMode)
+            if (_cartridge.SupportsColor)
             {
                 if (tilePriority && tileId != 0 && _backgroundAndWindowEnabledOrPriority)
                 {

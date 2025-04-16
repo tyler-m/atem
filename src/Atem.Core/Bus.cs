@@ -25,10 +25,9 @@ namespace Atem.Core
         private byte _svbk;
 
         public byte SVBK { get => _svbk; set => _svbk = value; }
-        public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize => 0x10000;
 
-        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics, AudioManager audio)
+        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics, AudioManager audio, Cartridge cartridge)
         {
             _interrupt = interrupt;
             _joypad = joypad;
@@ -36,24 +35,13 @@ namespace Atem.Core
             _serial = serial;
             _graphics = graphics;
             _audio = audio;
-            _cartridge = new Cartridge();
+            _cartridge = cartridge;
             _processor = processor;
-        }
-
-        public bool ColorMode
-        {
-            get => _cartridge.SupportsColor;
         }
 
         public void LoadBootROM(string filepath, bool enabled = true)
         {
             _bootROM = new BootROM(filepath, enabled);
-        }
-
-        public bool LoadCartridge(byte[] data)
-        {
-            _cartridge = new Cartridge();
-            return _cartridge.Load(data);
         }
 
         public byte Read(ushort address)
@@ -536,7 +524,7 @@ namespace Atem.Core
             }
             else if (offset == 0x50 && _bootROM != null)
             {
-                if (_bootROM.Enabled && ColorMode)
+                if (_bootROM.Enabled && _cartridge.SupportsColor)
                 {
                     _processor.Registers.A = 0x11;
                 }

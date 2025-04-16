@@ -3,6 +3,7 @@ using System.IO;
 using Atem.Core.Graphics.Palettes;
 using Atem.Core.Graphics.Tiles;
 using Atem.Core.Graphics.Timing;
+using Atem.Core.Memory;
 
 namespace Atem.Core.Graphics.Objects
 {
@@ -15,6 +16,7 @@ namespace Atem.Core.Graphics.Objects
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly ITileManager _tileManager;
         private readonly IPaletteProvider _paletteProvider;
+        private readonly Cartridge _cartridge;
         private readonly Sprite[] _objects = new Sprite[MAX_SPRITES];
         private readonly List<Sprite> _spriteBuffer = [];
         private bool _objectsEnabled;
@@ -38,12 +40,13 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public ObjectManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IPaletteProvider paletteProvider)
+        public ObjectManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IPaletteProvider paletteProvider, Cartridge cartridge)
         {
             _bus = bus;
             _renderModeScheduler = renderModeScheduler;
             _tileManager = tileManager;
             _paletteProvider = paletteProvider;
+            _cartridge = cartridge;
 
             for (int i = 0; i < MAX_SPRITES; i++)
             {
@@ -120,7 +123,7 @@ namespace Atem.Core.Graphics.Objects
                 }
             }
 
-            int tileDataAddress = spriteTile * 16 + (_bus.ColorMode ? 0x2000 * sprite.Bank : 0);
+            int tileDataAddress = spriteTile * 16 + (_cartridge.SupportsColor ? 0x2000 * sprite.Bank : 0);
             int id = _tileManager.GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
             return id;
         }
@@ -144,7 +147,7 @@ namespace Atem.Core.Graphics.Objects
                         continue;
                     }
 
-                    if (_bus.ColorMode)
+                    if (_cartridge.SupportsColor)
                     {
                         // in color mode object locations in OAM determines priority
                         // (the object list is populated in order of OAM location, so we
