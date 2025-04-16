@@ -5,22 +5,22 @@ namespace Atem.Input.Command
 {
     internal class JoypadCommand : ICommand
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
         private readonly JoypadButton _joypadButton;
         private readonly CommandType _commandType;
 
         public CommandType Type { get => _commandType; }
 
-        public JoypadCommand(AtemRunner atem, JoypadButton joypadButton, CommandType commandType)
+        public JoypadCommand(Emulator emulator, JoypadButton joypadButton, CommandType commandType)
         {
-            _atem = atem;
+            _emulator = emulator;
             _joypadButton = joypadButton;
             _commandType = commandType;
         }
 
         public void Execute(bool pressed)
         {
-            _atem.OnJoypadChange(_joypadButton, pressed);
+            _emulator.OnJoypadChange(_joypadButton, pressed);
         }
     }
 }

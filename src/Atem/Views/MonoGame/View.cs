@@ -18,7 +18,7 @@ namespace Atem.Views.MonoGame
 
         private readonly GraphicsDeviceManager _graphics;
 
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
         private readonly ISoundService _soundService;
         private readonly IShutdownService _shutdownService;
         private readonly Screen _screen;
@@ -29,12 +29,12 @@ namespace Atem.Views.MonoGame
         public delegate void ViewInitializeEvent();
         public event ViewInitializeEvent OnInitialize;
 
-        public View(ViewUIManager viewUIManager, AtemRunner atem, Screen screen, Window window, ISoundService soundService, InputManager inputManager, IShutdownService shutdownService)
+        public View(ViewUIManager viewUIManager, Emulator emulator, Screen screen, Window window, ISoundService soundService, InputManager inputManager, IShutdownService shutdownService)
         {
             _graphics = new GraphicsDeviceManager(this);
 
             _viewUIManager = viewUIManager;
-            _atem = atem;
+            _emulator = emulator;
             _soundService = soundService;
             _shutdownService = shutdownService;
             _inputManager = inputManager;
@@ -45,7 +45,7 @@ namespace Atem.Views.MonoGame
 
             Window.AllowUserResizing = true;
 
-            _atem.Paused = true;
+            _emulator.Paused = true;
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -110,7 +110,7 @@ namespace Atem.Views.MonoGame
         protected override void Update(GameTime gameTime)
         {
             _inputManager.Update();
-            _atem.Update();
+            _emulator.Update();
 
             base.Update(gameTime);
         }

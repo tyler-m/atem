@@ -6,25 +6,25 @@ namespace Atem.Input.Configure
 {
     public class AtemCommandConfigurator
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
 
-        public AtemCommandConfigurator(AtemRunner atem)
+        public AtemCommandConfigurator(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Configure(InputManager inputManager)
         {
-            inputManager.AddCommand(new PauseCommand(_atem));
-            inputManager.AddCommand(new ContinueCommand(_atem));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Up, CommandType.Up));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Down, CommandType.Down));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Left, CommandType.Left));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Right, CommandType.Right));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.B, CommandType.B));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.A, CommandType.A));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Select, CommandType.Select));
-            inputManager.AddCommand(new JoypadCommand(_atem, JoypadButton.Start, CommandType.Start));
+            inputManager.AddCommand(new PauseCommand(_emulator));
+            inputManager.AddCommand(new ContinueCommand(_emulator));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Up, CommandType.Up));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Down, CommandType.Down));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Left, CommandType.Left));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Right, CommandType.Right));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.B, CommandType.B));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.A, CommandType.A));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Select, CommandType.Select));
+            inputManager.AddCommand(new JoypadCommand(_emulator, JoypadButton.Start, CommandType.Start));
         }
     }
 }

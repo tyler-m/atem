@@ -4,20 +4,20 @@ namespace Atem.Input.Command
 {
     public class ContinueCommand : ICommand
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
 
         public CommandType Type { get => CommandType.Continue; }
 
-        public ContinueCommand(AtemRunner atem)
+        public ContinueCommand(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Execute(bool pressed)
         {
             if (pressed)
             {
-                _atem.Continue();
+                _emulator.Continue();
             }
         }
     }

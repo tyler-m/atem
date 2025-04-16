@@ -18,11 +18,11 @@ namespace Atem.Views.MonoGame
     public class ViewStarter
     {
         private View _view;
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
 
-        public ViewStarter(AtemRunner atem)
+        public ViewStarter(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Run()
@@ -34,27 +34,27 @@ namespace Atem.Views.MonoGame
 
         public void InitializeView()
         {
-            SoundService soundService = new(_atem.Audio);
-            FileSaveStateService saveStateService = new(_atem);
-            FileCartridgeLoader cartridgeLoader = new(_atem);
-            FileBatterySaveService batterySaveService = new(_atem);
+            SoundService soundService = new(_emulator.Audio);
+            FileSaveStateService saveStateService = new(_emulator);
+            FileCartridgeLoader cartridgeLoader = new(_emulator);
+            FileBatterySaveService batterySaveService = new(_emulator);
             InputManager inputManager = new(new KeyProvider());
             ImGuiRenderer imGui = new();
             Window window = new();
-            Screen screen = new(_atem, window);
+            Screen screen = new(_emulator, window);
             RecentFilesService recentFilesService = new();
 
             AtemConfigDefaultsProvider atemConfigDefaultsProvider = new();
             FileConfigStore<AtemConfig> configStore = new(atemConfigDefaultsProvider, Directory.GetCurrentDirectory() + "/config.json");
-            AtemConfigService configService = new(configStore, window, screen, _atem.Audio, inputManager, recentFilesService);
-            ViewUIManager viewUIManager = new(imGui, _atem, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService);
-            AtemShutdownService shutdownService = new(_atem, configService, cartridgeLoader, batterySaveService);
+            AtemConfigService configService = new(configStore, window, screen, _emulator.Audio, inputManager, recentFilesService);
+            ViewUIManager viewUIManager = new(imGui, _emulator, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService);
+            AtemShutdownService shutdownService = new(_emulator, configService, cartridgeLoader, batterySaveService);
 
-            _view = new View(viewUIManager, _atem, screen, window, soundService, inputManager, shutdownService);
+            _view = new View(viewUIManager, _emulator, screen, window, soundService, inputManager, shutdownService);
             _view.OnInitialize += () => imGui.Initialize(_view); // link ImGuiRenderer and View instances
 
             // add commands to the input manager
-            AtemCommandConfigurator atemCommandConfigurator = new(_atem);
+            AtemCommandConfigurator atemCommandConfigurator = new(_emulator);
             ViewCommandConfigurator viewCommandConfigurator = new(_view);
             StateCommandConfigurator stateCommandConfigurator = new(saveStateService, cartridgeLoader.Context);
             atemCommandConfigurator.Configure(inputManager);

@@ -14,7 +14,7 @@ namespace Atem.Views.MonoGame.UI
     public class ViewUIManager
     {
         private readonly ImGuiRenderer _imGui;
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
         private readonly IBatterySaveService _batterySaveService;
         private readonly ICartridgeLoader _cartridgeLoader;
         private readonly Screen _screen;
@@ -37,10 +37,10 @@ namespace Atem.Views.MonoGame.UI
 
         public bool Debug { get => _debug; }
 
-        public ViewUIManager(ImGuiRenderer imGui, AtemRunner atem, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager, IRecentFilesService recentFilesService)
+        public ViewUIManager(ImGuiRenderer imGui, Emulator emulator, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager, IRecentFilesService recentFilesService)
         {
             _imGui = imGui;
-            _atem = atem;
+            _emulator = emulator;
             _batterySaveService = batterySaveService;
             _cartridgeLoader = cartridgeLoader;
             _screen = screen;
@@ -48,16 +48,16 @@ namespace Atem.Views.MonoGame.UI
 
             _fileBrowserWindow = new FileBrowserWindow();
             _fileBrowserWindow.OnSelectFile += LoadFile;
-            _memoryWindow = new MemoryWindow(_atem.Bus);
+            _memoryWindow = new MemoryWindow(_emulator.Bus);
             _menuBar = new MenuBar(saveStateService, cartridgeLoader, recentFilesService);
             _menuBar.OnExit += () => OnExitRequest?.Invoke();
             _menuBar.OnDebug += ToggleDebug;
             _menuBar.OnOpen += OnOpen;
             _menuBar.OnOptions += OnOptions;
             _menuBar.OnSelectRecentFile += LoadFile;
-            _breakpointWindow = new BreakpointWindow(_atem.Debugger);
-            _processorRegistersWindow = new ProcessorRegistersWindow(_atem.Processor);
-            _optionsWindow = new OptionsWindow(screen, _atem.Audio, inputManager);
+            _breakpointWindow = new BreakpointWindow(_emulator.Debugger);
+            _processorRegistersWindow = new ProcessorRegistersWindow(_emulator.Processor);
+            _optionsWindow = new OptionsWindow(screen, _emulator.Audio, inputManager);
             _screen.OnScreenTextureCreated += OnScreenTextureCreated;
         }
 
@@ -79,7 +79,7 @@ namespace Atem.Views.MonoGame.UI
             if (_cartridgeLoader.Load())
             {
                 _batterySaveService.Load(_cartridgeLoader.Context);
-                _atem.Paused = false;
+                _emulator.Paused = false;
                 _fileBrowserWindow.Active = false;
                 _menuBar.EnableStates = true;
                 _recentFilesService.Add(fileInfo.FullName);
@@ -99,7 +99,7 @@ namespace Atem.Views.MonoGame.UI
         private void ToggleDebug()
         {
             _debug = !_debug;
-            _atem.Debugger.Active = _debug;
+            _emulator.Debugger.Active = _debug;
             OnUpdateWindowSize?.Invoke();
         }
 

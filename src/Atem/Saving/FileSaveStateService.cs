@@ -5,11 +5,11 @@ namespace Atem.Saving
 {
     public class FileSaveStateService : ISaveStateService
     {
-        private AtemRunner _atem;
+        private Emulator _emulator;
 
-        public FileSaveStateService(AtemRunner atem)
+        public FileSaveStateService(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Load(int slot, ICartridgeContext context)
@@ -20,7 +20,7 @@ namespace Atem.Saving
             {
                 using FileStream stream = new(saveStatePath, FileMode.Open);
                 using BinaryReader reader = new(stream);
-                _atem.SetState(reader);
+                _emulator.SetState(reader);
             }
         }
 
@@ -30,7 +30,7 @@ namespace Atem.Saving
 
             using FileStream stream = new(saveStatePath, FileMode.Create);
             using BinaryWriter writer = new(stream);
-            _atem.GetState(writer);
+            _emulator.GetState(writer);
         }
     }
 }

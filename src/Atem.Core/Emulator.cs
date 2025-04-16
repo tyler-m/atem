@@ -15,7 +15,7 @@ using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class AtemRunner : IStateful
+    public class Emulator : IStateful
     {
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
 
@@ -49,7 +49,7 @@ namespace Atem.Core
             remove => _graphics.OnVerticalBlank -= value;
         }
 
-        public AtemRunner()
+        public Emulator()
         {
             _bus = new Bus();
 

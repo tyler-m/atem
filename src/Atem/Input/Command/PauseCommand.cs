@@ -4,20 +4,20 @@ namespace Atem.Input.Command
 {
     public class PauseCommand : ICommand
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
 
         public CommandType Type { get => CommandType.Pause; }
 
-        public PauseCommand(AtemRunner atem)
+        public PauseCommand(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Execute(bool pressed)
         {
             if (pressed)
             {
-                _atem.Paused = !_atem.Paused;
+                _emulator.Paused = !_emulator.Paused;
             }
         }
     }

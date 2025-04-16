@@ -6,14 +6,14 @@ namespace Atem.Saving
 {
     public class FileCartridgeLoader : ICartridgeLoader
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
         private readonly FileCartridgeContext _context;
 
         public ICartridgeContext Context { get => _context; }
 
-        public FileCartridgeLoader(AtemRunner atem)
+        public FileCartridgeLoader(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
             _context = new FileCartridgeContext();
         }
 
@@ -28,7 +28,7 @@ namespace Atem.Saving
 
             byte[] data = File.ReadAllBytes(filePath);
 
-            return _atem.LoadCartridge(data, filePath.ToLower().EndsWith(".gbc"));
+            return _emulator.LoadCartridge(data, filePath.ToLower().EndsWith(".gbc"));
         }
     }
 }

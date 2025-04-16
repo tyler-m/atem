@@ -7,8 +7,8 @@ namespace Atem
     {
         static void Main(string[] args)
         {
-            AtemRunner atem = new AtemRunner();
-            ViewStarter viewStarter = new ViewStarter(atem);
+            Emulator emulator = new Emulator();
+            ViewStarter viewStarter = new ViewStarter(emulator);
             viewStarter.Run();
         }
     }

@@ -5,11 +5,11 @@ namespace Atem.Saving
 {
     public class FileBatterySaveService : IBatterySaveService
     {
-        private readonly AtemRunner _atem;
+        private readonly Emulator _emulator;
 
-        public FileBatterySaveService(AtemRunner atem)
+        public FileBatterySaveService(Emulator emulator)
         {
-            _atem = atem;
+            _emulator = emulator;
         }
 
         public void Load(ICartridgeContext context)
@@ -19,13 +19,13 @@ namespace Atem.Saving
             if (File.Exists(savePath))
             {
                 byte[] saveData = File.ReadAllBytes(savePath);
-                _atem.Cartridge.LoadBatterySave(saveData);
+                _emulator.Cartridge.LoadBatterySave(saveData);
             }
         }
 
         public void Save(ICartridgeContext context)
         {
-            File.WriteAllBytes(context.Id + ".sav", _atem.Cartridge.GetBatterySave());
+            File.WriteAllBytes(context.Id + ".sav", _emulator.Cartridge.GetBatterySave());
         }
     }
 }

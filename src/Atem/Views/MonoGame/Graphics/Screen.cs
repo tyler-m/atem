@@ -46,9 +46,9 @@ namespace Atem.Views.MonoGame.Graphics
         public delegate void OnScreenSizeChangeEvent();
         public event OnScreenSizeChangeEvent OnScreenSizeChange;
 
-        public Screen(AtemRunner atem, IWindow window)
+        public Screen(Emulator emulator, IWindow window)
         {
-            atem.OnVerticalBlank += OnVerticalBlank;
+            emulator.OnVerticalBlank += OnVerticalBlank;
             _window = window;
             _window.WindowSizeChanged += OnWindowSizeChanged;
         }
