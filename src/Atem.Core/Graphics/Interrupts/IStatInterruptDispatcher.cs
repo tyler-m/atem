@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Graphics.Interrupts
 {
-    public interface IStatInterruptManager : IStateful
+    public interface IStatInterruptDispatcher : IStateful
     {
         public bool InterruptOnOAM { get; set; }
         public bool InterruptOnVerticalBlank { get; set; }

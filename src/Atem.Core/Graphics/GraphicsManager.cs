@@ -22,7 +22,7 @@ namespace Atem.Core.Graphics
         private readonly IScreenManager _screenManager;
         private readonly IHDMA _hdma;
         private readonly IRenderModeScheduler _renderModeScheduler;
-        private readonly IStatInterruptManager _statInterruptManager;
+        private readonly IStatInterruptDispatcher _statInterruptDispatcher;
         private readonly IPaletteProvider _paletteProvider;
 
         public GraphicsRegisters Registers;
@@ -33,20 +33,20 @@ namespace Atem.Core.Graphics
         public ITileManager TileManager => _tileManager;
         public IHDMA HDMA => _hdma;
         public IRenderModeScheduler RenderModeScheduler => _renderModeScheduler;
-        public IStatInterruptManager StatInterruptManager => _statInterruptManager;
+        public IStatInterruptDispatcher StatInterruptDispatcher => _statInterruptDispatcher;
         public IScreenManager ScreenManager => _screenManager;
         public IPaletteProvider PaletteProvider => _paletteProvider;
 
         public GraphicsManager(
             IBus bus, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, IHDMA hdma,
-            IStatInterruptManager statInterruptManager, ITileManager tileManager, IObjectManager objectManager,
+            IStatInterruptDispatcher statInterruptDispatcher, ITileManager tileManager, IObjectManager objectManager,
             IScreenManager screenManager)
         {
             _bus = bus;
             _renderModeScheduler = renderModeScheduler;
             _paletteProvider = paletteProvider;
             _hdma = hdma;
-            _statInterruptManager = statInterruptManager;
+            _statInterruptDispatcher = statInterruptDispatcher;
             _tileManager = tileManager;
             _objectManager = objectManager;
             _screenManager = screenManager;
@@ -104,7 +104,7 @@ namespace Atem.Core.Graphics
 
             _renderModeScheduler.Clock();
 
-            _statInterruptManager.UpdateLineYCompare();
+            _statInterruptDispatcher.UpdateLineYCompare();
         }
 
         public void GetState(BinaryWriter writer)
@@ -112,7 +112,7 @@ namespace Atem.Core.Graphics
             writer.Write(Enabled);
 
             _renderModeScheduler.GetState(writer);
-            _statInterruptManager.GetState(writer);
+            _statInterruptDispatcher.GetState(writer);
             _screenManager.GetState(writer);
             _objectManager.GetState(writer);
             _hdma.GetState(writer);
@@ -125,7 +125,7 @@ namespace Atem.Core.Graphics
             Enabled = reader.ReadBoolean();
 
             _renderModeScheduler.SetState(reader);
-            _statInterruptManager.SetState(reader);
+            _statInterruptDispatcher.SetState(reader);
             _screenManager.SetState(reader);
             _objectManager.SetState(reader);
             _hdma.SetState(reader);

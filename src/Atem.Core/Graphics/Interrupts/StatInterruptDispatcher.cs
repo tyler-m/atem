@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Atem.Core.Graphics.Interrupts
 {
-    public class StatInterruptManager : IStatInterruptManager
+    public class StatInterruptDispatcher : IStatInterruptDispatcher
     {
         private readonly IBus _bus;
         private readonly IRenderModeScheduler _scheduler;
@@ -22,7 +22,7 @@ namespace Atem.Core.Graphics.Interrupts
         public byte LineYToCompare { get => _lineYToCompare; set => _lineYToCompare = value; }
         public bool CurrentlyOnLineY => _currentlyOnLineY;
 
-        public StatInterruptManager(IBus bus, IRenderModeScheduler scheduler)
+        public StatInterruptDispatcher(IBus bus, IRenderModeScheduler scheduler)
         {
             _bus = bus;
             _scheduler = scheduler;

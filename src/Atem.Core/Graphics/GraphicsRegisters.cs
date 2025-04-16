@@ -41,19 +41,19 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)((_manager.StatInterruptManager.InterruptOnLineY.Int() << 6) 
-                    | (_manager.StatInterruptManager.InterruptOnOAM.Int() << 5)
-                    | (_manager.StatInterruptManager.InterruptOnVerticalBlank.Int() << 4)
-                    | (_manager.StatInterruptManager.InterruptOnHorizontalBlank.Int() << 3)
-                    | (_manager.StatInterruptManager.CurrentlyOnLineY.Int() << 2)
+                return (byte)((_manager.StatInterruptDispatcher.InterruptOnLineY.Int() << 6) 
+                    | (_manager.StatInterruptDispatcher.InterruptOnOAM.Int() << 5)
+                    | (_manager.StatInterruptDispatcher.InterruptOnVerticalBlank.Int() << 4)
+                    | (_manager.StatInterruptDispatcher.InterruptOnHorizontalBlank.Int() << 3)
+                    | (_manager.StatInterruptDispatcher.CurrentlyOnLineY.Int() << 2)
                     | (int)_manager.RenderModeScheduler.Mode);
             }
             set
             {
-                _manager.StatInterruptManager.InterruptOnLineY = value.GetBit(6);
-                _manager.StatInterruptManager.InterruptOnOAM = value.GetBit(5);
-                _manager.StatInterruptManager.InterruptOnVerticalBlank = value.GetBit(4);
-                _manager.StatInterruptManager.InterruptOnHorizontalBlank = value.GetBit(3);
+                _manager.StatInterruptDispatcher.InterruptOnLineY = value.GetBit(6);
+                _manager.StatInterruptDispatcher.InterruptOnOAM = value.GetBit(5);
+                _manager.StatInterruptDispatcher.InterruptOnVerticalBlank = value.GetBit(4);
+                _manager.StatInterruptDispatcher.InterruptOnHorizontalBlank = value.GetBit(3);
                 // CurrentlyOnLineY and Render Mode are read-only
             }
         }
@@ -92,11 +92,11 @@ namespace Atem.Core.Graphics
         {
             get
             {
-                return (byte)_manager.StatInterruptManager.LineYToCompare;
+                return (byte)_manager.StatInterruptDispatcher.LineYToCompare;
             }
             set
             {
-                _manager.StatInterruptManager.LineYToCompare = value;
+                _manager.StatInterruptDispatcher.LineYToCompare = value;
             }
         }
 

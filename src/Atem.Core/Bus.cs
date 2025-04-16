@@ -52,11 +52,11 @@ namespace Atem.Core
             RenderModeScheduler renderModeScheduler = new();
             PaletteProvider paletteProvider = new();
             HDMA hdma = new(this, renderModeScheduler);
-            StatInterruptManager statInterruptManager = new(this, renderModeScheduler);
+            StatInterruptDispatcher statInterruptDispatcher = new(this, renderModeScheduler);
             TileManager tileManager = new(this, renderModeScheduler, paletteProvider);
             ObjectManager objectManager = new(this, renderModeScheduler, tileManager, paletteProvider);
             ScreenManager screenManager = new(this, renderModeScheduler, tileManager, objectManager);
-            _graphics = new GraphicsManager(this, renderModeScheduler, paletteProvider, hdma, statInterruptManager, tileManager, objectManager, screenManager);
+            _graphics = new GraphicsManager(this, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
 
             _joypad = new Joypad(this);
             _serial = new Serial();
