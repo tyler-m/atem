@@ -39,29 +39,27 @@ namespace Atem.Core
         public GraphicsManager Graphics { get => _graphics; }
         public Joypad Joypad { get => _joypad; }
         public Serial Serial { get => _serial; }
-        public Interrupt Interrupt { get => _interrupt; }
         public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize { get => 0x10000; }
 
-        public Bus()
+        public Bus(Interrupt interrupt)
         {
-            _processor = new Processor(this);
-            _timer = new Timer(this);
+            _interrupt = interrupt;
             _audio = new AudioManager();
+            _serial = new Serial();
+            _cartridge = new Cartridge();
+            _processor = new Processor(this);
+            _joypad = new Joypad(_interrupt);
+            _timer = new Timer(_interrupt);
 
             RenderModeScheduler renderModeScheduler = new();
             PaletteProvider paletteProvider = new();
             HDMA hdma = new(this, renderModeScheduler);
-            StatInterruptDispatcher statInterruptDispatcher = new(this, renderModeScheduler);
+            StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
             TileManager tileManager = new(this, renderModeScheduler, paletteProvider);
             ObjectManager objectManager = new(this, renderModeScheduler, tileManager, paletteProvider);
             ScreenManager screenManager = new(this, renderModeScheduler, tileManager, objectManager);
-            _graphics = new GraphicsManager(this, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
-
-            _joypad = new Joypad(this);
-            _serial = new Serial();
-            _interrupt = new Interrupt();
-            _cartridge = new Cartridge();
+            _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
         }
 
         public bool ColorMode
@@ -677,11 +675,6 @@ namespace Atem.Core
             {
                 WriteRegister(offset, value);
             }
-        }
-
-        public void RequestInterrupt(InterruptType interruptType)
-        {
-            _interrupt.SetInterrupt(interruptType);
         }
 
         public void GetState(BinaryWriter writer)

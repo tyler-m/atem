@@ -5,6 +5,8 @@ namespace Atem.Core.Processing
 {
     public class Timer : IStateful
     {
+        private readonly Interrupt _interrupt;
+
         // should probably be incrementing _div every clock
         // and bit shifting it on read instead of using the
         // additional _divTick with conditionals
@@ -15,11 +17,10 @@ namespace Atem.Core.Processing
 
         private int _divTick;
         private int _timaTick;
-        private IBus _bus;
 
-        public Timer(IBus bus)
+        public Timer(Interrupt interrupt)
         {
-            _bus = bus;
+            _interrupt = interrupt;
         }
 
         public byte DIV
@@ -108,7 +109,7 @@ namespace Atem.Core.Processing
             if (_tima.WillCarry(1))
             {
                 _tima = _tma;
-                _bus.RequestInterrupt(InterruptType.Timer);
+                _interrupt.SetInterrupt(InterruptType.Timer);
             }
             else
             {

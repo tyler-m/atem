@@ -10,17 +10,17 @@ namespace Atem.Core
     public class AtemRunner : IResetable, IStateful
     {
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
-        private double _leftoverClocks = 0.0f;
-        private readonly int _clockCost = 4;
+
         private readonly Bus _bus;
+        private readonly Interrupt _interrupt;
         private readonly Debugger _debugger;
+        private readonly int _clockCost = 4;
+        private double _leftoverClocks;
         private bool _forceClock;
         private bool _paused;
 
-        public Debugger Debugger { get => _debugger; }
-
-        public Bus Bus { get =>  _bus; }
-
+        public Debugger Debugger => _debugger;
+        public Bus Bus =>  _bus;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
@@ -31,7 +31,8 @@ namespace Atem.Core
 
         public AtemRunner()
         {
-            _bus = new Bus();
+            _interrupt = new Interrupt();
+            _bus = new Bus(_interrupt);
             _debugger = new Debugger();
         }
 
@@ -63,8 +64,8 @@ namespace Atem.Core
                 _bus.Timer.TIMA = 0x00;
                 _bus.Timer.TMA = 0x00;
                 _bus.Timer.TAC = 0xF8;
-                _bus.Interrupt.IF = 0xE1;
-                _bus.Interrupt.IE = 0x00;
+                _interrupt.IF = 0xE1;
+                _interrupt.IE = 0x00;
                 _bus.Audio.Registers.NR10 = 0x80;
                 _bus.Audio.Registers.NR11 = 0xBF;
                 _bus.Audio.Registers.NR12 = 0xF3;
@@ -116,8 +117,8 @@ namespace Atem.Core
                 _bus.Timer.TIMA = 0x00;
                 _bus.Timer.TMA = 0x00;
                 _bus.Timer.TAC = 0xF8;
-                _bus.Interrupt.IF = 0xE1;
-                _bus.Interrupt.IE = 0x00;
+                _interrupt.IF = 0xE1;
+                _interrupt.IE = 0x00;
                 _bus.Audio.Registers.NR10 = 0x80;
                 _bus.Audio.Registers.NR11 = 0xBF;
                 _bus.Audio.Registers.NR12 = 0xF3;

@@ -6,7 +6,7 @@ namespace Atem.Core.Graphics.Interrupts
 {
     public class StatInterruptDispatcher : IStatInterruptDispatcher
     {
-        private readonly IBus _bus;
+        private readonly Interrupt _interrupt;
         private readonly IRenderModeScheduler _scheduler;
         private bool _interruptOnOAM;
         private bool _interruptOnVerticalBlank;
@@ -22,9 +22,9 @@ namespace Atem.Core.Graphics.Interrupts
         public byte LineYToCompare { get => _lineYToCompare; set => _lineYToCompare = value; }
         public bool CurrentlyOnLineY => _currentlyOnLineY;
 
-        public StatInterruptDispatcher(IBus bus, IRenderModeScheduler scheduler)
+        public StatInterruptDispatcher(Interrupt interrupt, IRenderModeScheduler scheduler)
         {
-            _bus = bus;
+            _interrupt = interrupt;
             _scheduler = scheduler;
 
             _scheduler.RenderModeChanged += HandleRenderModeChanged;
@@ -37,7 +37,7 @@ namespace Atem.Core.Graphics.Interrupts
 
             if (_interruptOnLineY && _currentlyOnLineY && !wasMatching)
             {
-                _bus.RequestInterrupt(InterruptType.STAT);
+                _interrupt.SetInterrupt(InterruptType.STAT);
             }
         }
 
@@ -45,15 +45,15 @@ namespace Atem.Core.Graphics.Interrupts
         {
             if (e.CurrentMode == RenderMode.OAM && _interruptOnOAM)
             {
-                _bus.RequestInterrupt(InterruptType.STAT);
+                _interrupt.SetInterrupt(InterruptType.STAT);
             }
             else if (e.CurrentMode == RenderMode.VerticalBlank && _interruptOnVerticalBlank)
             {
-                _bus.RequestInterrupt(InterruptType.STAT);
+                _interrupt.SetInterrupt(InterruptType.STAT);
             }
             else if (e.CurrentMode == RenderMode.HorizontalBlank && _interruptOnHorizontalBlank)
             {
-                _bus.RequestInterrupt(InterruptType.STAT);
+                _interrupt.SetInterrupt(InterruptType.STAT);
             }
         }
 

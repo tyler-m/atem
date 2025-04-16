@@ -20,7 +20,7 @@ namespace Atem.Core.Input
     {
         private byte _joypad;
         private byte _joyp;
-        private readonly IBus _bus;
+        private readonly Interrupt _interrupt;
 
         private bool Up => _joypad.GetBit((int)JoypadButton.Up);
         private bool Down => _joypad.GetBit((int)JoypadButton.Down);
@@ -31,9 +31,9 @@ namespace Atem.Core.Input
         private bool Select => _joypad.GetBit((int)JoypadButton.Select);
         private bool Start => _joypad.GetBit((int)JoypadButton.Start);
 
-        public Joypad(IBus bus)
+        public Joypad(Interrupt interrupt)
         {
-            _bus = bus;
+            _interrupt = interrupt;
         }
 
         public byte P1
@@ -62,7 +62,7 @@ namespace Atem.Core.Input
         public void OnJoypadChange(JoypadButton button, bool down)
         {
             _joypad = _joypad.SetBit((int)button, down);
-            _bus.RequestInterrupt(InterruptType.Joypad);
+            _interrupt.SetInterrupt(InterruptType.Joypad);
         }
 
         public void GetState(BinaryWriter writer)

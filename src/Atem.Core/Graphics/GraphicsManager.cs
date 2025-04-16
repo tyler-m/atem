@@ -16,7 +16,7 @@ namespace Atem.Core.Graphics
     {
         public const float FrameRate = 59.73f;
 
-        private readonly IBus _bus;
+        private readonly Interrupt _interrupt;
         private readonly IObjectManager _objectManager;
         private readonly ITileManager _tileManager;
         private readonly IScreenManager _screenManager;
@@ -38,11 +38,11 @@ namespace Atem.Core.Graphics
         public IPaletteProvider PaletteProvider => _paletteProvider;
 
         public GraphicsManager(
-            IBus bus, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, IHDMA hdma,
+            Interrupt interrupt, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, IHDMA hdma,
             IStatInterruptDispatcher statInterruptDispatcher, ITileManager tileManager, IObjectManager objectManager,
             IScreenManager screenManager)
         {
-            _bus = bus;
+            _interrupt = interrupt;
             _renderModeScheduler = renderModeScheduler;
             _paletteProvider = paletteProvider;
             _hdma = hdma;
@@ -62,7 +62,7 @@ namespace Atem.Core.Graphics
             {
                 OnVerticalBlank?.Invoke(_screenManager.Screen);
 
-                _bus.RequestInterrupt(InterruptType.VerticalBlank);
+                _interrupt.SetInterrupt(InterruptType.VerticalBlank);
             }
         }
 

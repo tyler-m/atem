@@ -14,14 +14,12 @@ namespace Atem.Core
         Joypad Joypad { get; }
         Serial Serial { get; }
         Timer Timer { get; }
-        Interrupt Interrupt { get; }
-        AudioManager Audio { get; }
+         AudioManager Audio { get; }
         Cartridge Cartridge { get; }
         byte[] HRAM { get; }
         byte[] WRAM { get; }
         bool ColorMode { get; }
         public void Write(ushort address, byte value);
         public bool LoadCartridge(byte[] data);
-        public void RequestInterrupt(InterruptType interruptType);
     }
 }
