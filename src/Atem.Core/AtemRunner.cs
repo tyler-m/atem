@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Atem.Core.Audio;
 using Atem.Core.Debugging;
 using Atem.Core.Graphics;
 using Atem.Core.Graphics.Interrupts;
@@ -24,6 +25,7 @@ namespace Atem.Core
         private readonly Timer _timer;
         private readonly Serial _serial;
         private readonly GraphicsManager _graphics;
+        private readonly AudioManager _audio;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -33,6 +35,7 @@ namespace Atem.Core
         public Debugger Debugger => _debugger;
         public Bus Bus =>  _bus;
         public Processor Processor => _processor;
+        public AudioManager Audio => _audio;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
@@ -50,6 +53,7 @@ namespace Atem.Core
             _joypad = new Joypad(_interrupt);
             _timer = new Timer(_interrupt);
             _serial = new Serial();
+            _audio = new AudioManager();
 
             RenderModeScheduler renderModeScheduler = new();
             PaletteProvider paletteProvider = new();
@@ -60,7 +64,7 @@ namespace Atem.Core
             ScreenManager screenManager = new(_bus, renderModeScheduler, tileManager, objectManager);
             _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
 
-            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics);
+            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio);
 
             _debugger = new Debugger();
         }
@@ -95,27 +99,27 @@ namespace Atem.Core
                 _timer.TAC = 0xF8;
                 _interrupt.IF = 0xE1;
                 _interrupt.IE = 0x00;
-                _bus.Audio.Registers.NR10 = 0x80;
-                _bus.Audio.Registers.NR11 = 0xBF;
-                _bus.Audio.Registers.NR12 = 0xF3;
-                _bus.Audio.Registers.NR13 = 0xFF;
-                _bus.Audio.Registers.NR14 = 0xBF;
-                _bus.Audio.Registers.NR21 = 0x3F;
-                _bus.Audio.Registers.NR22 = 0x00;
-                _bus.Audio.Registers.NR23 = 0xFF;
-                _bus.Audio.Registers.NR24 = 0xBF;
-                _bus.Audio.Registers.NR30 = 0x7F;
-                _bus.Audio.Registers.NR31 = 0xFF;
-                _bus.Audio.Registers.NR32 = 0x9F;
-                _bus.Audio.Registers.NR33 = 0xFF;
-                _bus.Audio.Registers.NR34 = 0xBF;
-                _bus.Audio.Registers.NR41 = 0xFF;
-                _bus.Audio.Registers.NR42 = 0x00;
-                _bus.Audio.Registers.NR43 = 0x00;
-                _bus.Audio.Registers.NR44 = 0xBF;
-                _bus.Audio.Registers.NR50 = 0x77;
-                _bus.Audio.Registers.NR51 = 0xF3;
-                _bus.Audio.Registers.NR52 = 0xF1;
+                _audio.Registers.NR10 = 0x80;
+                _audio.Registers.NR11 = 0xBF;
+                _audio.Registers.NR12 = 0xF3;
+                _audio.Registers.NR13 = 0xFF;
+                _audio.Registers.NR14 = 0xBF;
+                _audio.Registers.NR21 = 0x3F;
+                _audio.Registers.NR22 = 0x00;
+                _audio.Registers.NR23 = 0xFF;
+                _audio.Registers.NR24 = 0xBF;
+                _audio.Registers.NR30 = 0x7F;
+                _audio.Registers.NR31 = 0xFF;
+                _audio.Registers.NR32 = 0x9F;
+                _audio.Registers.NR33 = 0xFF;
+                _audio.Registers.NR34 = 0xBF;
+                _audio.Registers.NR41 = 0xFF;
+                _audio.Registers.NR42 = 0x00;
+                _audio.Registers.NR43 = 0x00;
+                _audio.Registers.NR44 = 0xBF;
+                _audio.Registers.NR50 = 0x77;
+                _audio.Registers.NR51 = 0xF3;
+                _audio.Registers.NR52 = 0xF1;
                 _graphics.Registers.LCDC = 0x91;
                 _graphics.Registers.SCY = 0x00;
                 _graphics.Registers.SCX = 0x00;
@@ -148,27 +152,27 @@ namespace Atem.Core
                 _timer.TAC = 0xF8;
                 _interrupt.IF = 0xE1;
                 _interrupt.IE = 0x00;
-                _bus.Audio.Registers.NR10 = 0x80;
-                _bus.Audio.Registers.NR11 = 0xBF;
-                _bus.Audio.Registers.NR12 = 0xF3;
-                _bus.Audio.Registers.NR13 = 0xFF;
-                _bus.Audio.Registers.NR14 = 0xBF;
-                _bus.Audio.Registers.NR21 = 0x3F;
-                _bus.Audio.Registers.NR22 = 0x00;
-                _bus.Audio.Registers.NR23 = 0xFF;
-                _bus.Audio.Registers.NR24 = 0xBF;
-                _bus.Audio.Registers.NR30 = 0x7F;
-                _bus.Audio.Registers.NR31 = 0xFF;
-                _bus.Audio.Registers.NR32 = 0x9F;
-                _bus.Audio.Registers.NR33 = 0xFF;
-                _bus.Audio.Registers.NR34 = 0xBF;
-                _bus.Audio.Registers.NR41 = 0xFF;
-                _bus.Audio.Registers.NR42 = 0x00;
-                _bus.Audio.Registers.NR43 = 0x00;
-                _bus.Audio.Registers.NR44 = 0xBF;
-                _bus.Audio.Registers.NR50 = 0x77;
-                _bus.Audio.Registers.NR51 = 0xF3;
-                _bus.Audio.Registers.NR52 = 0xF1;
+                _audio.Registers.NR10 = 0x80;
+                _audio.Registers.NR11 = 0xBF;
+                _audio.Registers.NR12 = 0xF3;
+                _audio.Registers.NR13 = 0xFF;
+                _audio.Registers.NR14 = 0xBF;
+                _audio.Registers.NR21 = 0x3F;
+                _audio.Registers.NR22 = 0x00;
+                _audio.Registers.NR23 = 0xFF;
+                _audio.Registers.NR24 = 0xBF;
+                _audio.Registers.NR30 = 0x7F;
+                _audio.Registers.NR31 = 0xFF;
+                _audio.Registers.NR32 = 0x9F;
+                _audio.Registers.NR33 = 0xFF;
+                _audio.Registers.NR34 = 0xBF;
+                _audio.Registers.NR41 = 0xFF;
+                _audio.Registers.NR42 = 0x00;
+                _audio.Registers.NR43 = 0x00;
+                _audio.Registers.NR44 = 0xBF;
+                _audio.Registers.NR50 = 0x77;
+                _audio.Registers.NR51 = 0xF3;
+                _audio.Registers.NR52 = 0xF1;
                 _graphics.Registers.LCDC = 0x91;
                 _graphics.Registers.SCY = 0x00;
                 _graphics.Registers.SCX = 0x00;
@@ -238,7 +242,7 @@ namespace Atem.Core
             }
 
             _graphics.Clock();
-            _bus.Audio.Clock();
+            _audio.Clock();
             return opFinished;
         }
 

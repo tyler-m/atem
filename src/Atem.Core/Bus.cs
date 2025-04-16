@@ -25,18 +25,17 @@ namespace Atem.Core
         private byte _svbk;
 
         public byte SVBK { get => _svbk; set => _svbk = value; }
-        public AudioManager Audio { get => _audio; }
         public Cartridge Cartridge { get => _cartridge; }
         public int MemorySize => 0x10000;
 
-        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics)
+        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics, AudioManager audio)
         {
             _interrupt = interrupt;
             _joypad = joypad;
             _timer = timer;
             _serial = serial;
             _graphics = graphics;
-            _audio = new AudioManager();
+            _audio = audio;
             _cartridge = new Cartridge();
             _processor = processor;
         }
