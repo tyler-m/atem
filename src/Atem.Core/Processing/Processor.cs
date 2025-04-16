@@ -227,5 +227,21 @@ namespace Atem.Core.Processing
             _tick = reader.ReadInt32();
             _interruptType = reader.ReadInt32();
         }
+
+        public void Reset()
+        {
+            _registers.Reset();
+
+            _instruction = 0;
+            _cb = false;
+            _ime = false;
+            _doubleSpeed = false;
+            _speedSwitchFlag = false;
+            _length = 0;
+            _halted = false;
+            _instructionFinished = true;
+            _tick = 0;
+            _interruptType = 0;
+        }
     }
 }

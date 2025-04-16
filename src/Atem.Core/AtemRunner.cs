@@ -7,7 +7,7 @@ using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class AtemRunner : IStateful
+    public class AtemRunner : IResetable, IStateful
     {
         private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
         private double _leftoverClocks = 0.0f;
@@ -22,7 +22,6 @@ namespace Atem.Core
         public Bus Bus { get =>  _bus; }
 
         public bool Paused { get => _paused; set => _paused = value; }
-
 
         public event VerticalBlankEvent OnVerticalBlank
         {
@@ -155,6 +154,8 @@ namespace Atem.Core
 
         public bool LoadCartridge(byte[] data, bool color)
         {
+            Reset();
+
             bool loaded = _bus.LoadCartridge(data);
             if (loaded)
             {
@@ -226,6 +227,14 @@ namespace Atem.Core
         {
             _leftoverClocks = reader.ReadDouble();
             _bus.SetState(reader);
+        }
+
+        public void Reset()
+        {
+            _leftoverClocks = 0;
+            _forceClock = false;
+            _paused = false;
+            _bus.Reset();
         }
     }
 }

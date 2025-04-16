@@ -3,10 +3,11 @@ using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public interface IBus : IMemoryProvider
+    public interface IBus : IResetable, IMemoryProvider
     {
         IProcessor Processor { get; }
         GraphicsManager Graphics { get; }

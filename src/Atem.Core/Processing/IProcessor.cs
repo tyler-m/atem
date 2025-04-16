@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Processing
 {
-    public interface IProcessor : IStateful
+    public interface IProcessor : IResetable, IStateful
     {
         bool CB { get; set; }
         bool DoubleSpeed { get; set; }
