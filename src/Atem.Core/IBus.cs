@@ -11,13 +11,10 @@ namespace Atem.Core
     {
         IProcessor Processor { get; }
         GraphicsManager Graphics { get; }
-        Joypad Joypad { get; }
         Serial Serial { get; }
         Timer Timer { get; }
          AudioManager Audio { get; }
         Cartridge Cartridge { get; }
-        byte[] HRAM { get; }
-        byte[] WRAM { get; }
         bool ColorMode { get; }
         public void Write(ushort address, byte value);
         public bool LoadCartridge(byte[] data);

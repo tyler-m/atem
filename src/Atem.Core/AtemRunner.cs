@@ -13,6 +13,7 @@ namespace Atem.Core
 
         private readonly Bus _bus;
         private readonly Interrupt _interrupt;
+        private readonly Joypad _joypad;
         private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
@@ -32,7 +33,8 @@ namespace Atem.Core
         public AtemRunner()
         {
             _interrupt = new Interrupt();
-            _bus = new Bus(_interrupt);
+            _joypad = new Joypad(_interrupt);
+            _bus = new Bus(_interrupt, _joypad);
             _debugger = new Debugger();
         }
 
@@ -58,7 +60,7 @@ namespace Atem.Core
                 _bus.Processor.Registers.PC = 0x0100;
                 _bus.Processor.Registers.SP = 0xFFFE;
 
-                _bus.Joypad.P1 = 0xC7;
+                _joypad.P1 = 0xC7;
                 _bus.Serial.SB = 0x00;
                 _bus.Serial.SC = 0x7F;
                 _bus.Timer.TIMA = 0x00;
@@ -111,7 +113,7 @@ namespace Atem.Core
                 _bus.Processor.Registers.PC = 0x0100;
                 _bus.Processor.Registers.SP = 0xFFFE;
 
-                _bus.Joypad.P1 = 0xCF;
+                _joypad.P1 = 0xCF;
                 _bus.Serial.SB = 0x00;
                 _bus.Serial.SC = 0x7E;
                 _bus.Timer.TIMA = 0x00;
@@ -215,7 +217,7 @@ namespace Atem.Core
 
         public void OnJoypadChange(JoypadButton button, bool down)
         {
-            _bus.Joypad.OnJoypadChange(button, down);
+            _joypad.OnJoypadChange(button, down);
         }
 
         public void GetState(BinaryWriter writer)
