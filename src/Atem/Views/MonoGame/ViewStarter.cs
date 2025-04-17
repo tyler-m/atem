@@ -31,7 +31,7 @@ namespace Atem.Views.MonoGame
             AtemConfigDefaultsProvider atemConfigDefaultsProvider = new();
             FileConfigStore<AtemConfig> configStore = new(atemConfigDefaultsProvider, Directory.GetCurrentDirectory() + "/config.json");
             AtemConfigService configService = new(configStore, window, screen, emulator.Audio, inputManager, recentFilesService);
-            AtemShutdownService shutdownService = new(emulator, configService, cartridgeLoader, batterySaveService);
+            ShutdownService shutdownService = new(emulator, configService, cartridgeLoader, batterySaveService);
 
             ImGuiRenderer imGui = new();
             ViewUIManager viewUIManager = new(imGui, emulator, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService);

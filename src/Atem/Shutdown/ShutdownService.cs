@@ -4,14 +4,14 @@ using Atem.Saving;
 
 namespace Atem.Shutdown
 {
-    public class AtemShutdownService : IShutdownService
+    public class ShutdownService : IShutdownService
     {
         private readonly Emulator _emulator;
         private readonly IConfigService _configService;
         private readonly ICartridgeLoader _cartridgeLoader;
         private readonly IBatterySaveService _batterySaveService;
 
-        public AtemShutdownService(Emulator emulator, IConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
+        public ShutdownService(Emulator emulator, IConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
         {
             _emulator = emulator;
             _configService = configService;
