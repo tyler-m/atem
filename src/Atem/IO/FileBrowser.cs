@@ -4,17 +4,20 @@ using System.IO;
 
 namespace Atem.IO
 {
-    internal class FileBrowser
+    /// <summary>
+    /// Provides an interface for navigating and browsing a file system.
+    /// Supports directory traversal, listing subdirectories and files,
+    /// and filtering by extensions.
+    /// </summary>
+    public class FileBrowser
     {
-        private readonly DirectoryInfo _rootDirectory;
         private DirectoryInfo _currentDirectory;
 
-        public DirectoryInfo CurrentDirectory { get => _currentDirectory; }
+        public DirectoryInfo CurrentDirectory => _currentDirectory;
 
-        public FileBrowser(string rootPath)
+        public FileBrowser(string startingDirectory)
         {
-            _rootDirectory = new DirectoryInfo(rootPath);
-            _currentDirectory = new DirectoryInfo(_rootDirectory.FullName);
+            _currentDirectory = new DirectoryInfo(startingDirectory);
         }
 
         public void NavigateTo(DirectoryInfo directory)
@@ -39,11 +42,18 @@ namespace Atem.IO
         {
             foreach (FileInfo file in _currentDirectory.EnumerateFiles())
             {
+                if (extensions == null || extensions.Length == 0)
+                {
+                    yield return file;
+                    continue;
+                }
+
                 foreach (string extension in extensions)
                 {
                     if (file.Extension.Equals(extension, StringComparison.OrdinalIgnoreCase))
                     {
                         yield return file;
+                        break;
                     }
                 }
             }

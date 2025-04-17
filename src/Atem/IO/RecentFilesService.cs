@@ -5,9 +5,15 @@ using System.Linq;
 
 namespace Atem.IO
 {
+    /// <summary>
+    /// Tracks and stores the most recently accessed files in a bounded list. New
+    /// entries are added to the front, duplicates are reordered, and the oldest
+    /// files are discarded once the maximum limit is reached. Consumers can
+    /// retrieve the list as file paths or as <see cref="FileInfo"/> objects.
+    /// </summary>
     public class RecentFilesService : IRecentFilesService
     {
-        private const int MaxFiles = 10;
+        public const int MaxFiles = 10;
 
         private readonly List<FileInfo> _recentFiles = [];
 
