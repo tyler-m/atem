@@ -1,6 +1,6 @@
-﻿using Atem.Saving;
-using Atem.Core;
+﻿using Atem.Core;
 using Atem.Core.Memory;
+using Atem.Saving;
 
 namespace Atem.Test.Saving
 {
@@ -35,8 +35,8 @@ namespace Atem.Test.Saving
 
             _saveService.Save(_context);
 
-            Assert.True(File.Exists(_batterySaveFilePath));
             byte[] fileContents = File.ReadAllBytes(_batterySaveFilePath);
+            Assert.True(File.Exists(_batterySaveFilePath));
             Assert.Equal(expectedData, fileContents);
         }
 
@@ -54,7 +54,6 @@ namespace Atem.Test.Saving
         [Fact]
         public void Load_WhenSaveFileDoesNotExist_DoesNotCallLoadBatterySave()
         {
-            // Ensure no save file
             Assert.False(File.Exists(_batterySaveFilePath));
 
             _saveService.Load(_context);

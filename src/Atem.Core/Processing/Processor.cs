@@ -17,9 +17,14 @@ namespace Atem.Core.Processing
         private bool _doubleSpeed;
         private bool _speedSwitchFlag;
         private int _length;
+        private bool _halted;
+        private bool _instructionFinished = true;
+        private int _tick;
+        private readonly ushort[] _interruptJumps = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
+        private int _interruptType;
 
-        private Dictionary<byte, Func<IProcessor, int>> _instructions = [];
-        private Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
+        private readonly Dictionary<byte, Func<IProcessor, int>> _instructions = [];
+        private readonly Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
 
         public CPURegisters Registers { get => _registers; }
         public bool CB { get => _cb; set => _cb = value; }
@@ -37,21 +42,6 @@ namespace Atem.Core.Processing
             {
                 DoubleSpeed = value.GetBit(7);
                 SpeedSwitchFlag = value.GetBit(0);
-            }
-        }
-
-        private bool _halted = false;
-        private bool _instructionFinished = true;
-        private int _tick = 0;
-
-        private readonly ushort[] _interruptJumps = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
-        private int _interruptType;
-
-        public ushort AddressOfNextInstruction
-        {
-            get
-            {
-                return Registers.PC;
             }
         }
 
