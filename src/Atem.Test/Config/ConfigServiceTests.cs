@@ -1,10 +1,10 @@
 ﻿using Atem.Config;
+using Atem.Core.Audio;
+using Atem.Core.Audio.Channel;
 using Atem.Graphics;
 using Atem.Input;
 using Atem.Input.Command;
 using Atem.IO;
-using Atem.Test.Core.Audio;
-using Atem.Test.Graphics;
 using Atem.Views.MonoGame.Input;
 
 namespace Atem.Test.Config
@@ -33,8 +33,8 @@ namespace Atem.Test.Config
             config.RecentFiles.Add(tempFileInfo.FullName);
 
             FakeConfigStore<AtemConfig> configStore = new() { Config = config };
-            StubScreen screen = new();
-            StubAudioManager audioManager = new();
+            FakeScreen screen = new();
+            FakeAudioManager audioManager = new();
             Window window = new();
             InputManager inputManager = new(new KeyProvider());
             RecentFilesService recentFilesService = new();
@@ -65,8 +65,8 @@ namespace Atem.Test.Config
         {
             AtemConfig config = new();
             FakeConfigStore<AtemConfig> configStore = new() { Config = config };
-            StubScreen screen = new();
-            StubAudioManager audioManager = new();
+            FakeScreen screen = new();
+            FakeAudioManager audioManager = new();
             Window window = new();
             InputManager inputManager = new(new KeyProvider());
             window.SetSize(int.MaxValue, int.MinValue);
@@ -101,6 +101,19 @@ namespace Atem.Test.Config
             public T Config;
             public T Load() => Config;
             public void Save(T config) => Config = config;
+        }
+
+        private class FakeAudioManager : IAudioManager
+        {
+            public float VolumeFactor { get; set; }
+            public IList<IAudioChannel> Channels => throw new NotImplementedException();
+            public event Action<byte[]>? OnFullAudioBuffer;
+        }
+
+        private class FakeScreen : IScreen
+        {
+            public bool SizeLocked { get; set; }
+            public int SizeFactor { get; set; }
         }
     }
 }
