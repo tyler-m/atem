@@ -11,11 +11,10 @@ using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
-using Atem.Core.State;
 
 namespace Atem.Core
 {
-    public class Emulator : IStateful
+    public class Emulator : IEmulator
     {
         public const float ScreenRefreshRate = 59.73f;
 
@@ -42,7 +41,7 @@ namespace Atem.Core
         public Bus Bus => _bus;
         public Processor Processor => _processor;
         public AudioManager Audio => _audio;
-        public Cartridge Cartridge => _cartridge;
+        public ICartridge Cartridge => _cartridge;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank

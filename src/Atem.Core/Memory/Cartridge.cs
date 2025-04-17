@@ -1,11 +1,10 @@
 ﻿using System.IO;
 using System.Text;
 using Atem.Core.Memory.Mapper;
-using Atem.Core.State;
 
 namespace Atem.Core.Memory
 {
-    public class Cartridge : IStateful
+    public class Cartridge : ICartridge
     {
         private byte _type;
         private byte _colorFlag;
