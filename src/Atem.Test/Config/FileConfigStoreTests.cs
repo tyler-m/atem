@@ -48,5 +48,10 @@ namespace Atem.Test.Config
 
             Assert.Throws<InvalidConfigException>(store.Load);
         }
+
+        private class StubAtemConfigDefaultsProvider : IConfigDefaultsProvider<AtemConfig>
+        {
+            public AtemConfig GetDefaults() => new() { WindowWidth = int.MaxValue };
+        }
     }
 }

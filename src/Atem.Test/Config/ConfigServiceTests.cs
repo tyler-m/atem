@@ -32,7 +32,7 @@ namespace Atem.Test.Config
             FileInfo tempFileInfo = new(Path.GetTempFileName());
             config.RecentFiles.Add(tempFileInfo.FullName);
 
-            StubConfigStore<AtemConfig> configStore = new(config);
+            FakeConfigStore<AtemConfig> configStore = new() { Config = config };
             StubScreen screen = new();
             StubAudioManager audioManager = new();
             Window window = new();
@@ -64,7 +64,7 @@ namespace Atem.Test.Config
         public void SaveValues_ShouldSetConfigFromValues()
         {
             AtemConfig config = new();
-            StubConfigStore<AtemConfig> configStore = new(config);
+            FakeConfigStore<AtemConfig> configStore = new() { Config = config };
             StubScreen screen = new();
             StubAudioManager audioManager = new();
             Window window = new();
@@ -94,6 +94,13 @@ namespace Atem.Test.Config
             Assert.Equal(configService.Config.UserVolumeFactor, audioManager.VolumeFactor);
             Assert.Equal(configService.Config.Keybinds, inputManager.Keybinds);
             Assert.Equal(configService.Config.RecentFiles, recentFilesService.RecentFiles);
+        }
+
+        private class FakeConfigStore<T> : IConfigStore<T> where T : IConfig<T>
+        {
+            public T Config;
+            public T Load() => Config;
+            public void Save(T config) => Config = config;
         }
     }
 }
