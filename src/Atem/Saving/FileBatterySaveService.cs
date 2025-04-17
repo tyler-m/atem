@@ -5,9 +5,9 @@ namespace Atem.Saving
 {
     public class FileBatterySaveService : IBatterySaveService
     {
-        private readonly Emulator _emulator;
+        private readonly IEmulator _emulator;
 
-        public FileBatterySaveService(Emulator emulator)
+        public FileBatterySaveService(IEmulator emulator)
         {
             _emulator = emulator;
         }
