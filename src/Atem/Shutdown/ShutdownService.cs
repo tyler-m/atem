@@ -6,12 +6,12 @@ namespace Atem.Shutdown
 {
     public class ShutdownService : IShutdownService
     {
-        private readonly Emulator _emulator;
+        private readonly IEmulator _emulator;
         private readonly IConfigService _configService;
         private readonly ICartridgeLoader _cartridgeLoader;
         private readonly IBatterySaveService _batterySaveService;
 
-        public ShutdownService(Emulator emulator, IConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
+        public ShutdownService(IEmulator emulator, IConfigService configService, ICartridgeLoader cartridgeLoader, IBatterySaveService batterySaveService)
         {
             _emulator = emulator;
             _configService = configService;
