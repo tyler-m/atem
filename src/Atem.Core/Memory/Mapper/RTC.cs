@@ -138,6 +138,19 @@ namespace Atem.Core.Memory.Mapper
             );
         }
 
+        public byte[] ToSaveData()
+        {
+            byte[] data = new byte[20];
+            data[0] = (byte)_seconds;
+            data[4] = (byte)_minutes;
+            data[8] = (byte)_hours;
+            data[12] = (byte)_day;
+            data[16].SetBit(0, ((ushort)_day).GetBit(8));
+            data[16].SetBit(6, _halt);
+            data[16].SetBit(7, _dayCarry);
+            return data;
+        }
+
         private void Update()
         {
             if (!_halt && !_latched)

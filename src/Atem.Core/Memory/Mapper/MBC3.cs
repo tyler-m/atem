@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Atem.Core.Memory.Mapper
 {
@@ -16,14 +18,6 @@ namespace Atem.Core.Memory.Mapper
         private byte _latch = 0;
 
         public byte[] RAM { get => _ram; set => _ram = value; }
-
-        public void LoadRTCFromSaveData(byte[] data)
-        {
-            ReadOnlySpan<byte> dataSpan = data;
-            _rtc = RTC.FromSaveData(dataSpan);
-            _rtcLatched = RTC.FromSaveData(dataSpan, true);
-            _rtcLatched.Latched = true;
-        }
 
         public void Init(byte type, byte[] rom, int ramSize)
         {
@@ -174,48 +168,34 @@ namespace Atem.Core.Memory.Mapper
 
         public byte[] GetBatterySave()
         {
-            byte[] saveFile = new byte[RAM.Length + 48];
-            byte[] rtcData = new byte[48];
+            const int rtcDataSize = 48;
+            const int rtcTimestampIndex = 40;
 
-            rtcData[0] = (byte)_rtc.Seconds;
-            rtcData[4] = (byte)_rtc.Minutes;
-            rtcData[8] = (byte)_rtc.Hours;
-            rtcData[12] = (byte)_rtc.Day;
-            rtcData[16].SetBit(0, ((ushort)_rtc.Day).GetBit(8));
-            rtcData[16].SetBit(6, _rtc.Halt);
-            rtcData[16].SetBit(7, _rtc.DayCarry);
-            rtcData[20] = (byte)_rtcLatched.Seconds;
-            rtcData[24] = (byte)_rtcLatched.Minutes;
-            rtcData[28] = (byte)_rtcLatched.Hours;
-            rtcData[32] = (byte)_rtcLatched.Day;
-            rtcData[36].SetBit(0, ((ushort)_rtcLatched.Day).GetBit(8));
-            rtcData[36].SetBit(6, _rtcLatched.Halt);
-            rtcData[36].SetBit(7, _rtcLatched.DayCarry);
+            Span<byte> saveFile = new byte[_ram.Length + rtcDataSize];
+            _ram.CopyTo(saveFile);
 
-            byte[] timestampData = BitConverter.GetBytes((int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            ReadOnlySpan<byte> rtcData = _rtc.ToSaveData();
+            ReadOnlySpan<byte> rtcLatchedData = _rtcLatched.ToSaveData();
+            Span<byte> rtcSaveSpan = saveFile.Slice(_ram.Length, rtcDataSize);
 
-            // RTC values are conventionally saved in little endian
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(timestampData);
-            }
+            rtcData.CopyTo(rtcSaveSpan.Slice(0, rtcData.Length));
+            rtcLatchedData.CopyTo(rtcSaveSpan.Slice(rtcData.Length, rtcLatchedData.Length));
+            BinaryPrimitives.WriteInt32LittleEndian(rtcSaveSpan.Slice(rtcTimestampIndex, 4), (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
 
-            Array.Copy(timestampData, 0, rtcData, 40, 4);
-            Array.Copy(RAM, saveFile, RAM.Length);
-            Array.Copy(rtcData, 0, saveFile, RAM.Length, rtcData.Length);
-            return saveFile;
+            return saveFile.ToArray();
         }
 
         public void LoadBatterySave(byte[] saveData)
         {
+            const int rtcDataSize = 48;
             Array.Copy(saveData, _ram, _ram.Length);
 
-            // RTC data is appended at the end of a save file and is 48 bytes long
-            if (saveData.Length - _ram.Length == 48)
+            if (saveData.Length - _ram.Length == rtcDataSize)
             {
-                byte[] rtcData = new byte[48];
-                Array.Copy(saveData, saveData.Length - 48, rtcData, 0, 48);
-                LoadRTCFromSaveData(rtcData);
+                var rtcSpan = saveData.AsSpan(_ram.Length, rtcDataSize);
+                _rtc = RTC.FromSaveData(rtcSpan);
+                _rtcLatched = RTC.FromSaveData(rtcSpan, true);
+                _rtcLatched.Latched = true;
             }
         }
 
