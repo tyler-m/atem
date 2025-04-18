@@ -6,6 +6,11 @@ using Atem.IO;
 
 namespace Atem.Config
 {
+    /// <summary>
+    /// Provides functionality to persist and restore emulator configuration via
+    /// <see cref="AtemConfig"/>. Coordinates updates between runtime systems and
+    /// a backing <see cref="IConfigStore{AtemConfig}"/>.
+    /// </summary>
     public class AtemConfigService : IConfigService
     {
         private AtemConfig _config;
