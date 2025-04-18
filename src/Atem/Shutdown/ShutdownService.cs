@@ -4,6 +4,10 @@ using Atem.Saving;
 
 namespace Atem.Shutdown
 {
+    /// <summary>
+    /// Handles orderly shutdown of the emulator, storing battery save data
+    /// and configuration values.
+    /// </summary>
     public class ShutdownService : IShutdownService
     {
         private readonly IEmulator _emulator;
