@@ -19,19 +19,9 @@ namespace Atem.Core.Memory.Mapper
 
         public void LoadRTCFromSaveData(byte[] data)
         {
-            byte[] timestampData = new byte[4];
-            Array.Copy(data, 40, timestampData, 0, 4);
-
-            // RTC values are conventionally saved in little endian
-            if (!BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(timestampData);
-            }
-
-            int unixTimestamp = BitConverter.ToInt32(timestampData);
-
-            _rtc = new RTC(data[0], data[4], data[8], data[12].SetBit(8, data[16].GetBit(0)), data[16].GetBit(7), data[16].GetBit(6), unixTimestamp);
-            _rtcLatched = new RTC(data[20], data[24], data[28], data[32].SetBit(8, data[36].GetBit(0)), data[36].GetBit(7), data[36].GetBit(6), unixTimestamp);
+            ReadOnlySpan<byte> dataSpan = data;
+            _rtc = RTC.FromSaveData(dataSpan);
+            _rtcLatched = RTC.FromSaveData(dataSpan, true);
             _rtcLatched.Latched = true;
         }
 

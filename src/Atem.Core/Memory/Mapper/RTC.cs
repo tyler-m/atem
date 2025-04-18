@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO;
 using Atem.Core.State;
 
@@ -121,6 +122,20 @@ namespace Atem.Core.Memory.Mapper
             _secondsElapsed += DateTimeOffset.UtcNow.ToUnixTimeSeconds() - savedUnixTimestamp;
 
             _lastUnixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        }
+
+        public static RTC FromSaveData(ReadOnlySpan<byte> data, bool latch = false)
+        {
+            int offset = latch ? 20 : 0;
+            return new RTC(
+                data[offset],
+                data[offset + 4],
+                data[offset + 8],
+                data[offset + 12].SetBit(8, data[offset + 16].GetBit(0)),
+                data[offset + 16].GetBit(7),
+                data[offset + 16].GetBit(6),
+                BinaryPrimitives.ReadInt32LittleEndian(data.Slice(40, 4))
+            );
         }
 
         private void Update()
