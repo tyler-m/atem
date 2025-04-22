@@ -7,10 +7,6 @@ namespace Atem.Core
         {
             return b ? 1 : 0;
         }
-        public static byte Byte(this bool b)
-        {
-            return (byte)(b ? 1 : 0);
-        }
 
         public static bool GetBit(this byte b, int index)
         {
@@ -44,19 +40,9 @@ namespace Atem.Core
             return u + value > ushort.MaxValue;
         }
 
-        public static bool WillBorrow(this ushort u, int value)
-        {
-            return value > u;
-        }
-
         public static bool WillHalfCarry(this ushort u, int value)
         {
             return (((u & 0xFFF) + (value & 0xFFF)) & 0x1000) == 0x1000;
-        }
-
-        public static bool WillHalfBorrow(this ushort u, int value)
-        {
-            return (((u & 0xFFF) - (value & 0xFFF)) & 0x1000) == 0x1000;
         }
 
         public static bool WillCarry(this byte b, int value)
@@ -113,6 +99,7 @@ namespace Atem.Core
         {
             return (byte)((b >> 4) | (b << 4));
         }
+
         public static bool GetBit(this ushort u, int index)
         {
             return (u & (1 << index)) != 0;
