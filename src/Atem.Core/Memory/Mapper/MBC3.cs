@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Buffers.Binary;
 using System.IO;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Atem.Core.Memory.Mapper
 {
     internal class MBC3 : IMapper
     {
+        private const int RamBankSize = 0x2000;
+
         private byte _type;
         private byte[] _rom;
         private byte[] _ram;
@@ -47,36 +48,15 @@ namespace Atem.Core.Memory.Mapper
             {
                 if (_ramBank <= 0x03)
                 {
-                    int adjustedAddress = address + 0x2000 * _ramBank;
+                    int adjustedAddress = address + RamBankSize * _ramBank;
                     if (adjustedAddress < _ram.Length)
                     {
                         _ram[adjustedAddress] = value;
                     }
                 }
-                else // RTC register write
+                else
                 {
-                    if (_ramBank == 0x08)
-                    {
-                        _rtc.Seconds = value;
-                    }
-                    else if (_ramBank == 0x09)
-                    {
-                        _rtc.Minutes = value;
-                    }
-                    else if (_ramBank == 0x0A)
-                    {
-                        _rtc.Hours = value;
-                    }
-                    else if (_ramBank == 0x0B)
-                    {
-                        _rtc.Day = (_rtc.Day & 0b100000000) | value;
-                    }
-                    else if (_ramBank == 0x0C)
-                    {
-                        _rtc.Day = (_rtc.Day & 0xFF) | (value.GetBit(0).Int() << 8);
-                        _rtc.Halt = value.GetBit(6);
-                        _rtc.DayCarry = value.GetBit(7);
-                    }
+                    WriteRTC(value);
                 }
             }
         }
@@ -87,34 +67,15 @@ namespace Atem.Core.Memory.Mapper
             {
                 if (_ramBank <= 0x03)
                 {
-                    int adjustedAddress = address + 0x2000 * _ramBank;
+                    int adjustedAddress = address + RamBankSize * _ramBank;
                     if (adjustedAddress < _ram.Length)
                     {
                         return _ram[adjustedAddress];
                     }
                 }
-                else // RTC register read
+                else
                 {
-                    if (_ramBank == 0x08)
-                    {
-                        return (byte)_rtcLatched.Seconds;
-                    }
-                    else if (_ramBank == 0x09)
-                    {
-                        return (byte)_rtcLatched.Minutes;
-                    }
-                    else if (_ramBank == 0x0A)
-                    {
-                        return (byte)_rtcLatched.Hours;
-                    }
-                    else if (_ramBank == 0x0B)
-                    {
-                        _rtcLatched.Day = (byte)_rtc.Day;
-                    }
-                    else if (_ramBank == 0x0C)
-                    {
-                        return (byte)(((_rtcLatched.Day >> 8) & 0b1) | (_rtcLatched.Halt.Int() << 6) | (_rtcLatched.DayCarry.Int() << 7));
-                    }
+                    return ReadRTC();
                 }
             }
 
@@ -164,6 +125,47 @@ namespace Atem.Core.Memory.Mapper
                     _latch = 0x01;
                 }
             }
+        }
+
+        private void WriteRTC(byte value)
+        {
+            switch (_ramBank)
+            {
+                case 0x08:
+                    _rtc.Seconds = value;
+                    break;
+                case 0x09:
+                    _rtc.Minutes = value;
+                    break;
+                case 0x0A:
+                    _rtc.Hours = value;
+                    break;
+                case 0x0B:
+                    _rtc.DayLower = value;
+                    break;
+                case 0x0C:
+                    _rtc.DayUpper = (byte)value.GetBit(0).Int();
+                    _rtc.Halt = value.GetBit(6);
+                    _rtc.DayCarry = value.GetBit(7);
+                    break;
+            }
+        }
+        private byte ReadRTC()
+        {
+            switch (_ramBank)
+            {
+                case 0x08:
+                    return (byte)_rtcLatched.Seconds;
+                case 0x09:
+                    return (byte)_rtcLatched.Minutes;
+                case 0x0A:
+                    return (byte)_rtcLatched.Hours;
+                case 0x0B:
+                    return _rtcLatched.DayLower;
+                case 0x0C:
+                    return (byte)(_rtcLatched.DayUpper | (_rtcLatched.Halt.Int() << 6) | (_rtcLatched.DayCarry.Int() << 7));
+            }
+            return 0xFF;
         }
 
         public byte[] GetBatterySave()

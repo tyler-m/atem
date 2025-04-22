@@ -11,7 +11,8 @@ namespace Atem.Core.Memory.Mapper
         private bool _halt, _dayCarry;
         private double _secondsElapsed;
         private long _lastUnixTimestamp;
-        private bool _latched = false;
+
+        public bool Latched { get; set; }
 
         public int Seconds
         {
@@ -20,10 +21,7 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _seconds;
             }
-            set
-            {
-                _seconds = value;
-            }
+            set => _seconds = value;
         }
 
         public int Minutes
@@ -33,10 +31,7 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _minutes;
             }
-            set
-            {
-                _minutes = value;
-            }
+            set => _minutes = value;
         }
 
         public int Hours
@@ -46,10 +41,7 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _hours;
             }
-            set
-            {
-                _hours = value;
-            }
+            set => _hours = value;
         }
 
         public int Day
@@ -59,10 +51,27 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _day;
             }
-            set
+            set => _day = value;
+        }
+
+        public byte DayLower
+        {
+            get
             {
-                _day = value;
+                Update();
+                return (byte)_day;
             }
+            set => _day = (_day & 0b100000000) | value;
+        }
+
+        public byte DayUpper
+        {
+            get
+            {
+                Update();
+                return (byte)((_day >> 8) & 0b1);
+            }
+            set => _day = (_day & 0xFF) | (value.GetBit(0).Int() << 8);
         }
 
         public bool Halt
@@ -72,10 +81,7 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _halt;
             }
-            set
-            {
-                _halt = value;
-            }
+            set => _halt = value;
         }
 
         public bool DayCarry
@@ -85,13 +91,8 @@ namespace Atem.Core.Memory.Mapper
                 Update();
                 return _dayCarry;
             }
-            set
-            {
-                _dayCarry = value;
-            }
+            set => _dayCarry = value;
         }
-
-        public bool Latched { get => _latched; set => _latched = value; }
 
         public RTC()
         {
@@ -153,7 +154,7 @@ namespace Atem.Core.Memory.Mapper
 
         private void Update()
         {
-            if (!_halt && !_latched)
+            if (!_halt && !Latched)
             {
                 long _currentUnixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                 _secondsElapsed += (_currentUnixTimestamp - _lastUnixTimestamp) / 1000.0;
@@ -195,7 +196,7 @@ namespace Atem.Core.Memory.Mapper
             writer.Write(_dayCarry);
             writer.Write(_secondsElapsed);
             writer.Write(_lastUnixTimestamp);
-            writer.Write(_latched);
+            writer.Write(Latched);
         }
 
         public void SetState(BinaryReader reader)
@@ -208,7 +209,7 @@ namespace Atem.Core.Memory.Mapper
             _dayCarry = reader.ReadBoolean();
             _secondsElapsed = reader.ReadDouble();
             _lastUnixTimestamp = reader.ReadInt64();
-            _latched = reader.ReadBoolean();
+            Latched = reader.ReadBoolean();
         }
     }
 }
