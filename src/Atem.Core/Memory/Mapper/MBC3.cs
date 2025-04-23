@@ -118,8 +118,8 @@ namespace Atem.Core.Memory.Mapper
                 {
                     if (_latch == 0x00)
                     {
-                        _rtcLatched = new RTC(_rtc);
-                        _rtcLatched.Latched = true;
+                        _rtc.Update();
+                        _rtcLatched.Set(_rtc);
                     }
 
                     _latch = 0x01;
@@ -182,7 +182,7 @@ namespace Atem.Core.Memory.Mapper
 
             rtcData.CopyTo(rtcSaveSpan.Slice(0, rtcData.Length));
             rtcLatchedData.CopyTo(rtcSaveSpan.Slice(rtcData.Length, rtcLatchedData.Length));
-            BinaryPrimitives.WriteInt32LittleEndian(rtcSaveSpan.Slice(rtcTimestampIndex, 4), (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            BinaryPrimitives.WriteInt64LittleEndian(rtcSaveSpan.Slice(rtcTimestampIndex, 8), _rtc.LastUnixTimestamp);
 
             return saveFile.ToArray();
         }
@@ -197,7 +197,6 @@ namespace Atem.Core.Memory.Mapper
                 var rtcSpan = saveData.AsSpan(_ram.Length, rtcDataSize);
                 _rtc = RTC.FromSaveData(rtcSpan);
                 _rtcLatched = RTC.FromSaveData(rtcSpan, true);
-                _rtcLatched.Latched = true;
             }
         }
 
