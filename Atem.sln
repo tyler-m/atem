@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Core", "src\Atem.Core\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Test", "src\Atem.Test\Atem.Test.csproj", "{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Atem.Core.Test", "src\Atem.Core.Test\Atem.Core.Test.csproj", "{DDFC7364-B9F7-40FD-A50F-A6210A7CF666}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF14A5EC-197C-472A-81FF-8B5DEDB6823D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDFC7364-B9F7-40FD-A50F-A6210A7CF666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDFC7364-B9F7-40FD-A50F-A6210A7CF666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDFC7364-B9F7-40FD-A50F-A6210A7CF666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDFC7364-B9F7-40FD-A50F-A6210A7CF666}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

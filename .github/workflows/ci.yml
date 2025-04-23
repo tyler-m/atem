@@ -18,6 +18,7 @@ jobs:
           dotnet restore src/Atem.Core/Atem.Core.csproj --no-cache
           dotnet restore src/Atem/Atem.csproj --no-cache
           dotnet restore src/Atem.Test/Atem.Test.csproj --no-cache
+          dotnet restore src/Atem.Core.Test/Atem.Core.Test.csproj --no-cache
       - name: Build
         run: dotnet build -c Release --no-restore
       - name: Test
