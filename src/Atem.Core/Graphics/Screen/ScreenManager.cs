@@ -12,7 +12,6 @@ namespace Atem.Core.Graphics.Screen
         public const int ScreenWidth = 160;
         public const int ScreenHeight = 144;
 
-        private readonly IBus _bus;
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly ITileManager _tileManager;
         private readonly IObjectManager _objectManager;
@@ -28,9 +27,8 @@ namespace Atem.Core.Graphics.Screen
         public bool BackgroundAndWindowEnabledOrPriority { get => _backgroundAndWindowEnabledOrPriority; set => _backgroundAndWindowEnabledOrPriority = value; }
         public GBColor[] Screen { get => _screen; set => _screen = value; }
 
-        public ScreenManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
+        public ScreenManager(IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
         {
-            _bus = bus;
             _renderModeScheduler = renderModeScheduler;
             _tileManager = tileManager;
             _objectManager = objectManager;

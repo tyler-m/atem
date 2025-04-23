@@ -68,7 +68,7 @@ namespace Atem.Core
             StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
             TileManager tileManager = new(renderModeScheduler, paletteProvider, _cartridge);
             ObjectManager objectManager = new(_bus, renderModeScheduler, tileManager, paletteProvider, _cartridge);
-            ScreenManager screenManager = new(_bus, renderModeScheduler, tileManager, objectManager, _cartridge);
+            ScreenManager screenManager = new(renderModeScheduler, tileManager, objectManager, _cartridge);
             _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
 
             _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio, _cartridge);
