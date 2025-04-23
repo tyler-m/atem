@@ -10,7 +10,7 @@ namespace Atem.Core.Processing
         byte KEY1 { get; set; }
         bool SpeedSwitchFlag { get; set; }
         void Halt();
-        CPURegisters Registers { get; }
+        ProcessorRegisters Registers { get; }
         byte ReadBus(ushort address);
         void WriteBus(ushort address, byte value);
         byte ReadByte();

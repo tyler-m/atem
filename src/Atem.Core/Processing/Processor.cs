@@ -9,7 +9,7 @@ namespace Atem.Core.Processing
     {
         public const int FREQUENCY = 4194304;
 
-        private readonly CPURegisters _registers;
+        private readonly ProcessorRegisters _registers;
         private readonly IBus _bus;
         private byte _instruction;
         private bool _cb;
@@ -26,7 +26,7 @@ namespace Atem.Core.Processing
         private readonly Dictionary<byte, Func<IProcessor, int>> _instructions = [];
         private readonly Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
 
-        public CPURegisters Registers { get => _registers; }
+        public ProcessorRegisters Registers { get => _registers; }
         public bool CB { get => _cb; set => _cb = value; }
         public bool DoubleSpeed { get => _doubleSpeed; set => _doubleSpeed = value; }
         public bool SpeedSwitchFlag { get => _speedSwitchFlag; set => _speedSwitchFlag = value; }
@@ -48,7 +48,7 @@ namespace Atem.Core.Processing
         public Processor(IBus bus)
         {
             _bus = bus;
-            _registers = new CPURegisters();
+            _registers = new ProcessorRegisters();
             PopulateInstructionsLists();
         }
 
