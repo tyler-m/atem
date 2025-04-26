@@ -29,8 +29,8 @@ Status
   
 - **Input**
   - Keyboard control rebinding
+  - Simulated [Game Link Cable](https://en.wikipedia.org/wiki/Game_Link_Cable) over network
   - No Gamepad support yet
-  - No Serial communication yet (simulated link cable)
   
 - **Saving**
   - Save and load emulator states
