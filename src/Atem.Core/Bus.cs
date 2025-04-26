@@ -16,7 +16,7 @@ namespace Atem.Core
         private Timer _timer;
         private Interrupt _interrupt;
         private Joypad _joypad;
-        private Serial _serial;
+        private SerialManager _serial;
         private BootROM _bootROM;
         private Cartridge _cartridge;
         private AudioManager _audio;
@@ -27,7 +27,7 @@ namespace Atem.Core
         public byte SVBK { get => _svbk; set => _svbk = value; }
         public int MemorySize => 0x10000;
 
-        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, Serial serial, GraphicsManager graphics, AudioManager audio, Cartridge cartridge)
+        public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, SerialManager serial, GraphicsManager graphics, AudioManager audio, Cartridge cartridge)
         {
             _interrupt = interrupt;
             _joypad = joypad;

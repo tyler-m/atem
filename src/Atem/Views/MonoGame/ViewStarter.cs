@@ -27,6 +27,7 @@ namespace Atem.Views.MonoGame
             FileBatterySaveService batterySaveService = new(emulator);
             InputManager inputManager = new(new KeyProvider());
             RecentFilesService recentFilesService = new();
+            TCPSerialLink serialLink = new TCPSerialLink(emulator.Serial);
 
             AtemConfigDefaultsProvider atemConfigDefaultsProvider = new();
             FileConfigStore<AtemConfig> configStore = new(atemConfigDefaultsProvider, Directory.GetCurrentDirectory() + "/config.json");
@@ -34,7 +35,7 @@ namespace Atem.Views.MonoGame
             ShutdownService shutdownService = new(emulator, configService, cartridgeLoader, batterySaveService);
 
             ImGuiRenderer imGui = new();
-            ViewUIManager viewUIManager = new(imGui, emulator, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService);
+            ViewUIManager viewUIManager = new(imGui, emulator, saveStateService, batterySaveService, cartridgeLoader, screen, inputManager, recentFilesService, serialLink);
 
             View view = new View(viewUIManager, emulator, screen, window, soundService, inputManager, shutdownService);
             view.OnInitialize += () => imGui.Initialize(view); // link ImGuiRenderer and View instances

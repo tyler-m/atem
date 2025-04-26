@@ -25,7 +25,7 @@ namespace Atem.Core
         private readonly Interrupt _interrupt;
         private readonly Joypad _joypad;
         private readonly Timer _timer;
-        private readonly Serial _serial;
+        private readonly SerialManager _serial;
         private readonly GraphicsManager _graphics;
         private readonly AudioManager _audio;
         private readonly Cartridge _cartridge;
@@ -42,6 +42,7 @@ namespace Atem.Core
         public Processor Processor => _processor;
         public AudioManager Audio => _audio;
         public ICartridge Cartridge => _cartridge;
+        public SerialManager Serial => _serial;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
@@ -58,7 +59,7 @@ namespace Atem.Core
             _interrupt = new Interrupt();
             _joypad = new Joypad(_interrupt);
             _timer = new Timer(_interrupt);
-            _serial = new Serial();
+            _serial = new SerialManager(_interrupt);
             _audio = new AudioManager();
             _cartridge = new Cartridge();
 
@@ -261,11 +262,13 @@ namespace Atem.Core
 
             bool opFinished = _processor.Clock();
             _timer.Clock();
+            _serial.Clock();
 
             if (_processor.DoubleSpeed)
             {
                 opFinished |= _processor.Clock();
                 _timer.Clock();
+                _serial.Clock();
             }
 
             _graphics.Clock();

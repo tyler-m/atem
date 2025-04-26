@@ -3,11 +3,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Atem.Core;
-using Atem.Views.MonoGame.UI.Window;
 using Atem.Input;
 using Atem.IO;
 using Atem.Saving;
 using Atem.Views.MonoGame.Graphics;
+using Atem.Views.MonoGame.UI.Window;
 
 namespace Atem.Views.MonoGame.UI
 {
@@ -37,7 +37,7 @@ namespace Atem.Views.MonoGame.UI
 
         public bool Debug { get => _debug; }
 
-        public ViewUIManager(ImGuiRenderer imGui, Emulator emulator, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager, IRecentFilesService recentFilesService)
+        public ViewUIManager(ImGuiRenderer imGui, Emulator emulator, ISaveStateService saveStateService, IBatterySaveService batterySaveService, ICartridgeLoader cartridgeLoader, Screen screen, InputManager inputManager, IRecentFilesService recentFilesService, TCPSerialLink serialLink)
         {
             _imGui = imGui;
             _emulator = emulator;
@@ -57,7 +57,7 @@ namespace Atem.Views.MonoGame.UI
             _menuBar.OnSelectRecentFile += LoadFile;
             _breakpointWindow = new BreakpointWindow(_emulator.Debugger);
             _processorRegistersWindow = new ProcessorRegistersWindow(_emulator.Processor);
-            _optionsWindow = new OptionsWindow(screen, _emulator.Audio, inputManager);
+            _optionsWindow = new OptionsWindow(screen, _emulator.Audio, inputManager, serialLink);
             _screen.OnScreenTextureCreated += OnScreenTextureCreated;
         }
 

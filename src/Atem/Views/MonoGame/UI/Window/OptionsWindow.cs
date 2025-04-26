@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using ImGuiNET;
 using Atem.Core.Audio;
 using Atem.Graphics;
 using Atem.Input.Command;
 using Atem.Input;
+using Atem.IO;
 
 namespace Atem.Views.MonoGame.UI.Window
 {
@@ -13,11 +15,15 @@ namespace Atem.Views.MonoGame.UI.Window
         private readonly IScreen _screen;
         private readonly IAudioManager _audioManager;
         private readonly InputManager _inputManager;
+        private readonly TCPSerialLink _serialLink;
         private bool _active;
         private bool _screenSizeLocked;
         private float _volume;
         private int _selectedScreenSizeFactor;
         private readonly bool[] _enableChannel;
+
+        private byte[] _hostname = new byte[128];
+        private int _port;
 
         public bool Active
         {
@@ -45,12 +51,15 @@ namespace Atem.Views.MonoGame.UI.Window
             }
         }
 
-        public OptionsWindow(IScreen screen, IAudioManager audioManager, InputManager inputManager)
+        public OptionsWindow(IScreen screen, IAudioManager audioManager, InputManager inputManager, TCPSerialLink serialLink)
         {
             _screen = screen;
             _inputManager = inputManager;
             _audioManager = audioManager;
             _enableChannel = new bool[_audioManager.Channels.Count];
+            _serialLink = serialLink;
+            _port = _serialLink.Port;
+            Encoding.ASCII.GetBytes(_serialLink.Hostname).CopyTo(_hostname, 0);
         }
 
         public void Draw()
@@ -168,6 +177,43 @@ namespace Atem.Views.MonoGame.UI.Window
                 {
                     _screen.SizeFactor = _selectedScreenSizeFactor + 1;
                     UpdateOptionsValues();
+                }
+
+                ImGui.EndChild();
+                ImGui.EndTabItem();
+            }
+
+            if (ImGui.BeginTabItem("Netplay"))
+            {
+                ImGui.BeginChild("NetplayChild");
+
+                if (!_serialLink.IsConnected)
+                {
+                    if (ImGui.Button("Start Hosting"))
+                    {
+                        _ = _serialLink.StartAsync(_port);
+                    }
+
+                    ImGui.InputText("##Address", _hostname, (uint)_hostname.Length);
+                    ImGui.InputInt("##Port", ref _port);
+
+                    if (ImGui.Button("Connect To Host"))
+                    {
+                        int nullTerminatorIndex = Array.IndexOf(_hostname, (byte)0);
+                        string address = Encoding.ASCII.GetString(_hostname, 0, nullTerminatorIndex);
+                        _ = _serialLink.ConnectAsync(address, _port);
+                    }
+                }
+                else
+                {
+                    if (_serialLink.IsHost)
+                    {
+                        ImGui.Text($"Hosting at {_serialLink.Hostname} on port {_serialLink.Port}");
+                    }
+                    else
+                    {
+                        ImGui.Text($"Connected to {_serialLink.Hostname} on port {_serialLink.Port}");
+                    }
                 }
 
                 ImGui.EndChild();
