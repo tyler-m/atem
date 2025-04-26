@@ -156,7 +156,6 @@ namespace Atem.IO
                     }
                     else
                     {
-                        Console.WriteLine("writing fallback byte");
                         Write(FallbackByte);
                     }
 
