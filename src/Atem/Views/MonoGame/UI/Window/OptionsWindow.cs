@@ -183,9 +183,9 @@ namespace Atem.Views.MonoGame.UI.Window
                 ImGui.EndTabItem();
             }
 
-            if (ImGui.BeginTabItem("Netplay"))
+            if (ImGui.BeginTabItem("Link Cable"))
             {
-                ImGui.BeginChild("NetplayChild");
+                ImGui.BeginChild("LinkCableChild");
 
                 if (!_serialLink.IsConnected)
                 {
