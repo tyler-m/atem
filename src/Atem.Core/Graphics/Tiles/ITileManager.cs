@@ -5,7 +5,8 @@ namespace Atem.Core.Graphics.Tiles
 {
     public interface ITileManager : IStateful
     {
-        public byte[] VRAM { get; set; }
+        public TileSet TileSet { get; }
+        public TileMap TileMap { get; }
         public byte Bank { get; set; }
         public int WindowTileMapArea { get; set; }
         public int BackgroundTileMapArea { get; set; }
@@ -16,7 +17,6 @@ namespace Atem.Core.Graphics.Tiles
         public int WindowY { get; set; }
         public byte ReadVRAM(ushort address);
         public void WriteVRAM(ushort address, byte value, bool ignoreRenderMode);
-        public int GetTileId(int tileDataAddress, int offsetX, int offsetY, bool flipX = false, bool flipY = false);
-        public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfo(int pixelX, int pixelY, bool window);
+        public (GBColor tileColor, int tileId, bool tilePriority) GetTileInfoAtScreenPixel(int pixelX, int pixelY, bool window);
     }
 }

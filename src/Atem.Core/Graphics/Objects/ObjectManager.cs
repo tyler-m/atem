@@ -19,13 +19,11 @@ namespace Atem.Core.Graphics.Objects
         private readonly Cartridge _cartridge;
         private readonly Sprite[] _objects = new Sprite[MAX_SPRITES];
         private readonly List<Sprite> _spriteBuffer = [];
-        private bool _objectsEnabled;
         private int _objectIndex;
-        private bool _largeObjects;
         private byte _odma;
 
-        public bool ObjectsEnabled { get => _objectsEnabled; set => _objectsEnabled = value; }
-        public bool LargeObjects { get => _largeObjects; set => _largeObjects = value; }
+        public bool ObjectsEnabled { get; set; }
+        public bool LargeObjects { get; set; }
 
         public byte ODMA
         {
@@ -40,7 +38,7 @@ namespace Atem.Core.Graphics.Objects
             }
         }
 
-        public ObjectManager(IBus bus, IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IPaletteProvider paletteProvider, Cartridge cartridge)
+        public ObjectManager(IBus bus, IRenderModeScheduler renderModeScheduler, TileManager tileManager, IPaletteProvider paletteProvider, Cartridge cartridge)
         {
             _bus = bus;
             _renderModeScheduler = renderModeScheduler;
@@ -90,7 +88,7 @@ namespace Atem.Core.Graphics.Objects
                 {
                     Sprite sprite = _objects[_objectIndex++];
 
-                    int spriteHeight = _largeObjects ? 16 : 8;
+                    int spriteHeight = LargeObjects ? 16 : 8;
                     if (sprite.X > 0 && _renderModeScheduler.CurrentLine + 16 >= sprite.Y && _renderModeScheduler.CurrentLine + 16 < sprite.Y + spriteHeight)
                     {
                         _spriteBuffer.Add(sprite);
@@ -101,15 +99,13 @@ namespace Atem.Core.Graphics.Objects
 
         private int GetSpriteId(Sprite sprite, int pixelX, int pixelY)
         {
-            int offsetX = pixelX - (sprite.X - 8); // coordinates of pixel inside tile at (x, y)
+            // coordinates of pixel inside tile at (x, y)
+            int offsetX = pixelX - (sprite.X - 8);
             int offsetY = pixelY - (sprite.Y - 16);
             byte spriteTile = sprite.Tile;
 
-            if (_largeObjects)
+            if (LargeObjects)
             {
-                // ignore first bit of tile with 8x16 objects
-                spriteTile &= 0b11111110;
-
                 if (sprite.FlipY)
                 {
                     offsetY = 15 - offsetY;
@@ -123,8 +119,9 @@ namespace Atem.Core.Graphics.Objects
                 }
             }
 
-            int tileDataAddress = spriteTile * 16 + (_cartridge.SupportsColor ? 0x2000 * sprite.Bank : 0);
-            int id = _tileManager.GetTileId(tileDataAddress, offsetX, offsetY, sprite.FlipX);
+            offsetY %= 8;
+
+            int id = _tileManager.TileSet.GetTile(spriteTile, (byte)(_cartridge.SupportsColor ? sprite.Bank : 0)).GetPixel(offsetX, offsetY, sprite.FlipX);
             return id;
         }
 
@@ -250,9 +247,9 @@ namespace Atem.Core.Graphics.Objects
                 writer.Write(_spriteBuffer.IndexOf(sprite));
             }
 
-            writer.Write(_objectsEnabled);
+            writer.Write(ObjectsEnabled);
             writer.Write(_objectIndex);
-            writer.Write(_largeObjects);
+            writer.Write(LargeObjects);
             writer.Write(_odma);
         }
 
@@ -277,9 +274,9 @@ namespace Atem.Core.Graphics.Objects
             _spriteBuffer.Clear();
             _spriteBuffer.AddRange(spriteBufferArray);
 
-            _objectsEnabled = reader.ReadBoolean();
+            ObjectsEnabled = reader.ReadBoolean();
             _objectIndex = reader.ReadInt32();
-            _largeObjects = reader.ReadBoolean();
+            LargeObjects = reader.ReadBoolean();
             _odma = reader.ReadByte();
         }
     }

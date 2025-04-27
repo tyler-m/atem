@@ -16,16 +16,13 @@ namespace Atem.Core.Graphics.Screen
         private readonly ITileManager _tileManager;
         private readonly IObjectManager _objectManager;
         private readonly Cartridge _cartridge;
-        private GBColor[] _screen = new GBColor[160 * 144];
         private byte _linePixel;
         private bool _windowWasTriggeredThisFrame;
         private byte _currentWindowLine;
-        private bool _windowEnabled;
-        private bool _backgroundAndWindowEnabledOrPriority;
 
-        public bool WindowEnabled { get => _windowEnabled; set => _windowEnabled = value; }
-        public bool BackgroundAndWindowEnabledOrPriority { get => _backgroundAndWindowEnabledOrPriority; set => _backgroundAndWindowEnabledOrPriority = value; }
-        public GBColor[] Screen { get => _screen; set => _screen = value; }
+        public bool WindowEnabled { get; set; }
+        public bool BackgroundAndWindowEnabledOrPriority { get; set; }
+        public GBColor[] Screen { get; private set; } = new GBColor[ScreenWidth * ScreenHeight];
 
         public ScreenManager(IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
         {
@@ -35,9 +32,9 @@ namespace Atem.Core.Graphics.Screen
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
             _cartridge = cartridge;
 
-            for (int i = 0; i < _screen.Length; i++)
+            for (int i = 0; i < Screen.Length; i++)
             {
-                _screen[i] = new GBColor(0, 0, 0);
+                Screen[i] = new GBColor(0, 0, 0);
             }
         }
 
@@ -60,12 +57,9 @@ namespace Atem.Core.Graphics.Screen
 
         private GBColor GetColorOfScreenPixel(byte pixelX, byte pixelY)
         {
-            bool window = _windowEnabled && pixelX > _tileManager.WindowX - 8 && _tileManager.WindowY <= pixelY;
-            _windowWasTriggeredThisFrame |= window;
+            (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfoAtScreenPixel(pixelX, _windowWasTriggeredThisFrame ? _currentWindowLine : pixelY, _windowWasTriggeredThisFrame);
 
-            (GBColor tileColor, int tileId, bool tilePriority) = _tileManager.GetTileInfo(pixelX, window ? _currentWindowLine : pixelY, window);
-
-            if (!_cartridge.SupportsColor && !_backgroundAndWindowEnabledOrPriority)
+            if (!_cartridge.SupportsColor && !BackgroundAndWindowEnabledOrPriority)
             {
                 tileColor = new GBColor(0xFFFF);
             }
@@ -83,7 +77,7 @@ namespace Atem.Core.Graphics.Screen
 
             if (_cartridge.SupportsColor)
             {
-                if (tilePriority && tileId != 0 && _backgroundAndWindowEnabledOrPriority)
+                if (tilePriority && tileId != 0 && BackgroundAndWindowEnabledOrPriority)
                 {
                     pixelColor = tileColor;
                 }
@@ -98,8 +92,14 @@ namespace Atem.Core.Graphics.Screen
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    int index = _renderModeScheduler.CurrentLine * 160 + _linePixel;
-                    _screen[index] = GetColorOfScreenPixel(_linePixel, _renderModeScheduler.CurrentLine);
+                    byte pixelX = _linePixel;
+                    byte pixelY = _renderModeScheduler.CurrentLine;
+
+                    bool window = WindowEnabled && pixelX > _tileManager.WindowX - 8 && _tileManager.WindowY <= pixelY;
+                    _windowWasTriggeredThisFrame |= window;
+
+                    int pixelIndex = pixelY * ScreenWidth + pixelX;
+                    Screen[pixelIndex] = GetColorOfScreenPixel(pixelX, pixelY);
                     _linePixel++;
                 }
             }
@@ -114,10 +114,10 @@ namespace Atem.Core.Graphics.Screen
             writer.Write(_linePixel);
             writer.Write(_windowWasTriggeredThisFrame);
             writer.Write(_currentWindowLine);
-            writer.Write(_windowEnabled);
-            writer.Write(_backgroundAndWindowEnabledOrPriority);
+            writer.Write(WindowEnabled);
+            writer.Write(BackgroundAndWindowEnabledOrPriority);
 
-            foreach (GBColor pixel in _screen)
+            foreach (GBColor pixel in Screen)
             {
                 pixel.GetState(writer);
             }
@@ -128,10 +128,10 @@ namespace Atem.Core.Graphics.Screen
             _linePixel = reader.ReadByte();
             _windowWasTriggeredThisFrame = reader.ReadBoolean();
             _currentWindowLine = reader.ReadByte();
-            _windowEnabled = reader.ReadBoolean();
-            _backgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
+            WindowEnabled = reader.ReadBoolean();
+            BackgroundAndWindowEnabledOrPriority = reader.ReadBoolean();
 
-            foreach (GBColor pixel in _screen)
+            foreach (GBColor pixel in Screen)
             {
                 pixel.SetState(reader);
             }
