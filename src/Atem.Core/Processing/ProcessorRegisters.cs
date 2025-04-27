@@ -1,4 +1,6 @@
-﻿
+﻿using System.IO;
+using Atem.Core.State;
+
 namespace Atem.Core.Processing
 {
     public class ProcessorFlags
@@ -10,7 +12,7 @@ namespace Atem.Core.Processing
         public bool C { get => F.GetBit(4); set => F = F.SetBit(4, value); }
     }
 
-    public class ProcessorRegisters
+    public class ProcessorRegisters : IStateful
     {
         public ushort SP, PC;
         public byte A, B, C, D, E, H, L;
@@ -54,6 +56,34 @@ namespace Atem.Core.Processing
                 H = value.GetHighByte();
                 L = value.GetLowByte();
             }
+        }
+
+        public void GetState(BinaryWriter writer)
+        {
+            writer.Write(A);
+            writer.Write(B);
+            writer.Write(C);
+            writer.Write(D);
+            writer.Write(E);
+            writer.Write(H);
+            writer.Write(L);
+            writer.Write(SP);
+            writer.Write(PC);
+            writer.Write(Flags.F);
+        }
+
+        public void SetState(BinaryReader reader)
+        {
+            A = reader.ReadByte();
+            B = reader.ReadByte();
+            C = reader.ReadByte();
+            D = reader.ReadByte();
+            E = reader.ReadByte();
+            H = reader.ReadByte();
+            L = reader.ReadByte();
+            SP = reader.ReadUInt16();
+            PC = reader.ReadUInt16();
+            Flags.F = reader.ReadByte();
         }
     }
 }

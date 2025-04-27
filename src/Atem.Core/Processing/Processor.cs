@@ -168,16 +168,7 @@ namespace Atem.Core.Processing
 
         public void GetState(BinaryWriter writer)
         {
-            writer.Write(Registers.A);
-            writer.Write(Registers.B);
-            writer.Write(Registers.C);
-            writer.Write(Registers.D);
-            writer.Write(Registers.E);
-            writer.Write(Registers.H);
-            writer.Write(Registers.L);
-            writer.Write(Registers.SP);
-            writer.Write(Registers.PC);
-            writer.Write(Registers.Flags.F);
+            _registers.GetState(writer);
             writer.Write(_instruction);
             writer.Write(_length);
             writer.Write(CB);
@@ -192,16 +183,7 @@ namespace Atem.Core.Processing
 
         public void SetState(BinaryReader reader)
         {
-            Registers.A = reader.ReadByte();
-            Registers.B = reader.ReadByte();
-            Registers.C = reader.ReadByte();
-            Registers.D = reader.ReadByte();
-            Registers.E = reader.ReadByte();
-            Registers.H = reader.ReadByte();
-            Registers.L = reader.ReadByte();
-            Registers.SP = reader.ReadUInt16();
-            Registers.PC = reader.ReadUInt16();
-            Registers.Flags.F = reader.ReadByte();
+            _registers.SetState(reader);
             _instruction = reader.ReadByte();
             _length = reader.ReadInt32();
             CB = reader.ReadBoolean();
