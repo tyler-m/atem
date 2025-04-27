@@ -21,7 +21,7 @@ Status
 - **Sound**
   - Synthesizes audio for Pulse, Wave, and Noise channels
   - Audio filters (high-pass, low-pass)
-  - Doesn't fully handle "obscure behavior" yet (see [Pan Docs](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior))
+  - Doesn't fully handle "[obscure behavior](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior)" yet
 
 - **Memory**
   - Loads MBC1, MBC3, MBC5 cartridges
@@ -29,8 +29,10 @@ Status
   
 - **Input**
   - Keyboard control rebinding
-  - Simulated [Game Link Cable](https://en.wikipedia.org/wiki/Game_Link_Cable) over network
   - No Gamepad support yet
+
+- **Networking**
+  - Simulated [Game Link Cable](https://en.wikipedia.org/wiki/Game_Link_Cable) over TCP
   
 - **Saving**
   - Save and load emulator states
