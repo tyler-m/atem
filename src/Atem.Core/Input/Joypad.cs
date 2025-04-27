@@ -1,6 +1,6 @@
-﻿using Atem.Core.Processing;
+﻿using System.IO;
+using Atem.Core.Processing;
 using Atem.Core.State;
-using System.IO;
 
 namespace Atem.Core.Input
 {
