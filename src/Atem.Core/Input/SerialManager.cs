@@ -6,12 +6,8 @@ namespace Atem.Core.Input
 {
     public class SerialManager : IStateful
     {
-        public object Lock = new();
-
-        private byte _sb, _sc;
         private readonly Interrupt _interrupt;
-
-        public byte SB { get => _sb; set => _sb = value; }
+        private byte _sc;
 
         public byte SC
         {
@@ -24,6 +20,7 @@ namespace Atem.Core.Input
             }
         }
 
+        public byte SB { get; set; }
         public bool TransferEnabled { get => _sc.GetBit(7); set => SC = _sc.SetBit(7, value); }
         public bool Master { get => _sc.GetBit(0); set => SC = _sc.SetBit(0, value); }
 
@@ -33,14 +30,19 @@ namespace Atem.Core.Input
         public delegate void ClockEvent();
         public event ClockEvent OnClock;
 
+        public SerialManager(Interrupt interrupt)
+        {
+            _interrupt = interrupt;
+        }
+
         public void Clock()
         {
             OnClock?.Invoke();
         }
 
-        public SerialManager(Interrupt interrupt)
+        public void RequestInterrupt()
         {
-            _interrupt = interrupt;
+            _interrupt.SetInterrupt(InterruptType.Serial);
         }
 
         public void GetState(BinaryWriter writer)
@@ -53,11 +55,6 @@ namespace Atem.Core.Input
         {
             SB = reader.ReadByte();
             SC = reader.ReadByte();
-        }
-
-        public void RequestInterrupt()
-        {
-            _interrupt.SetInterrupt(InterruptType.Serial);
         }
     }
 }
