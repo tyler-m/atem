@@ -11,9 +11,6 @@ namespace Atem.Core.Processing
         // and bit shifting it on read instead of using the
         // additional _divTick with conditionals
         private byte _div;
-        private byte _tima;
-        private byte _tma;
-        private byte _tac;
 
         private int _divTick;
         private int _timaTick;
@@ -23,67 +20,17 @@ namespace Atem.Core.Processing
             _interrupt = interrupt;
         }
 
-        public byte DIV
-        { 
-            get
-            {
-                return _div;
-            }
-            set
-            {
-                _div = 0;
-            }
-        }
-
-        public byte TIMA
-        {
-            get
-            {
-                return _tima;
-            }
-            set
-            {
-                _tima = value;
-            }
-        }
-
-        public byte TMA
-        {
-            get
-            {
-                return _tma;
-            }
-            set
-            {
-                _tma = value;
-            }
-        }
-
-        public byte TAC
-        {
-            get
-            {
-                return _tac;
-            }
-            set
-            {
-                _tac = value;
-            }
-        }
-
-        private bool TACEnabled
-        {
-            get
-            {
-                return _tac.GetBit(2);
-            }
-        }
+        public byte DIV { get => _div; set => _div = 0; }
+        public byte TIMA { get; set; }
+        public byte TMA { get; set; }
+        public byte TAC { get; set; }
+        private bool TACEnabled => TAC.GetBit(2);
 
         private int TIMATickPeriod
         {
             get
             {
-                int clockMode = _tac & 0b11;
+                int clockMode = TAC & 0b11;
 
                 if (clockMode == 0)
                 {
@@ -106,14 +53,14 @@ namespace Atem.Core.Processing
 
         private void IncrementTIMA()
         {
-            if (_tima.WillCarry(1))
+            if (TIMA.WillCarry(1))
             {
-                _tima = _tma;
+                TIMA = TMA;
                 _interrupt.SetInterrupt(InterruptType.Timer);
             }
             else
             {
-                _tima++;
+                TIMA++;
             }
         }
 
@@ -142,9 +89,9 @@ namespace Atem.Core.Processing
         public void GetState(BinaryWriter writer)
         {
             writer.Write(_div);
-            writer.Write(_tima);
-            writer.Write(_tma);
-            writer.Write(_tac);
+            writer.Write(TIMA);
+            writer.Write(TMA);
+            writer.Write(TAC);
             writer.Write(_divTick);
             writer.Write(_timaTick);
         }
@@ -152,9 +99,9 @@ namespace Atem.Core.Processing
         public void SetState(BinaryReader reader)
         {
             _div = reader.ReadByte();
-            _tima = reader.ReadByte();
-            _tma = reader.ReadByte();
-            _tac = reader.ReadByte();
+            TIMA = reader.ReadByte();
+            TMA = reader.ReadByte();
+            TAC = reader.ReadByte();
             _divTick = reader.ReadInt32();
             _timaTick = reader.ReadInt32();
         }
