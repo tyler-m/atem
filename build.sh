@@ -6,8 +6,8 @@ LICENSE_FILE="./LICENSE"
 NOTICE_FILE="./THIRD-PARTY-LICENSES"
 
 declare -A RUNTIMES
-RUNTIMES["win-x64"]="cimgui.dll openal.dll SDL2.dll"
-RUNTIMES["linux-x64"]="libcimgui.so libopenal.so libSDL2-2.0.so.0"
+RUNTIMES["win-x64"]="cimgui.dll soft_oal.dll SDL2.dll"
+RUNTIMES["linux-x64"]="libcimgui.so libopenal.so.1 libSDL2-2.0.so.0"
 
 # check for dotnet
 if ! command -v dotnet &> /dev/null; then
@@ -62,7 +62,7 @@ publish() {
   local self_contained=$2
   local output_path=$3
 
-  echo "Publishing $runtime ($self_contained)"
+  echo "Publishing $runtime (self-contained: $self_contained)"
   if ! dotnet publish "$PROJECT_PATH" -c Release -r "$runtime" --self-contained "$self_contained" \
         -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o "$output_path"; then
     echo "Error publishing $runtime"
@@ -72,8 +72,6 @@ publish() {
 
 for RUNTIME in "${!RUNTIMES[@]}"; do
   RUNTIMES_LIST="${RUNTIMES[$RUNTIME]}"
-  
-  echo "Publishing $RUNTIME"
 
   # framework-dependent
   OUTPUT_PATH="$OUTPUT_PATH_PREFIX-$RUNTIME-nd"
