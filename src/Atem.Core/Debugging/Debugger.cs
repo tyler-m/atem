@@ -6,9 +6,8 @@ namespace Atem.Core.Debugging
     {
         private readonly Dictionary<ushort, Breakpoint> _breakpointAddressHashset = [];
         private readonly List<Breakpoint> _breakpoints = [];
-        private bool _active;
 
-        public bool Active { get => _active; set => _active = value; }
+        public bool Active { get; set; }
         public int BreakpointCount { get => _breakpoints.Count; }
 
         public delegate void OnBreakpointEvent(ushort address);
@@ -39,14 +38,14 @@ namespace Atem.Core.Debugging
             return _breakpoints[index];
         }
 
-        internal bool CheckBreakpoints(ushort programCounter)
+        internal bool CheckBreakpoints(ushort address)
         {
-            if (_breakpointAddressHashset.TryGetValue(programCounter, out Breakpoint breakpoint)) 
+            if (_breakpointAddressHashset.TryGetValue(address, out Breakpoint breakpoint)) 
             {
                 if (breakpoint.Enabled)
                 {
                     breakpoint.HitCount++;
-                    OnBreakpoint?.Invoke(programCounter);
+                    OnBreakpoint?.Invoke(address);
                     return true;
                 }
             }
