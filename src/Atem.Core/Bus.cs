@@ -22,9 +22,8 @@ namespace Atem.Core
         private AudioManager _audio;
         private readonly byte[] _hram = new byte[0x7F];
         private readonly byte[] _wram = new byte[0x2000 * 4];
-        private byte _svbk;
 
-        public byte SVBK { get => _svbk; set => _svbk = value; }
+        public byte SVBK { get; private set; }
         public int MemorySize => 0x10000;
 
         public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, SerialManager serial, GraphicsManager graphics, AudioManager audio, Cartridge cartridge)
@@ -654,7 +653,7 @@ namespace Atem.Core
             _audio.GetState(writer);
             _cartridge.GetState(writer);
             
-            writer.Write(_svbk);
+            writer.Write(SVBK);
             writer.Write(_hram);
             writer.Write(_wram);
         }
@@ -670,7 +669,7 @@ namespace Atem.Core
             _audio.SetState(reader);
             _cartridge.SetState(reader);
 
-            _svbk = reader.ReadByte();
+            SVBK = reader.ReadByte();
             Array.Copy(reader.ReadBytes(_hram.Length), _hram, _hram.Length);
             Array.Copy(reader.ReadBytes(_wram.Length), _wram, _wram.Length);
         }

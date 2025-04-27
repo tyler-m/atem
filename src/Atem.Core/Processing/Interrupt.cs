@@ -1,5 +1,5 @@
-﻿using Atem.Core.State;
-using System.IO;
+﻿using System.IO;
+using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {

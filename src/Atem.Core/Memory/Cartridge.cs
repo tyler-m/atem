@@ -8,12 +8,10 @@ namespace Atem.Core.Memory
     {
         private byte _type;
         private byte _colorFlag;
-        private bool _loaded;
-        private string _title;
         private IMapper _mbc;
 
-        public bool Loaded { get => _loaded; }
-        public string Title { get => _title; }
+        public bool Loaded { get; private set; }
+        public string Title { get; private set; }
         public bool SupportsColor { get => _colorFlag == 0x80 || _colorFlag == 0xC0; }
 
         public Cartridge()
@@ -38,7 +36,7 @@ namespace Atem.Core.Memory
 
         public bool Load(byte[] rom)
         {
-            _loaded = false;
+            Loaded = false;
 
             byte checksum = 0;
             for (ushort address = 0x0134; address <= 0x014C; address++)
@@ -51,13 +49,13 @@ namespace Atem.Core.Memory
                 return false;
             }
 
-            _title = string.Empty;
+            Title = string.Empty;
             for (ushort address = 0x0134; address <= 0x0143; address++)
             {
                 byte c = rom[address];
                 if (c != 0)
                 {
-                    _title += Encoding.UTF8.GetString([c]);
+                    Title += Encoding.UTF8.GetString([c]);
                 }
                 else
                 {
@@ -113,8 +111,8 @@ namespace Atem.Core.Memory
                 return false;
             }
 
-            _loaded = true;
-            return _loaded;
+            Loaded = true;
+            return Loaded;
         }
 
         public byte ReadROM(ushort address)
@@ -152,8 +150,7 @@ namespace Atem.Core.Memory
         {
             writer.Write(_type);
             writer.Write(_colorFlag);
-            writer.Write(_loaded);
-
+            writer.Write(Loaded);
             _mbc.GetState(writer);
         }
 
@@ -161,8 +158,7 @@ namespace Atem.Core.Memory
         {
             _type = reader.ReadByte();
             _colorFlag = reader.ReadByte();
-            _loaded = reader.ReadBoolean();
-
+            Loaded = reader.ReadBoolean();
             _mbc.SetState(reader);
         }
     }
