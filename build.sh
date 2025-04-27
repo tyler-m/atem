@@ -1,13 +1,23 @@
 #!/bin/bash
 
 PROJECT_PATH="./src/Atem/Atem.csproj"
-RUNTIMES=("win-x64" "linux-x64")
 OUTPUT_DIR="./dist"
 LICENSE_FILE="./LICENSE"
 NOTICE_FILE="./THIRD-PARTY-LICENSES"
 
+declare -A RUNTIMES
+RUNTIMES["win-x64"]="cimgui.dll openal.dll SDL2.dll"
+RUNTIMES["linux-x64"]="libcimgui.so libopenal.so libSDL2-2.0.so.0"
+
+# check for dotnet
+if ! command -v dotnet &> /dev/null; then
+    echo "dotnet could not be found. Please install it."
+    exit 1
+fi
+
 # grab version from .csproj
-if ! VERSION=$(grep -oPm1 "(?<=<InformationalVersion>)(.*)(?=</InformationalVersion>)" "$PROJECT_PATH"); then
+VERSION=$(grep -oPm1 "(?<=<InformationalVersion>)(.*)(?=</InformationalVersion>)" "$PROJECT_PATH")
+if [ -z "$VERSION" ]; then
   VERSION="unknown"
   echo "Warning: Version not found in $PROJECT_PATH. Using 'unknown'."
 fi
@@ -18,32 +28,66 @@ OUTPUT_PATH_PREFIX="$OUTPUT_DIR/Atem-v$VERSION"
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-for RUNTIME in "${RUNTIMES[@]}"
-do
-  echo "Publishing $RUNTIME (framework-dependent)"
-  if ! dotnet publish "$PROJECT_PATH" -c Release -r "$RUNTIME" -p:DebugType=None \
-        -p:DebugSymbols=false -o "$OUTPUT_PATH_PREFIX-$RUNTIME-nd"; then
+move_runtime_files() {
+  local runtime_file_list=$1
+  local source_directory=$2
+  local destination_directory=$3
 
-    echo "Error publishing framework-dependent release for $RUNTIME"
+  mkdir -p "$destination_directory"
+  for runtime_file in $runtime_file_list; do
+    if mv "$source_directory/$runtime_file" "$destination_directory/$runtime_file"; then
+      echo "Moved $runtime_file"
+    else
+      echo "Error moving $runtime_file"
+      exit 1
+    fi
+  done
+}
+
+copy_license_files() {
+  local output_path=$1
+
+  local license_path="$output_path/licenses"
+  mkdir -p "$license_path"
+  if cp "$LICENSE_FILE" "$license_path" && cp "$NOTICE_FILE" "$license_path"; then
+    echo "Copied license and third-party licenses"
+  else
+    echo "Error copying license files"
+    exit 1
   fi
+}
 
-  echo "Copying license file."
-  cp "$LICENSE_FILE" "$OUTPUT_PATH_PREFIX-$RUNTIME-nd/"
-  echo "Copying third party licenses file."
-  cp "$NOTICE_FILE" "$OUTPUT_PATH_PREFIX-$RUNTIME-nd/"
+publish() {
+  local runtime=$1
+  local self_contained=$2
+  local output_path=$3
 
-  echo "Publishing $RUNTIME (self-contained)"
-  if ! dotnet publish "$PROJECT_PATH" -c Release -r "$RUNTIME" --self-contained true \
-        -p:PublishSingleFile=true -p:UseAppHost=true -p:DebugType=None -p:DebugSymbols=false \
-        -o "$OUTPUT_PATH_PREFIX-$RUNTIME-sc"; then
-    
-    echo "Error publishing self-contained release for $RUNTIME"
+  echo "Publishing $runtime ($self_contained)"
+  if ! dotnet publish "$PROJECT_PATH" -c Release -r "$runtime" --self-contained "$self_contained" \
+        -p:PublishSingleFile=true -p:DebugType=None -p:DebugSymbols=false -o "$output_path"; then
+    echo "Error publishing $runtime"
+    exit 1
   fi
+}
 
-  echo "Copying license file."
-  cp "$LICENSE_FILE" "$OUTPUT_PATH_PREFIX-$RUNTIME-sc/"
-  echo "Copying third party licenses file."
-  cp "$NOTICE_FILE" "$OUTPUT_PATH_PREFIX-$RUNTIME-sc/"
+for RUNTIME in "${!RUNTIMES[@]}"; do
+  RUNTIMES_LIST="${RUNTIMES[$RUNTIME]}"
+  
+  echo "Publishing $RUNTIME"
+
+  # framework-dependent
+  OUTPUT_PATH="$OUTPUT_PATH_PREFIX-$RUNTIME-nd"
+  RUNTIME_OUTPUT_PATH="$OUTPUT_PATH/runtimes/$RUNTIME/native"
+  publish "$RUNTIME" false "$OUTPUT_PATH"
+  move_runtime_files "$RUNTIMES_LIST" "$OUTPUT_PATH" "$RUNTIME_OUTPUT_PATH"
+  copy_license_files "$OUTPUT_PATH"
+
+  # self-contained
+  OUTPUT_PATH="$OUTPUT_PATH_PREFIX-$RUNTIME-sc"
+  RUNTIME_OUTPUT_PATH="$OUTPUT_PATH/runtimes/$RUNTIME/native"
+  publish "$RUNTIME" true "$OUTPUT_PATH"
+  move_runtime_files "$RUNTIMES_LIST" "$OUTPUT_PATH" "$RUNTIME_OUTPUT_PATH"
+  copy_license_files "$OUTPUT_PATH"
 done
 
 echo "Published to $OUTPUT_DIR"
