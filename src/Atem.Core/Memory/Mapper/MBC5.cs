@@ -80,7 +80,14 @@ namespace Atem.Core.Memory.Mapper
             }
             else if (address <= 0x3FFF)
             {
-                _romBank = _romBank.SetBit(8);
+                if ((value & 1) == 1)
+                {
+                    _romBank = _romBank.SetBit(8);
+                }
+                else
+                {
+                    _romBank = _romBank.ClearBit(8);
+                }
             }
             else if (address <= 0x5FFF)
             {
