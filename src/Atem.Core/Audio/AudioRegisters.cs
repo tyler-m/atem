@@ -123,7 +123,7 @@ namespace Atem.Core.Audio
                 if (On)
                 {
                     Channel1.Duty = (byte)(value >> 6);
-                    Channel1.InitialLengthTimer = (byte)(value & 0b00111111);
+                    Channel1.LengthTimer = (byte)(value & 0b00111111);
                 }
             }
         }
@@ -166,9 +166,9 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
-                    Channel1.Trigger = value.GetBit(7);
                     Channel1.LengthEnabled = value.GetBit(6);
                     Channel1.InitialPeriod = (ushort)(Channel1.InitialPeriod.GetLowByte() | (value & 0b111) << 8);
+                    Channel1.Trigger = value.GetBit(7);
                 }
             }
         }
@@ -181,7 +181,7 @@ namespace Atem.Core.Audio
                 if (On)
                 {
                     Channel2.Duty = (byte)(value >> 6);
-                    Channel2.InitialLengthTimer = (byte)(value & 0b00111111);
+                    Channel2.LengthTimer = (byte)(value & 0b00111111);
                 }
             }
         }
@@ -224,9 +224,9 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
-                    Channel2.Trigger = value.GetBit(7);
                     Channel2.LengthEnabled = value.GetBit(6);
                     Channel2.InitialPeriod = (ushort)(Channel2.InitialPeriod.GetLowByte() | ((value & 0b111) << 8));
+                    Channel2.Trigger = value.GetBit(7);
                 }
             }
         }
@@ -250,7 +250,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
-                    Channel3.InitialLengthTimer = value;
+                    Channel3.LengthTimer = value;
                 }
             }
         }
@@ -300,7 +300,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
-                    Channel4.InitialLengthTimer = (byte)(value & 0b00111111);
+                    Channel4.LengthTimer = (byte)(value & 0b00111111);
                 }
             }
         }

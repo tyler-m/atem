@@ -5,8 +5,6 @@ namespace Atem.Core.Audio.Channel
 {
     public class PulseChannel : AudioChannel
     {
-        private const int PERIOD_SWEEP_UPDATE_PERIOD = 8192; // 128 Hz
-
         private byte[] _dutyCycles = [0b11111110, 0b01111110, 0b01111000, 0b10000001];
         private byte _sampleIndex = 0;
         private int _periodSweepTimer = 0;
@@ -25,14 +23,6 @@ namespace Atem.Core.Audio.Channel
         public PulseChannel(bool periodSweepEnabled = false)
         {
             _periodSweepEnabled = periodSweepEnabled;
-        }
-
-        public override void OnClock()
-        {
-            if (ChannelTimer % PERIOD_SWEEP_UPDATE_PERIOD == 0)
-            {
-                UpdatePeriodSweep();
-            }
         }
 
         public override void OnTrigger()
@@ -57,7 +47,7 @@ namespace Atem.Core.Audio.Channel
             return MIN_CHANNEL_VOLUME;
         }
 
-        private void UpdatePeriodSweep()
+        public override void UpdatePeriodSweep()
         {
             if (_periodSweepEnabled && InitialPeriodSweepPeriod != 0)
             {
