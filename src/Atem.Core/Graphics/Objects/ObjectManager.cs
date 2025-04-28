@@ -106,9 +106,16 @@ namespace Atem.Core.Graphics.Objects
 
             if (LargeObjects)
             {
+                spriteTile &= 0b11111110;
+
                 if (sprite.FlipY)
                 {
                     offsetY = 15 - offsetY;
+                }
+
+                if (offsetY >= 8)
+                {
+                    spriteTile++;
                 }
             }
             else
