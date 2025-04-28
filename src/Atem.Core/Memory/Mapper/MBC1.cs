@@ -51,7 +51,7 @@ namespace Atem.Core.Memory.Mapper
                 adjustedAddress += 0x4000 * (_romBank & 0b11111);
             }
 
-            if (address < _rom.Length)
+            if (adjustedAddress < _rom.Length)
             {
                 return _rom[adjustedAddress];
             }
