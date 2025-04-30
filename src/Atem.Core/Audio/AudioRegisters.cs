@@ -93,6 +93,18 @@ namespace Atem.Core.Audio
                     NR50 = 0;
                     NR51 = 0;
                 }
+                else
+                {
+                    // blargg 07-len sweep period sync
+                    // test 5: powering up APU MODs next frame time with 8192
+                    if (!_manager.On) // APU was previously off
+                    {
+                        Channel1.RealignStep();
+                        Channel2.RealignStep();
+                        Channel3.RealignStep();
+                        Channel4.RealignStep();
+                    }
+                }
 
                 _manager.On = value.GetBit(7);
             }
@@ -108,6 +120,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
+                    Channel1.OnSweepDirectionChange((byte)value.GetBit(3).Int());
                     Channel1.InitialPeriodSweepPeriod = (byte)((value & 0b01110000) >> 4);
                     Channel1.PeriodSweepDirection = (byte)value.GetBit(3).Int();
                     Channel1.PeriodSweepStep = (byte)(value & 0b111);

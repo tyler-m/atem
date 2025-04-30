@@ -1,35 +1,59 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Atem.Core.Audio.Channel
 {
     public class PulseChannel : AudioChannel
     {
-        private byte[] _dutyCycles = [0b11111110, 0b01111110, 0b01111000, 0b10000001];
-        private byte _sampleIndex = 0;
-        private int _periodSweepTimer = 0;
-        private byte _periodSweepPeriod = 0;
-        private byte _duty = 0;
-        private byte _initialPeriodSweepPeriod = 0;
-        private bool _periodSweepEnabled = false;
-        private byte _periodSweepDirection = 0;
-        private byte _periodSweepStep = 0;
+        private readonly byte[] _dutyCycles = [0b11111110, 0b01111110, 0b01111000, 0b10000001];
 
-        public byte InitialPeriodSweepPeriod { get => _initialPeriodSweepPeriod; set => _initialPeriodSweepPeriod = value; }
-        public byte PeriodSweepDirection { get => _periodSweepDirection; set => _periodSweepDirection = value; }
-        public byte PeriodSweepStep { get => _periodSweepStep; set => _periodSweepStep = value; }
-        public byte Duty { get => _duty; set => _duty = value; }
+        private byte _sampleIndex;
+        private int _periodSweepTimer;
+        private byte _periodSweepPeriod;
+        private bool _sweepChannel;
+        private bool _periodSweepEnabled;
+        private int _sweepPeriod;
+        private bool _subtractedFromPeriod;
 
-        public PulseChannel(bool periodSweepEnabled = false)
+        public byte InitialPeriodSweepPeriod { get; set; }
+        public byte PeriodSweepDirection { get; set; }
+        public byte PeriodSweepStep { get; set; }
+        public byte Duty { get; set; }
+
+        public PulseChannel(bool sweepChannel = false)
         {
-            _periodSweepEnabled = periodSweepEnabled;
+            _sweepChannel = sweepChannel;
+        }
+
+        public void OnSweepDirectionChange(byte sweepDirection)
+        {
+            // blargg 05-sweep details
+            // test 4: exiting negate mode after calculation disables channel
+            if (_subtractedFromPeriod && sweepDirection == 0)
+            {
+                On = false;
+            }
         }
 
         public override void OnTrigger()
         {
             _sampleIndex = 0;
             _periodSweepTimer = 0;
-            _periodSweepPeriod = InitialPeriodSweepPeriod;
+            _subtractedFromPeriod = false;
+
+            // blargg 05-sweep details
+            // test 2: timer treats period 0 as 8
+            _periodSweepPeriod = (byte)(InitialPeriodSweepPeriod != 0 ? InitialPeriodSweepPeriod : 8);
+
+            if (_sweepChannel)
+            {
+                _sweepPeriod = InitialPeriod;
+                _periodSweepEnabled = InitialPeriodSweepPeriod != 0 || PeriodSweepStep != 0;
+
+                if (_periodSweepEnabled && PeriodSweepStep != 0)
+                {
+                    TrySweep(false);
+                }
+            }
         }
 
         public override void OnPeriodReset()
@@ -47,31 +71,70 @@ namespace Atem.Core.Audio.Channel
             return MIN_CHANNEL_VOLUME;
         }
 
+        private int CalculateNextSweepPeriod(int period)
+        {
+            int delta = period >> PeriodSweepStep;
+
+            if (PeriodSweepDirection == 0)
+            {
+                return period + delta;
+            }
+            else
+            {
+                _subtractedFromPeriod = true;
+                return period - delta;
+            }
+        }
+
+        private bool TrySweep(bool updateInitialPeriod)
+        {
+            int nextPeriod = CalculateNextSweepPeriod(_sweepPeriod);
+
+            if (nextPeriod > 0x7FF)
+            {
+                On = false;
+                return false;
+            }
+
+            InitialPeriod = updateInitialPeriod ? (ushort)nextPeriod : InitialPeriod;
+            _sweepPeriod = updateInitialPeriod ? (ushort)nextPeriod : _sweepPeriod;
+            return true;
+        }
+
         public override void UpdatePeriodSweep()
         {
-            if (_periodSweepEnabled && InitialPeriodSweepPeriod != 0)
+            if (_sweepChannel && _periodSweepEnabled)
             {
                 _periodSweepTimer++;
 
                 if (_periodSweepTimer >= _periodSweepPeriod)
                 {
-                    if (PeriodSweepDirection == 0)
+                    _periodSweepTimer = 0;
+
+                    if (InitialPeriodSweepPeriod != 0)
                     {
-                        if (InitialPeriod + InitialPeriod / Math.Pow(2, PeriodSweepStep) > 0x7FF)
+                        if (PeriodSweepStep != 0)
                         {
-                            On = false;
-                            return;
+                            if (TrySweep(true))
+                            {
+                                // blargg 04-sweep
+                                // test 5: after updating frequency, calculates a second time
+                                TrySweep(false);
+                            }
+                        }
+                        else
+                        {
+                            TrySweep(false);
                         }
 
-                        InitialPeriod = (ushort)(InitialPeriod + InitialPeriod / Math.Pow(2, PeriodSweepStep));
+                        _periodSweepPeriod = InitialPeriodSweepPeriod;
                     }
                     else
                     {
-                        InitialPeriod = (ushort)(InitialPeriod - InitialPeriod / Math.Pow(2, PeriodSweepStep));
+                        // blargg 05-sweep details
+                        // test 2: timer treats period 0 as 8
+                        _periodSweepPeriod = 8;
                     }
-
-                    _periodSweepPeriod = InitialPeriodSweepPeriod;
-                    _periodSweepTimer = 0;
                 }
             }
         }
@@ -81,11 +144,13 @@ namespace Atem.Core.Audio.Channel
             writer.Write(_sampleIndex);
             writer.Write(_periodSweepTimer);
             writer.Write(_periodSweepPeriod);
-            writer.Write(_duty);
-            writer.Write(_initialPeriodSweepPeriod);
+            writer.Write(Duty);
+            writer.Write(InitialPeriodSweepPeriod);
             writer.Write(_periodSweepEnabled);
-            writer.Write(_periodSweepDirection);
-            writer.Write(_periodSweepStep);
+            writer.Write(PeriodSweepDirection);
+            writer.Write(PeriodSweepStep);
+            writer.Write(_sweepPeriod);
+            writer.Write(_subtractedFromPeriod);
 
             base.GetState(writer);
         }
@@ -95,11 +160,13 @@ namespace Atem.Core.Audio.Channel
             _sampleIndex = reader.ReadByte();
             _periodSweepTimer = reader.ReadInt32();
             _periodSweepPeriod = reader.ReadByte();
-            _duty = reader.ReadByte();
-            _initialPeriodSweepPeriod = reader.ReadByte();
+            Duty = reader.ReadByte();
+            InitialPeriodSweepPeriod = reader.ReadByte();
             _periodSweepEnabled = reader.ReadBoolean();
-            _periodSweepDirection = reader.ReadByte();
-            _periodSweepStep = reader.ReadByte();
+            PeriodSweepDirection = reader.ReadByte();
+            PeriodSweepStep = reader.ReadByte();
+            _sweepPeriod = reader.ReadInt32();
+            _subtractedFromPeriod = reader.ReadBoolean();
 
             base.SetState(reader);
         }
