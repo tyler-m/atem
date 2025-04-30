@@ -214,14 +214,14 @@ namespace Atem.Core
             }
         }
 
-        public bool LoadCartridge(byte[] data, bool color)
+        public bool LoadCartridge(byte[] data)
         {
             SetResetState();
 
             bool loaded = _cartridge.Load(data);
             if (loaded)
             {
-                PrepareForGameBoot(color);
+                PrepareForGameBoot(_cartridge.SupportsColor);
             }
             return loaded;
         }

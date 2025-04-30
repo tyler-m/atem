@@ -28,7 +28,7 @@ namespace Atem.Saving
 
             byte[] data = File.ReadAllBytes(filePath);
 
-            return _emulator.LoadCartridge(data, filePath.ToLower().EndsWith(".gbc"));
+            return _emulator.LoadCartridge(data);
         }
     }
 }
