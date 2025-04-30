@@ -212,6 +212,37 @@ namespace Atem.Core.Audio.Channel
             }
         }
 
+        public void HandleVolumeGlitch(byte registerValue)
+        {
+            int newPeriod = registerValue & 0b00000111;
+            int newDirection = registerValue.GetBit(3).Int();
+
+            bool envelopeFinished = (VolumeEnvelopeDirection == 0 && Volume == MIN_CHANNEL_VOLUME) ||
+                                    (VolumeEnvelopeDirection == 1 && Volume == MAX_CHANNEL_VOLUME);
+
+            // tick volume if the envelope is being enabled
+            bool shouldTickVolume = (newPeriod != 0) && (VolumeEnvelopePeriod == 0);
+
+            // tick volume if both envelopes are disabled and both envelope directions are set to increase, 
+            shouldTickVolume |= (newPeriod == 0) && (VolumeEnvelopePeriod == 0) && (newDirection == 1) && (VolumeEnvelopeDirection == 1);
+
+            bool directionChanged = newDirection != VolumeEnvelopeDirection;
+
+            // invert volume if direction changed and some specific conditions are met
+            if (directionChanged && newDirection == 1 && VolumeEnvelopePeriod == 0 && !envelopeFinished)
+            {
+                Volume ^= 0xF;
+                Volume &= 0xF;
+            }
+
+            // apply volume bump
+            if (shouldTickVolume && !envelopeFinished)
+            {
+                Volume += (byte)((newDirection != 0) ? 1 : -1);
+                Volume &= 0xF;
+            }
+        }
+
         public virtual void GetState(BinaryWriter writer)
         {
             writer.Write(_stepTimer);

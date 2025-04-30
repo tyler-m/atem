@@ -148,6 +148,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
+                    Channel1.HandleVolumeGlitch(value);
                     Channel1.InitialVolume = (byte)(value >> 4);
                     Channel1.VolumeEnvelopeDirection = (byte)((value & 0b00001000) >> 3);
                     Channel1.VolumeEnvelopePeriod = (byte)(value & 0b00000111);
@@ -206,6 +207,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
+                    Channel2.HandleVolumeGlitch(value);
                     Channel2.InitialVolume = (byte)(value >> 4);
                     Channel2.VolumeEnvelopeDirection = (byte)((value & 0b00001000) >> 3);
                     Channel2.VolumeEnvelopePeriod = (byte)(value & 0b00000111);
@@ -325,6 +327,7 @@ namespace Atem.Core.Audio
             {
                 if (On)
                 {
+                    Channel4.HandleVolumeGlitch(value);
                     Channel4.InitialVolume = (byte)(value >> 4);
                     Channel4.VolumeEnvelopeDirection = (byte)((value & 0b00001000) >> 3);
                     Channel4.VolumeEnvelopePeriod = (byte)(value & 0b00000111);
