@@ -56,6 +56,8 @@ namespace Atem.Views.MonoGame
 
             Window.ClientSizeChanged += Window_ClientSizeChanged;
 
+            InactiveSleepTime = TimeSpan.Zero;
+
             UpdateWindowSize();
         }
 
