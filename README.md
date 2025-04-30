@@ -21,7 +21,7 @@ Status
 - **Sound**
   - Synthesizes audio for Pulse, Wave, and Noise channels
   - Audio filters (high-pass, low-pass)
-  - Doesn't fully handle "[obscure behavior](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior)" yet
+  - Handles some [obscure behavior](https://gbdev.io/pandocs/Audio_details.html#obscure-behavior) and glitches
 
 - **Memory**
   - Loads MBC1, MBC3, MBC5 cartridges
