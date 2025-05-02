@@ -6,6 +6,12 @@ using Atem.Core.Input;
 
 namespace Atem.IO
 {
+    /// <summary>
+    /// Emulates a serial link over TCP, enabling two emulator instances to exchange
+    /// data as if connected via a physical serial cable. Acts as either a host or
+    /// client, handling asynchronous byte-level communication. Integrates with a
+    /// <see cref="SerialManager"/> to coordinate data transfers and clock timing.
+    /// </summary>
     public class TCPSerialLink : IDisposable
     {
         private const int ClockDelay = 1024;
