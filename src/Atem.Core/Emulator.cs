@@ -2,12 +2,6 @@
 using Atem.Core.Audio;
 using Atem.Core.Debugging;
 using Atem.Core.Graphics;
-using Atem.Core.Graphics.Interrupts;
-using Atem.Core.Graphics.Objects;
-using Atem.Core.Graphics.Palettes;
-using Atem.Core.Graphics.Screen;
-using Atem.Core.Graphics.Tiles;
-using Atem.Core.Graphics.Timing;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
