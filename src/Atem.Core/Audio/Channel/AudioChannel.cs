@@ -117,7 +117,6 @@ namespace Atem.Core.Audio.Channel
         {
             // blargg 07-len sweep period sync
             // test 5: powering up APU MODs next frame time with 8192
-            _stepTimer = _stepTimer % ClocksPerStep;
             _step = 7;
         }
 
