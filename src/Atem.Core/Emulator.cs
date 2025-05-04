@@ -25,7 +25,7 @@ namespace Atem.Core
         private readonly Interrupt _interrupt;
         private readonly Joypad _joypad;
         private readonly Timer _timer;
-        private readonly SerialManager _serial;
+        private readonly ISerialManager _serial;
         private readonly GraphicsManager _graphics;
         private readonly AudioManager _audio;
         private readonly Cartridge _cartridge;
@@ -42,7 +42,7 @@ namespace Atem.Core
         public Processor Processor => _processor;
         public AudioManager Audio => _audio;
         public ICartridge Cartridge => _cartridge;
-        public SerialManager Serial => _serial;
+        public ISerialManager Serial => _serial;
         public bool Paused { get => _paused; set => _paused = value; }
 
         public event VerticalBlankEvent OnVerticalBlank
@@ -51,28 +51,17 @@ namespace Atem.Core
             remove => _graphics.OnVerticalBlank -= value;
         }
 
-        public Emulator()
+        public Emulator(Bus bus, Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, AudioManager audio, Cartridge cartridge, GraphicsManager graphics)
         {
-            _bus = new Bus();
-
-            _processor = new Processor(_bus);
-            _interrupt = new Interrupt();
-            _joypad = new Joypad(_interrupt);
-            _timer = new Timer(_interrupt);
-            _serial = new SerialManager(_interrupt);
-            _audio = new AudioManager();
-            _cartridge = new Cartridge();
-
-            RenderModeScheduler renderModeScheduler = new();
-            PaletteProvider paletteProvider = new();
-            HDMA hdma = new(_bus, renderModeScheduler);
-            StatInterruptDispatcher statInterruptDispatcher = new(_interrupt, renderModeScheduler);
-            TileManager tileManager = new(renderModeScheduler, paletteProvider, _cartridge);
-            ObjectManager objectManager = new(_bus, renderModeScheduler, tileManager, paletteProvider, _cartridge);
-            ScreenManager screenManager = new(renderModeScheduler, tileManager, objectManager, _cartridge);
-            _graphics = new GraphicsManager(_interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
-
-            _bus.ProvideDependencies(_processor, _interrupt, _joypad, _timer, _serial, _graphics, _audio, _cartridge);
+            _bus = bus;
+            _processor = processor;
+            _interrupt = interrupt;
+            _joypad = joypad;
+            _timer = timer;
+            _serial = serial;
+            _audio = audio;
+            _cartridge = cartridge;
+            _graphics = graphics;
 
             _debugger = new Debugger();
 

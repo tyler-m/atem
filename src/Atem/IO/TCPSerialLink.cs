@@ -19,7 +19,7 @@ namespace Atem.IO
         private const int DefaultPort = 8080;
         private const string DefaultHostname = "localhost";
 
-        private readonly SerialManager _serialManager;
+        private readonly ISerialManager _serialManager;
         private TcpListener _listener;
         private TcpClient _client;
         private NetworkStream _stream;
@@ -35,7 +35,7 @@ namespace Atem.IO
         public int Port { get; private set; } = DefaultPort;
         public bool IsHost { get; private set; }
 
-        public TCPSerialLink(SerialManager serialManager)
+        public TCPSerialLink(ISerialManager serialManager)
         {
             _serialManager = serialManager;
             _serialManager.OnTransferRequest += TransferRequest;

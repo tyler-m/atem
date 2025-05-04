@@ -2,6 +2,17 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using Atem.Core;
+using Atem.Core.Audio;
+using Atem.Core.Graphics.Interrupts;
+using Atem.Core.Graphics.Palettes;
+using Atem.Core.Graphics.Screen;
+using Atem.Core.Graphics.Tiles;
+using Atem.Core.Graphics.Timing;
+using Atem.Core.Graphics;
+using Atem.Core.Input;
+using Atem.Core.Memory;
+using Atem.Core.Processing;
+using Atem.Core.Graphics.Objects;
 using Atem.Views.MonoGame;
 
 namespace Atem
@@ -45,7 +56,28 @@ namespace Atem
 
         private static void Start()
         {
-            Emulator emulator = new();
+            Bus bus = new();
+
+            Processor processor = new(bus);
+            Interrupt interrupt = new();
+            Joypad joypad = new(interrupt);
+            Timer timer = new(interrupt);
+            SerialManager serial = new(interrupt);
+            AudioManager audio = new();
+            Cartridge cartridge = new();
+
+            RenderModeScheduler renderModeScheduler = new();
+            PaletteProvider paletteProvider = new();
+            HDMA hdma = new(bus, renderModeScheduler);
+            StatInterruptDispatcher statInterruptDispatcher = new(interrupt, renderModeScheduler);
+            TileManager tileManager = new(renderModeScheduler, paletteProvider, cartridge);
+            ObjectManager objectManager = new(bus, renderModeScheduler, tileManager, paletteProvider, cartridge);
+            ScreenManager screenManager = new(renderModeScheduler, tileManager, objectManager, cartridge);
+            GraphicsManager graphics = new(interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
+
+            bus.ProvideDependencies(processor, interrupt, joypad, timer, serial, graphics, audio, cartridge);
+
+            Emulator emulator = new(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics);
             ViewStarter.Start(emulator);
         }
     }
