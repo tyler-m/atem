@@ -274,7 +274,7 @@ namespace Atem.Core.Audio.Channel
             InitialPeriod = reader.ReadUInt16();
             VolumeEnvelopeDirection = reader.ReadByte();
             VolumeEnvelopePeriod = reader.ReadByte();
-            LengthTimer = reader.ReadByte();
+            LengthTimer = reader.ReadInt32();
             LeftChannel = reader.ReadBoolean();
             RightChannel = reader.ReadBoolean();
             _trigger = reader.ReadBoolean();
