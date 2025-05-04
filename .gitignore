@@ -42,3 +42,5 @@ dist/
 # GB
 *.gb
 *.gbc
+!test/roms/*.gb
+!test/roms/*.gbc
