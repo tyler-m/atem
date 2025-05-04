@@ -1,13 +1,16 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Atem.Core.Processing;
-using Atem.Core.State;
 
 namespace Atem.Core.Input
 {
-    public class SerialManager : IStateful
+    public class SerialManager : ISerialManager
     {
         private readonly Interrupt _interrupt;
         private byte _sc;
+
+        public event EventHandler<EventArgs> OnTransferRequest;
+        public event EventHandler<EventArgs> OnClock;
 
         public byte SC
         {
@@ -16,19 +19,13 @@ namespace Atem.Core.Input
             {
                 _sc = value;
 
-                OnTransferRequest?.Invoke();
+                OnTransferRequest?.Invoke(this, EventArgs.Empty);
             }
         }
 
         public byte SB { get; set; }
         public bool TransferEnabled { get => _sc.GetBit(7); set => SC = _sc.SetBit(7, value); }
         public bool Master { get => _sc.GetBit(0); set => SC = _sc.SetBit(0, value); }
-
-        public delegate void TransferRequestEvent();
-        public event TransferRequestEvent OnTransferRequest;
-
-        public delegate void ClockEvent();
-        public event ClockEvent OnClock;
 
         public SerialManager(Interrupt interrupt)
         {
@@ -37,7 +34,7 @@ namespace Atem.Core.Input
 
         public void Clock()
         {
-            OnClock?.Invoke();
+            OnClock?.Invoke(this, EventArgs.Empty);
         }
 
         public void RequestInterrupt()

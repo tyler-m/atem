@@ -120,7 +120,7 @@ namespace Atem.IO
             }
         }
 
-        public void TransferRequest()
+        public void TransferRequest(object sender, EventArgs e)
         {
             if (!IsConnected) return;
 
@@ -139,7 +139,7 @@ namespace Atem.IO
             }
         }
 
-        public void Clock()
+        public void Clock(object sender, EventArgs e)
         {
             if (!IsConnected) return;
 
