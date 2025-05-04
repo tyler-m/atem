@@ -3,15 +3,15 @@ using Atem.Core.State;
 
 namespace Atem.Core.Input
 {
-    internal interface ISerialManager : IStateful
+    public interface ISerialManager : IStateful
     {
-        public byte SC { get; set; }
-        public byte SB { get; set; }
-        public bool TransferEnabled { get; set; }
-        public bool Master { get; set; }
-
-        public event EventHandler<EventArgs> OnTransferRequest;
-
-        public event EventHandler<EventArgs> OnClock;
+        byte SC { get; set; }
+        byte SB { get; set; }
+        bool TransferEnabled { get; set; }
+        bool Master { get; set; }
+        event EventHandler<EventArgs> OnTransferRequest;
+        event EventHandler<EventArgs> OnClock;
+        void Clock();
+        void RequestInterrupt();
     }
 }
