@@ -10,9 +10,6 @@ namespace Atem.Core.Debugging
         public bool Active { get; set; }
         public int BreakpointCount { get => _breakpoints.Count; }
 
-        public delegate void OnBreakpointEvent(ushort address);
-        public event OnBreakpointEvent OnBreakpoint;
-
         public bool AddBreakpoint(Breakpoint breakpoint)
         {
             if (_breakpointAddressHashset.ContainsKey(breakpoint.Address))
@@ -45,7 +42,6 @@ namespace Atem.Core.Debugging
                 if (breakpoint.Enabled)
                 {
                     breakpoint.HitCount++;
-                    OnBreakpoint?.Invoke(address);
                     return true;
                 }
             }
