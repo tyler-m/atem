@@ -315,6 +315,22 @@ namespace Atem.Core
             {
                 return _graphics.Registers.DMA5;
             }
+            else if (offset == 0x68)
+            {
+                return _graphics.Registers.BGPI;
+            }
+            else if (offset == 0x69)
+            {
+                return _graphics.Registers.BGPD;
+            }
+            else if (offset == 0x6A)
+            {
+                return _graphics.Registers.OBPI;
+            }
+            else if (offset == 0x6B)
+            {
+                return _graphics.Registers.OBPD;
+            }
             else if (offset == 0x70)
             {
                 return SVBK;
