@@ -1,5 +1,5 @@
-﻿using Atem.Core.State;
-using System;
+﻿using System;
+using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Timing
 {
@@ -9,5 +9,7 @@ namespace Atem.Core.Graphics.Timing
         public byte CurrentLine { get; }
         public RenderMode Mode { get; }
         public void Clock();
+        public void Stop();
+        public void Resume();
     }
 }

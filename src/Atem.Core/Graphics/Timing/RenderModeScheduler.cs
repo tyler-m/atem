@@ -50,6 +50,18 @@ namespace Atem.Core.Graphics.Timing
             EvaluateModeTransition();
         }
 
+        public void Stop()
+        {
+            SetMode(RenderMode.HorizontalBlank);
+            _currentLine = 0;
+            _lineDotCount = 0;
+        }
+
+        public void Resume()
+        {
+            SetMode(RenderMode.OAM);
+        }
+
         private void SetMode(RenderMode newMode)
         {
             RenderMode previousMode = _mode;

@@ -27,7 +27,26 @@ namespace Atem.Core.Graphics
 
         public GraphicsRegisters Registers;
         public event VerticalBlankEvent OnVerticalBlank;
-        public bool Enabled { get; set; }
+
+        private bool _enabled;
+
+        public bool Enabled
+        {
+            get => _enabled;
+            set
+            {
+                if (_enabled && !value)
+                {
+                    _renderModeScheduler.Stop();
+                }
+                else if (!_enabled && value)
+                {
+                    _renderModeScheduler.Resume();
+                }
+
+                _enabled = value;
+            }
+        }
 
         public IObjectManager ObjectManager => _objectManager;
         public ITileManager TileManager => _tileManager;
@@ -88,12 +107,12 @@ namespace Atem.Core.Graphics
 
         public void Clock()
         {
+            _hdma.ClockTransfer();
+
             if (!Enabled)
             {
                 return;
             }
-
-            _hdma.ClockTransfer();
 
             if (_renderModeScheduler.Mode == RenderMode.OAM)
             {
