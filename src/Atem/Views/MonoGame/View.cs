@@ -76,8 +76,8 @@ namespace Atem.Views.MonoGame
             if (_screen.SizeLocked && !_viewUIManager.Debug)
             {
                 Window.AllowUserResizing = false;
-                _graphics.PreferredBackBufferWidth = ScreenManager.ScreenWidth * _screen.SizeFactor;
-                _graphics.PreferredBackBufferHeight = (ScreenManager.ScreenHeight * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
+                _graphics.PreferredBackBufferWidth = ScreenRenderer.ScreenWidth * _screen.SizeFactor;
+                _graphics.PreferredBackBufferHeight = (ScreenRenderer.ScreenHeight * _screen.SizeFactor) + _viewUIManager.GetMenuBarHeight();
                 _graphics.ApplyChanges();
             }
             else

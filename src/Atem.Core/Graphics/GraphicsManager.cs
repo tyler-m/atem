@@ -19,7 +19,7 @@ namespace Atem.Core.Graphics
         private readonly Interrupt _interrupt;
         private readonly IObjectManager _objectManager;
         private readonly ITileManager _tileManager;
-        private readonly IScreenManager _screenManager;
+        private readonly IScreenRenderer _screenRenderer;
         private readonly IHDMA _hdma;
         private readonly IRenderModeScheduler _renderModeScheduler;
         private readonly IStatInterruptDispatcher _statInterruptDispatcher;
@@ -53,13 +53,13 @@ namespace Atem.Core.Graphics
         public IHDMA HDMA => _hdma;
         public IRenderModeScheduler RenderModeScheduler => _renderModeScheduler;
         public IStatInterruptDispatcher StatInterruptDispatcher => _statInterruptDispatcher;
-        public IScreenManager ScreenManager => _screenManager;
+        public IScreenRenderer ScreenRenderer => _screenRenderer;
         public IPaletteProvider PaletteProvider => _paletteProvider;
 
         public GraphicsManager(
             Interrupt interrupt, IRenderModeScheduler renderModeScheduler, IPaletteProvider paletteProvider, IHDMA hdma,
             IStatInterruptDispatcher statInterruptDispatcher, ITileManager tileManager, IObjectManager objectManager,
-            IScreenManager screenManager)
+            IScreenRenderer screenRenderer)
         {
             _interrupt = interrupt;
             _renderModeScheduler = renderModeScheduler;
@@ -68,7 +68,7 @@ namespace Atem.Core.Graphics
             _statInterruptDispatcher = statInterruptDispatcher;
             _tileManager = tileManager;
             _objectManager = objectManager;
-            _screenManager = screenManager;
+            _screenRenderer = screenRenderer;
 
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
 
@@ -79,7 +79,7 @@ namespace Atem.Core.Graphics
         {
             if (e.CurrentMode == RenderMode.VerticalBlank)
             {
-                OnVerticalBlank?.Invoke(_screenManager.Screen);
+                OnVerticalBlank?.Invoke(_screenRenderer.Screen);
 
                 _interrupt.SetInterrupt(InterruptType.VerticalBlank);
             }
@@ -119,7 +119,7 @@ namespace Atem.Core.Graphics
                 _objectManager.CollectObjectsForScanline();
             }
             
-            _screenManager.Clock();
+            _screenRenderer.Clock();
 
             _renderModeScheduler.Clock();
 
@@ -132,7 +132,7 @@ namespace Atem.Core.Graphics
 
             _renderModeScheduler.GetState(writer);
             _statInterruptDispatcher.GetState(writer);
-            _screenManager.GetState(writer);
+            _screenRenderer.GetState(writer);
             _objectManager.GetState(writer);
             _hdma.GetState(writer);
             _tileManager.GetState(writer);
@@ -145,7 +145,7 @@ namespace Atem.Core.Graphics
 
             _renderModeScheduler.SetState(reader);
             _statInterruptDispatcher.SetState(reader);
-            _screenManager.SetState(reader);
+            _screenRenderer.SetState(reader);
             _objectManager.SetState(reader);
             _hdma.SetState(reader);
             _tileManager.SetState(reader);

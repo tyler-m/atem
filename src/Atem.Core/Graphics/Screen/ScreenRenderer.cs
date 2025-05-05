@@ -7,7 +7,7 @@ using Atem.Core.Memory;
 
 namespace Atem.Core.Graphics.Screen
 {
-    public class ScreenManager : IScreenManager
+    public class ScreenRenderer : IScreenRenderer
     {
         public const int ScreenWidth = 160;
         public const int ScreenHeight = 144;
@@ -24,7 +24,7 @@ namespace Atem.Core.Graphics.Screen
         public bool BackgroundAndWindowEnabledOrPriority { get; set; }
         public GBColor[] Screen { get; private set; } = new GBColor[ScreenWidth * ScreenHeight];
 
-        public ScreenManager(IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
+        public ScreenRenderer(IRenderModeScheduler renderModeScheduler, ITileManager tileManager, IObjectManager objectManager, Cartridge cartridge)
         {
             _renderModeScheduler = renderModeScheduler;
             _tileManager = tileManager;

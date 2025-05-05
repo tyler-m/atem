@@ -3,7 +3,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Screen
 {
-    public interface IScreenManager : IStateful
+    public interface IScreenRenderer : IStateful
     {
         public bool WindowEnabled { get; set; }
         public bool BackgroundAndWindowEnabledOrPriority { get; set; }

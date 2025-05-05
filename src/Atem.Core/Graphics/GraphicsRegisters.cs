@@ -17,23 +17,23 @@ namespace Atem.Core.Graphics
             {
                 return (byte)((_manager.Enabled.Int() << 7)
                     | (_manager.TileManager.WindowTileMapArea << 6)
-                    | (_manager.ScreenManager.WindowEnabled.Int() << 5)
+                    | (_manager.ScreenRenderer.WindowEnabled.Int() << 5)
                     | (_manager.TileManager.TileDataArea << 4)
                     | (_manager.TileManager.BackgroundTileMapArea << 3)
                     | (_manager.ObjectManager.LargeObjects.Int() << 2)
                     | (_manager.ObjectManager.ObjectsEnabled.Int() << 1)
-                    | _manager.ScreenManager.BackgroundAndWindowEnabledOrPriority.Int());
+                    | _manager.ScreenRenderer.BackgroundAndWindowEnabledOrPriority.Int());
             }
             set
             {
                 _manager.Enabled = value.GetBit(7);
                 _manager.TileManager.WindowTileMapArea = value.GetBit(6).Int();
-                _manager.ScreenManager.WindowEnabled = value.GetBit(5);
+                _manager.ScreenRenderer.WindowEnabled = value.GetBit(5);
                 _manager.TileManager.TileDataArea = value.GetBit(4).Int();
                 _manager.TileManager.BackgroundTileMapArea = value.GetBit(3).Int();
                 _manager.ObjectManager.LargeObjects = value.GetBit(2);
                 _manager.ObjectManager.ObjectsEnabled = value.GetBit(1);
-                _manager.ScreenManager.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
+                _manager.ScreenRenderer.BackgroundAndWindowEnabledOrPriority = value.GetBit(0);
             }
         }
 

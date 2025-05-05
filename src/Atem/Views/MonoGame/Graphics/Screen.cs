@@ -9,7 +9,7 @@ namespace Atem.Views.MonoGame.Graphics
 {
     public class Screen : IScreen
     {
-        private const float AspectRatio = (float)ScreenManager.ScreenWidth / ScreenManager.ScreenHeight;
+        private const float AspectRatio = (float)ScreenRenderer.ScreenWidth / ScreenRenderer.ScreenHeight;
 
         private readonly IWindow _window;
         private int _displayOffsetX, _displayOffsetY;
@@ -81,9 +81,9 @@ namespace Atem.Views.MonoGame.Graphics
 
         public void LoadContent(GraphicsDevice graphicsDevice)
         {
-            _texture = new Texture2D(graphicsDevice, ScreenManager.ScreenWidth, ScreenManager.ScreenHeight);
+            _texture = new Texture2D(graphicsDevice, ScreenRenderer.ScreenWidth, ScreenRenderer.ScreenHeight);
             _spriteBatch = new SpriteBatch(graphicsDevice);
-            _screenData = new Color[ScreenManager.ScreenWidth * ScreenManager.ScreenHeight];
+            _screenData = new Color[ScreenRenderer.ScreenWidth * ScreenRenderer.ScreenHeight];
             OnScreenTextureCreated?.Invoke(_texture);
         }
 
@@ -94,7 +94,7 @@ namespace Atem.Views.MonoGame.Graphics
             if (_sizeLocked)
             {
                 _spriteBatch.Draw(_texture,
-                    new Rectangle(0, 19, ScreenManager.ScreenWidth * SizeFactor, ScreenManager.ScreenHeight * SizeFactor),
+                    new Rectangle(0, 19, ScreenRenderer.ScreenWidth * SizeFactor, ScreenRenderer.ScreenHeight * SizeFactor),
                     new Rectangle(0, 0, _texture.Width, _texture.Height), Color.White);
             }
             else
