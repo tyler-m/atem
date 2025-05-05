@@ -15,7 +15,7 @@ namespace Atem.Core.Test.Integration
 {
     public class RomTests
     {
-        private static (Emulator, ScreenManager) CreateTestEmulator()
+        private static (Emulator, ScreenRenderer) CreateTestEmulator()
         {
             Bus bus = new();
 
@@ -33,19 +33,19 @@ namespace Atem.Core.Test.Integration
             StatInterruptDispatcher statInterruptDispatcher = new(interrupt, renderModeScheduler);
             TileManager tileManager = new(renderModeScheduler, paletteProvider, cartridge);
             ObjectManager objectManager = new(bus, renderModeScheduler, tileManager, paletteProvider, cartridge);
-            ScreenManager screenManager = new(renderModeScheduler, tileManager, objectManager, cartridge);
-            GraphicsManager graphics = new(interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenManager);
+            ScreenRenderer screenRenderer = new(renderModeScheduler, tileManager, objectManager, cartridge);
+            GraphicsManager graphics = new(interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenRenderer);
 
             bus.ProvideDependencies(processor, interrupt, joypad, timer, serial, graphics, audio, cartridge);
 
             Emulator emulator = new(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics);
 
-            return (emulator, screenManager);
+            return (emulator, screenRenderer);
         }
 
-        private static byte[] GetScreenDataAsByteArray(ScreenManager screenManager)
+        private static byte[] GetScreenDataAsByteArray(ScreenRenderer screenRenderer)
         {
-            return screenManager.Screen.SelectMany(p => new[] { (byte)(p.Color & 0xFF), (byte)((p.Color & 0xFF00) >> 8) }).ToArray();
+            return screenRenderer.Screen.SelectMany(p => new[] { (byte)(p.Color & 0xFF), (byte)((p.Color & 0xFF00) >> 8) }).ToArray();
         }
 
         private static string HashScreenData(byte[] screenData)
@@ -55,7 +55,7 @@ namespace Atem.Core.Test.Integration
 
         private static void RunRomTest(RomTestCase testCase)
         {
-            (Emulator emulator, ScreenManager screenManager) = CreateTestEmulator();
+            (Emulator emulator, ScreenRenderer screenRenderer) = CreateTestEmulator();
 
             string romFilePath = RomPathResolver.Resolve(testCase.RelativeFilePath);
             emulator.LoadCartridge(File.ReadAllBytes(romFilePath));
@@ -65,7 +65,7 @@ namespace Atem.Core.Test.Integration
                 emulator.Update();
             }
 
-            byte[] screenData = GetScreenDataAsByteArray(screenManager);
+            byte[] screenData = GetScreenDataAsByteArray(screenRenderer);
             string screenHash = HashScreenData(screenData);
 
             Assert.Equal(testCase.ExpectedScreenHash, screenHash);
