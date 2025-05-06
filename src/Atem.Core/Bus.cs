@@ -3,9 +3,14 @@ using Atem.Core.Memory;
 
 namespace Atem.Core
 {
+    /// <summary>
+    /// Represents the main system bus for communication in the emulator. The bus
+    /// provides a 64KB addressable space and supports memory-mapped I/O by delegating
+    /// read and write operations to registered <see cref="IAddressable"/> objects.
+    /// </summary>
     public class Bus : IBus
     {
-        public const int Size = 0x10000;
+        public const int Size = ushort.MaxValue + 1;
 
         private readonly IAddressable[] _memoryMap = new IAddressable[Size];
 
