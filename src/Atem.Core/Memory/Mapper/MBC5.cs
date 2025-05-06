@@ -114,12 +114,18 @@ namespace Atem.Core.Memory.Mapper
 
         public void GetState(BinaryWriter writer)
         {
-            throw new System.NotImplementedException();
+            writer.Write(_ram);
+            writer.Write(_ramEnable);
+            writer.Write(_romBank);
+            writer.Write(_ramBank);
         }
 
         public void SetState(BinaryReader reader)
         {
-            throw new System.NotImplementedException();
+            _ram = reader.ReadBytes(_ram.Length);
+            _ramEnable = reader.ReadBoolean();
+            _romBank = reader.ReadUInt16();
+            _ramBank = reader.ReadInt32();
         }
     }
 }
