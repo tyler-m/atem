@@ -66,7 +66,7 @@ namespace Atem.Core.Input
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF01, 0xFF02); // registers
         }

@@ -244,7 +244,7 @@ namespace Atem.Core.Audio
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF10, 0xFF26); // registers
             yield return (0xFF30, 0xFF3F); // wave RAM

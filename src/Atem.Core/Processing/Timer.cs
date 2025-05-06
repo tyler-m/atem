@@ -5,7 +5,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public class Timer : IMemoryProvider, IStateful
+    public class Timer : IAddressable, IStateful
     {
         private readonly Interrupt _interrupt;
 
@@ -119,7 +119,7 @@ namespace Atem.Core.Processing
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF04, 0xFF07); // registers
         }

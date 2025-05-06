@@ -18,7 +18,7 @@ namespace Atem.Core.Input
         Start
     }
 
-    public class Joypad : IMemoryProvider, IStateful
+    public class Joypad : IAddressable, IStateful
     {
         private byte _joypad;
         private byte _joyp;
@@ -86,7 +86,7 @@ namespace Atem.Core.Input
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF00, 0xFF00); // P1 register
         }

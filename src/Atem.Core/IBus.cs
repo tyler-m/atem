@@ -2,5 +2,5 @@
 
 namespace Atem.Core
 {
-    public interface IBus : IMemoryProvider { }
+    public interface IBus : IAddressable { }
 }

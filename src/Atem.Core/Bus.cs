@@ -23,7 +23,7 @@ namespace Atem.Core
         private AudioManager _audio;
         private SystemMemory _systemMemory;
 
-        private readonly IMemoryProvider[] _memoryMap = new IMemoryProvider[Size];
+        private readonly IAddressable[] _memoryMap = new IAddressable[Size];
 
         public void ProvideDependencies(Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, GraphicsManager graphics, AudioManager audio, Cartridge cartridge)
         {
@@ -37,25 +37,25 @@ namespace Atem.Core
             _processor = processor;
             _systemMemory = new SystemMemory();
 
-            RegisterMemoryProvider(new NullMemoryProvider());
-            RegisterMemoryProvider(_interrupt);
-            RegisterMemoryProvider(_joypad);
-            RegisterMemoryProvider(_timer);
-            RegisterMemoryProvider(_serial);
-            RegisterMemoryProvider(_graphics);
-            RegisterMemoryProvider(_audio);
-            RegisterMemoryProvider(_systemMemory);
-            RegisterMemoryProvider(_cartridge);
-            RegisterMemoryProvider(_processor);
+            AddToMemoryMap(new NullMemoryProvider());
+            AddToMemoryMap(_interrupt);
+            AddToMemoryMap(_joypad);
+            AddToMemoryMap(_timer);
+            AddToMemoryMap(_serial);
+            AddToMemoryMap(_graphics);
+            AddToMemoryMap(_audio);
+            AddToMemoryMap(_systemMemory);
+            AddToMemoryMap(_cartridge);
+            AddToMemoryMap(_processor);
         }
 
-        private void RegisterMemoryProvider(IMemoryProvider memoryProvider)
+        private void AddToMemoryMap(IAddressable addressable)
         {
-            foreach ((ushort startAddress, ushort endAddress) in memoryProvider.GetMemoryRanges())
+            foreach ((ushort startAddress, ushort endAddress) in addressable.GetAddressRanges())
             {
                 for (int address = startAddress; address <= endAddress; address++)
                 {
-                    _memoryMap[address] = memoryProvider;
+                    _memoryMap[address] = addressable;
                 }
             }
         }
@@ -69,7 +69,7 @@ namespace Atem.Core
             _memoryMap[address].Write(address, value, ignoreRenderMode);
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (ushort.MinValue, ushort.MaxValue);
         }

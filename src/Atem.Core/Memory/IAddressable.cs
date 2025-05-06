@@ -2,10 +2,10 @@
 
 namespace Atem.Core.Memory
 {
-    public interface IMemoryProvider
+    public interface IAddressable
     {
         byte Read(ushort address, bool ignoreAccessRestrictions = false);
         public void Write(ushort address, byte value, bool ignoreRenderMode = false);
-        IEnumerable<(ushort Start, ushort End)> GetMemoryRanges();
+        IEnumerable<(ushort Start, ushort End)> GetAddressRanges();
     }
 }

@@ -11,13 +11,13 @@ namespace Atem.Views.MonoGame.UI.Window
     public class MemoryWindow
     {
         private const int BYTES_PER_ROW = 16; // number of memory bytes to show per row
-        private readonly IMemoryProvider _memoryProvider;
+        private readonly IAddressable _memory;
         private readonly int _rowCount;
         private readonly int[] _valueCache = new int[BYTES_PER_ROW];
 
-        public MemoryWindow(IMemoryProvider memoryProvider)
+        public MemoryWindow(IAddressable memory)
         {
-            _memoryProvider = memoryProvider;
+            _memory = memory;
             _rowCount = Bus.Size / BYTES_PER_ROW;
         }
 
@@ -53,7 +53,7 @@ namespace Atem.Views.MonoGame.UI.Window
                         // print each byte of the line in hex format
                         for (int column = 0; column < BYTES_PER_ROW; column++)
                         {
-                            _valueCache[column] = _memoryProvider.Read((ushort)(baseAddress + column));
+                            _valueCache[column] = _memory.Read((ushort)(baseAddress + column));
                             int value = _valueCache[column];
 
                             ImGui.SameLine();

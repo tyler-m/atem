@@ -2,7 +2,7 @@
 
 namespace Atem.Core.Memory
 {
-    public interface ICartridge : IMemoryProvider, IStateful
+    public interface ICartridge : IAddressable, IStateful
     {
         public bool Loaded { get; }
         public void LoadBatterySave(byte[] data);

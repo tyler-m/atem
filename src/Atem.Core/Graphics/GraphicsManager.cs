@@ -14,7 +14,7 @@ namespace Atem.Core.Graphics
 {
     public delegate void VerticalBlankEvent(GBColor[] screen);
 
-    public class GraphicsManager : IMemoryProvider, IStateful
+    public class GraphicsManager : IAddressable, IStateful
     {
         public const float FrameRate = 59.73f;
 
@@ -260,7 +260,7 @@ namespace Atem.Core.Graphics
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0x8000, 0x9FFF); // VRAM
             yield return (0xFE00, 0xFE9F); // OAM

@@ -5,7 +5,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Memory
 {
-    public class SystemMemory : IMemoryProvider, IStateful
+    public class SystemMemory : IAddressable, IStateful
     {
         private readonly byte[] _hram = new byte[0x7F];
         private readonly byte[] _wram = new byte[0x2000 * 4];
@@ -65,7 +65,7 @@ namespace Atem.Core.Memory
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xC000, 0xDFFF); // work RAM
             yield return (0xFF70, 0xFF70); // SVBK register

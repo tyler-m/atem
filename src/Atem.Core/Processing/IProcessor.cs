@@ -3,7 +3,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public interface IProcessor : IMemoryProvider, IStateful
+    public interface IProcessor : IAddressable, IStateful
     {
         bool CB { get; set; }
         bool DoubleSpeed { get; set; }

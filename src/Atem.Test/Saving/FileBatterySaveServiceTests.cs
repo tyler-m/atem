@@ -87,7 +87,7 @@ namespace Atem.Test.Saving
             public void SetState(BinaryReader reader) => throw new NotImplementedException();
             public byte Read(ushort address, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
-            public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges() => throw new NotImplementedException();
+            public IEnumerable<(ushort Start, ushort End)> GetAddressRanges() => throw new NotImplementedException();
         }
 
         private class TestEmulator : IEmulator

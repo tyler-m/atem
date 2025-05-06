@@ -185,7 +185,7 @@ namespace Atem.Core.Processing
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF4D, 0xFF4D); // KEY1
         }

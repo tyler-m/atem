@@ -108,7 +108,7 @@ namespace Atem.Test.Config
             public float VolumeFactor { get; set; }
             public IList<IAudioChannel> Channels => throw new NotImplementedException();
             public event Action<byte[]>? OnFullAudioBuffer;
-            public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges() => throw new NotImplementedException();
+            public IEnumerable<(ushort Start, ushort End)> GetAddressRanges() => throw new NotImplementedException();
             public byte Read(ushort address, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
         }

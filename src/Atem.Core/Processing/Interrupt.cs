@@ -14,7 +14,7 @@ namespace Atem.Core.Processing
         Joypad
     }
 
-    public class Interrupt : IMemoryProvider, IStateful
+    public class Interrupt : IAddressable, IStateful
     {
         public byte IE { get; set; }
         public byte IF { get; set; }
@@ -47,7 +47,7 @@ namespace Atem.Core.Processing
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF0F, 0xFF0F); // IF register
             yield return (0xFFFF, 0xFFFF); // IE register

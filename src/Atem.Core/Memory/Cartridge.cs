@@ -178,7 +178,7 @@ namespace Atem.Core.Memory
             }
         }
 
-        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0x0000, 0x7FFF); // cartridge ROM
             yield return (0xA000, 0xBFFF); // cartridge RAM
