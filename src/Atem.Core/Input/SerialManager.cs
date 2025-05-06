@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Atem.Core.Processing;
 
@@ -40,6 +41,34 @@ namespace Atem.Core.Input
         public void RequestInterrupt()
         {
             _interrupt.SetInterrupt(InterruptType.Serial);
+        }
+
+        public byte Read(ushort address, bool ignoreAccessRestrictions = false)
+        {
+            return address switch
+            {
+                0xFF01 => SB,
+                0xFF02 => SC,
+                _ => 0xFF
+            };
+        }
+
+        public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false)
+        {
+            switch (address)
+            {
+                case 0xFF01:
+                    SB = value;
+                    break;
+                case 0xFF02:
+                    SC = value;
+                    break;
+            }
+        }
+
+        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        {
+            yield return (0xFF01, 0xFF02); // registers
         }
 
         public void GetState(BinaryWriter writer)

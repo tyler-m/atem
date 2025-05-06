@@ -166,6 +166,30 @@ namespace Atem.Core.Processing
             _halted = true;
         }
 
+        public byte Read(ushort address, bool ignoreAccessRestrictions = false)
+        {
+            return address switch
+            {
+                0xFF4D => KEY1,
+                _ => 0xFF,
+            };
+        }
+
+        public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false)
+        {
+            switch (address)
+            {
+                case 0xFF4D:
+                    KEY1 = value;
+                    break;
+            }
+        }
+
+        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        {
+            yield return (0xFF4D, 0xFF4D); // KEY1
+        }
+
         public void GetState(BinaryWriter writer)
         {
             _registers.GetState(writer);

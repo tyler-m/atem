@@ -1,9 +1,10 @@
 ﻿using System;
+using Atem.Core.Memory;
 using Atem.Core.State;
 
 namespace Atem.Core.Input
 {
-    public interface ISerialManager : IStateful
+    public interface ISerialManager : IMemoryProvider, IStateful
     {
         byte SC { get; set; }
         byte SB { get; set; }

@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using Atem.Core.Memory;
 using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public class Timer : IStateful
+    public class Timer : IMemoryProvider, IStateful
     {
         private readonly Interrupt _interrupt;
 
@@ -84,6 +86,42 @@ namespace Atem.Core.Processing
                     _timaTick = 0;
                 }
             }
+        }
+
+        public byte Read(ushort address, bool ignoreAccessRestrictions = false)
+        {
+            return address switch
+            {
+                0xFF04 => DIV,
+                0xFF05 => TIMA,
+                0xFF06 => TMA,
+                0xFF07 => TAC,
+                _ => 0xFF
+            };
+        }
+
+        public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false)
+        {
+            switch (address)
+            {
+                case 0xFF04:
+                    DIV = value;
+                    break;
+                case 0xFF05:
+                    TIMA = value;
+                    break;
+                case 0xFF06:
+                    TMA = value;
+                    break;
+                case 0xFF07:
+                    TAC = value;
+                    break;
+            }
+        }
+
+        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        {
+            yield return (0xFF04, 0xFF07); // registers
         }
 
         public void GetState(BinaryWriter writer)

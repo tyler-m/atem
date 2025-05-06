@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Atem.Core.Memory.Mapper;
 
@@ -144,6 +145,43 @@ namespace Atem.Core.Memory
         public void WriteRAM(ushort address, byte value)
         {
             _mbc.WriteRAM((ushort)(address - 0xA000), value);
+        }
+
+        public byte Read(ushort address, bool ignoreAccessRestrictions = false)
+        {
+            if (address <= 0x7FFF)
+            {
+                if (Loaded)
+                {
+                    return ReadROM(address);
+                }
+                else
+                {
+                    return 0x00;
+                }
+            }
+            else
+            {
+                return ReadRAM(address);
+            }
+        }
+
+        public void Write(ushort address, byte value, bool ignoreRenderMode = false)
+        {
+            if (address <= 0x7FFF)
+            {
+                WriteROM(address, value);
+            }
+            else
+            {
+                WriteRAM(address, value);
+            }
+        }
+
+        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        {
+            yield return (0x0000, 0x7FFF); // cartridge ROM
+            yield return (0xA000, 0xBFFF); // cartridge RAM
         }
 
         public void GetState(BinaryWriter writer)

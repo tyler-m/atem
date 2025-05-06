@@ -2,8 +2,5 @@
 
 namespace Atem.Core
 {
-    public interface IBus : IMemoryProvider
-    {
-        public void Write(ushort address, byte value, bool ignoreRenderMode = false);
-    }
+    public interface IBus : IMemoryProvider { }
 }

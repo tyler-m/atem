@@ -1,8 +1,9 @@
-﻿using Atem.Core.State;
+﻿using Atem.Core.Memory;
+using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public interface IProcessor : IStateful
+    public interface IProcessor : IMemoryProvider, IStateful
     {
         bool CB { get; set; }
         bool DoubleSpeed { get; set; }

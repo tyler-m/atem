@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using ImGuiNET;
+using Atem.Core;
 using Atem.Core.Memory;
 
 namespace Atem.Views.MonoGame.UI.Window
@@ -17,7 +18,7 @@ namespace Atem.Views.MonoGame.UI.Window
         public MemoryWindow(IMemoryProvider memoryProvider)
         {
             _memoryProvider = memoryProvider;
-            _rowCount = _memoryProvider.MemorySize / BYTES_PER_ROW;
+            _rowCount = Bus.Size / BYTES_PER_ROW;
         }
 
         /// <summary>

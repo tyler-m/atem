@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using Atem.Core.Memory;
 using Atem.Core.Processing;
 using Atem.Core.State;
 
@@ -16,7 +18,7 @@ namespace Atem.Core.Input
         Start
     }
 
-    public class Joypad : IStateful
+    public class Joypad : IMemoryProvider, IStateful
     {
         private byte _joypad;
         private byte _joyp;
@@ -63,6 +65,30 @@ namespace Atem.Core.Input
         {
             _joypad = _joypad.SetBit((int)button, down);
             _interrupt.SetInterrupt(InterruptType.Joypad);
+        }
+
+        public byte Read(ushort address, bool ignoreAccessRestrictions = false)
+        {
+            return address switch
+            {
+                0xFF00 => P1,
+                _ => 0xFF
+            };
+        }
+
+        public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false)
+        {
+            switch (address)
+            {
+                case 0xFF00:
+                    P1 = value;
+                    break;
+            }
+        }
+
+        public IEnumerable<(ushort Start, ushort End)> GetMemoryRanges()
+        {
+            yield return (0xFF00, 0xFF00); // P1 register
         }
 
         public void GetState(BinaryWriter writer)
