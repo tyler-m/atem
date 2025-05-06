@@ -12,7 +12,7 @@ namespace Atem.Core.Processing
         public bool C { get => F.GetBit(4); set => F = F.SetBit(4, value); }
     }
 
-    public class ProcessorRegisters : IStateful
+    public class ProcessorRegisters : IBootable, IStateful
     {
         public ushort SP, PC;
         public byte A, B, C, D, E, H, L;
@@ -55,6 +55,37 @@ namespace Atem.Core.Processing
             {
                 H = value.GetHighByte();
                 L = value.GetLowByte();
+            }
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    A = 0x11;
+                    Flags.Z = true;
+                    B = 0x00;
+                    C = 0x00;
+                    D = 0xFF;
+                    E = 0x56;
+                    H = 0x00;
+                    L = 0x0D;
+                    PC = 0x0100;
+                    SP = 0xFFFE;
+                    break;
+                case BootMode.DMG:
+                    A = 0x01;
+                    Flags.Z = true;
+                    B = 0x00;
+                    C = 0x13;
+                    D = 0x00;
+                    E = 0xD8;
+                    H = 0x01;
+                    L = 0x4D;
+                    PC = 0x0100;
+                    SP = 0xFFFE;
+                    break;
             }
         }
 

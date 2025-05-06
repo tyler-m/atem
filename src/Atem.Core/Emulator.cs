@@ -5,64 +5,54 @@ using Atem.Core.Graphics;
 using Atem.Core.Input;
 using Atem.Core.Memory;
 using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core
 {
     public class Emulator : IEmulator
     {
-        public const float ScreenRefreshRate = 59.73f;
+        private const float ClocksPerFrame = Processor.FREQUENCY / GraphicsManager.FrameRate;
 
-        private static float ClocksPerFrame => Processor.FREQUENCY / GraphicsManager.FrameRate;
-
-        private readonly Processor _processor;
-        private readonly Bus _bus;
-        private readonly Interrupt _interrupt;
-        private readonly Joypad _joypad;
-        private readonly Timer _timer;
-        private readonly ISerialManager _serial;
-        private readonly GraphicsManager _graphics;
-        private readonly SystemMemory _systemMemory;
-        private readonly AudioManager _audio;
-        private readonly Cartridge _cartridge;
-        private readonly Debugger _debugger;
         private readonly int _clockCost = 4;
         private double _leftoverClocks;
         private bool _forceClock;
-        private bool _paused;
-
         private byte[] _resetState = new byte[0x40000];
 
-        public Debugger Debugger => _debugger;
-        public Bus Bus => _bus;
-        public Processor Processor => _processor;
-        public AudioManager Audio => _audio;
-        public Joypad Joypad => _joypad;
-        public ICartridge Cartridge => _cartridge;
-        public ISerialManager Serial => _serial;
-        public bool Paused { get => _paused; set => _paused = value; }
+        public Interrupt Interrupt { get; private set; }
+        public Timer Timer { get; private set; }
+        public GraphicsManager Graphics { get; private set; }
+        public SystemMemory SystemMemory { get; private set; }
+        public Debugger Debugger { get; private set; }
+        public Bus Bus { get; private set; }
+        public Processor Processor { get; private set; }
+        public AudioManager Audio { get; private set; }
+        public Joypad Joypad { get; private set; }
+        public ICartridge Cartridge { get; private set; }
+        public ISerialManager Serial { get; private set; }
+        public bool Paused { get; set; }
 
         public event VerticalBlankEvent OnVerticalBlank
         {
-            add => _graphics.OnVerticalBlank += value;
-            remove => _graphics.OnVerticalBlank -= value;
+            add => Graphics.OnVerticalBlank += value;
+            remove => Graphics.OnVerticalBlank -= value;
         }
 
         public Emulator(Bus bus, Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, AudioManager audio, Cartridge cartridge, GraphicsManager graphics, SystemMemory systemMemory)
         {
-            _bus = bus;
-            _processor = processor;
-            _interrupt = interrupt;
-            _joypad = joypad;
-            _timer = timer;
-            _serial = serial;
-            _audio = audio;
-            _cartridge = cartridge;
-            _graphics = graphics;
-            _systemMemory = systemMemory;
+            Bus = bus;
+            Processor = processor;
+            Interrupt = interrupt;
+            Joypad = joypad;
+            Timer = timer;
+            Serial = serial;
+            Audio = audio;
+            Cartridge = cartridge;
+            Graphics = graphics;
+            SystemMemory = systemMemory;
 
-            _bus.AddAddressables([processor, interrupt, joypad, timer, serial, audio, cartridge, graphics, systemMemory]);
+            Bus.AddAddressables([processor, interrupt, joypad, timer, serial, audio, cartridge, graphics, systemMemory]);
 
-            _debugger = new Debugger();
+            Debugger = new Debugger();
 
             GetResetState();
         }
@@ -78,7 +68,7 @@ namespace Atem.Core
         {
             // before we restore the emulator to its reset state, we need
             // to make sure the cartridge is using NullMap as its mapper
-            _cartridge.ResetMapper();
+            Cartridge.ResetMapper();
 
             using MemoryStream stream = new(_resetState);
             using BinaryReader reader = new(stream);
@@ -87,129 +77,30 @@ namespace Atem.Core
 
         public void Continue()
         {
-            _paused = false;
+            Paused = false;
             _forceClock = true;
-        }
-
-        private void PrepareForGameBoot(bool color)
-        {
-            if (color)
-            {
-                // CGB Mode
-                _processor.Registers.A = 0x11;
-                _processor.Registers.Flags.Z = true;
-                _processor.Registers.B = 0x00;
-                _processor.Registers.C = 0x00;
-                _processor.Registers.D = 0xFF;
-                _processor.Registers.E = 0x56;
-                _processor.Registers.H = 0x00;
-                _processor.Registers.L = 0x0D;
-                _processor.Registers.PC = 0x0100;
-                _processor.Registers.SP = 0xFFFE;
-
-                _joypad.P1 = 0xC7;
-                _serial.SB = 0x00;
-                _serial.SC = 0x7F;
-                _timer.TIMA = 0x00;
-                _timer.TMA = 0x00;
-                _timer.TAC = 0xF8;
-                _interrupt.IF = 0xE1;
-                _interrupt.IE = 0x00;
-                _audio.Registers.NR10 = 0x80;
-                _audio.Registers.NR11 = 0xBF;
-                _audio.Registers.NR12 = 0xF3;
-                _audio.Registers.NR13 = 0xFF;
-                _audio.Registers.NR14 = 0xBF;
-                _audio.Registers.NR21 = 0x3F;
-                _audio.Registers.NR22 = 0x00;
-                _audio.Registers.NR23 = 0xFF;
-                _audio.Registers.NR24 = 0xBF;
-                _audio.Registers.NR30 = 0x7F;
-                _audio.Registers.NR31 = 0xFF;
-                _audio.Registers.NR32 = 0x9F;
-                _audio.Registers.NR33 = 0xFF;
-                _audio.Registers.NR34 = 0xBF;
-                _audio.Registers.NR41 = 0xFF;
-                _audio.Registers.NR42 = 0x00;
-                _audio.Registers.NR43 = 0x00;
-                _audio.Registers.NR44 = 0xBF;
-                _audio.Registers.NR50 = 0x77;
-                _audio.Registers.NR51 = 0xF3;
-                _audio.Registers.NR52 = 0xF1;
-                _graphics.Registers.LCDC = 0x91;
-                _graphics.Registers.SCY = 0x00;
-                _graphics.Registers.SCX = 0x00;
-                _graphics.Registers.LYC = 0x00;
-                _graphics.Registers.BGP = 0xFC;
-                _graphics.Registers.OBP0 = 0x00;
-                _graphics.Registers.OBP1 = 0x00;
-                _graphics.Registers.WY = 0x00;
-                _graphics.Registers.WX = 0x00;
-            }
-            else
-            {
-                // DMG mode
-                _processor.Registers.A = 0x01;
-                _processor.Registers.Flags.Z = true;
-                _processor.Registers.B = 0x00;
-                _processor.Registers.C = 0x13;
-                _processor.Registers.D = 0x00;
-                _processor.Registers.E = 0xD8;
-                _processor.Registers.H = 0x01;
-                _processor.Registers.L = 0x4D;
-                _processor.Registers.PC = 0x0100;
-                _processor.Registers.SP = 0xFFFE;
-
-                _joypad.P1 = 0xCF;
-                _serial.SB = 0x00;
-                _serial.SC = 0x7E;
-                _timer.TIMA = 0x00;
-                _timer.TMA = 0x00;
-                _timer.TAC = 0xF8;
-                _interrupt.IF = 0xE1;
-                _interrupt.IE = 0x00;
-                _audio.Registers.NR10 = 0x80;
-                _audio.Registers.NR11 = 0xBF;
-                _audio.Registers.NR12 = 0xF3;
-                _audio.Registers.NR13 = 0xFF;
-                _audio.Registers.NR14 = 0xBF;
-                _audio.Registers.NR21 = 0x3F;
-                _audio.Registers.NR22 = 0x00;
-                _audio.Registers.NR23 = 0xFF;
-                _audio.Registers.NR24 = 0xBF;
-                _audio.Registers.NR30 = 0x7F;
-                _audio.Registers.NR31 = 0xFF;
-                _audio.Registers.NR32 = 0x9F;
-                _audio.Registers.NR33 = 0xFF;
-                _audio.Registers.NR34 = 0xBF;
-                _audio.Registers.NR41 = 0xFF;
-                _audio.Registers.NR42 = 0x00;
-                _audio.Registers.NR43 = 0x00;
-                _audio.Registers.NR44 = 0xBF;
-                _audio.Registers.NR50 = 0x77;
-                _audio.Registers.NR51 = 0xF3;
-                _audio.Registers.NR52 = 0xF1;
-                _graphics.Registers.LCDC = 0x91;
-                _graphics.Registers.SCY = 0x00;
-                _graphics.Registers.SCX = 0x00;
-                _graphics.Registers.LY = 0x00;
-                _graphics.Registers.LYC = 0x00;
-                _graphics.Registers.BGP = 0xFC;
-                _graphics.Registers.OBP0 = 0x00;
-                _graphics.Registers.OBP1 = 0x00;
-                _graphics.Registers.WY = 0x00;
-                _graphics.Registers.WX = 0x00;
-            }
         }
 
         public bool LoadCartridge(byte[] data)
         {
             SetResetState();
 
-            bool loaded = _cartridge.Load(data);
+            bool loaded = Cartridge.Load(data);
             if (loaded)
             {
-                PrepareForGameBoot(_cartridge.SupportsColor);
+                BootMode mode = BootMode.DMG;
+
+                if (Cartridge.SupportsColor)
+                {
+                    mode = BootMode.CGB;
+                }
+
+                Processor.Registers.Boot(mode);
+                Joypad.Boot(mode);
+                Serial.Boot(mode);
+                Timer.Boot(mode);
+                Audio.Registers.Boot(mode);
+                Graphics.Registers.Boot(mode);
             }
             return loaded;
         }
@@ -221,17 +112,17 @@ namespace Atem.Core
 
             for (int i = 0; i < clocksForCurrentFrame; i += _clockCost)
             {
-                if (_debugger.Active && !_paused)
+                if (Debugger.Active && !Paused)
                 {
                     // we don't pause if we're forcing a clock
                     // this prevents breaking on the same breakpoint repeatedly
-                    if (!_forceClock && _debugger.CheckBreakpoints(_processor.Registers.PC))
+                    if (!_forceClock && Debugger.CheckBreakpoints(Processor.Registers.PC))
                     {
-                        _paused = true;
+                        Paused = true;
                     }
                 }
 
-                if (!_paused)
+                if (!Paused)
                 {
                     Clock();
                 }
@@ -248,48 +139,48 @@ namespace Atem.Core
         {
             _forceClock = false;
 
-            bool opFinished = _processor.Clock();
-            _timer.Clock();
-            _serial.Clock();
+            bool opFinished = Processor.Clock();
+            Timer.Clock();
+            Serial.Clock();
 
-            if (_processor.DoubleSpeed)
+            if (Processor.DoubleSpeed)
             {
-                opFinished |= _processor.Clock();
-                _timer.Clock();
-                _serial.Clock();
+                opFinished |= Processor.Clock();
+                Timer.Clock();
+                Serial.Clock();
             }
 
-            _graphics.Clock();
-            _audio.Clock();
+            Graphics.Clock();
+            Audio.Clock();
             return opFinished;
         }
 
         public void GetState(BinaryWriter writer)
         {
             writer.Write(_leftoverClocks);
-            _processor.GetState(writer);
-            _timer.GetState(writer);
-            _interrupt.GetState(writer);
-            _joypad.GetState(writer);
-            _serial.GetState(writer);
-            _graphics.GetState(writer);
-            _audio.GetState(writer);
-            _cartridge.GetState(writer);
-            _systemMemory.GetState(writer);
+            Processor.GetState(writer);
+            Timer.GetState(writer);
+            Interrupt.GetState(writer);
+            Joypad.GetState(writer);
+            Serial.GetState(writer);
+            Graphics.GetState(writer);
+            Audio.GetState(writer);
+            Cartridge.GetState(writer);
+            SystemMemory.GetState(writer);
         }
 
         public void SetState(BinaryReader reader)
         {
             _leftoverClocks = reader.ReadDouble();
-            _processor.SetState(reader);
-            _timer.SetState(reader);
-            _interrupt.SetState(reader);
-            _joypad.SetState(reader);
-            _serial.SetState(reader);
-            _graphics.SetState(reader);
-            _audio.SetState(reader);
-            _cartridge.SetState(reader);
-            _systemMemory.SetState(reader);
+            Processor.SetState(reader);
+            Timer.SetState(reader);
+            Interrupt.SetState(reader);
+            Joypad.SetState(reader);
+            Serial.SetState(reader);
+            Graphics.SetState(reader);
+            Audio.SetState(reader);
+            Cartridge.SetState(reader);
+            SystemMemory.SetState(reader);
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Atem.Audio;
 using Atem.Core;
+using Atem.Core.Graphics;
 using Atem.Core.Graphics.Screen;
 using Atem.Graphics;
 using Atem.Input;
@@ -47,7 +48,7 @@ namespace Atem.Views.MonoGame
 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
-            TargetElapsedTime = TimeSpan.FromSeconds(1 / Emulator.ScreenRefreshRate);
+            TargetElapsedTime = TimeSpan.FromSeconds(1 / GraphicsManager.FrameRate);
 
             Exiting += OnExit;
 

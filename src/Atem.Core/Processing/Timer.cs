@@ -5,7 +5,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Processing
 {
-    public class Timer : IAddressable, IStateful
+    public class Timer : IAddressable, IBootable, IStateful
     {
         private readonly Interrupt _interrupt;
 
@@ -122,6 +122,23 @@ namespace Atem.Core.Processing
         public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF04, 0xFF07); // registers
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    TIMA = 0x00;
+                    TMA = 0x00;
+                    TAC = 0xF8;
+                    break;
+                case BootMode.DMG:
+                    TIMA = 0x00;
+                    TMA = 0x00;
+                    TAC = 0xF8;
+                    break;
+            }
         }
 
         public void GetState(BinaryWriter writer)

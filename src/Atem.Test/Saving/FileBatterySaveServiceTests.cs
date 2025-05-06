@@ -76,6 +76,8 @@ namespace Atem.Test.Saving
             public byte[] LoadedSaveData { get; private set; } = [];
             public bool Loaded => throw new NotImplementedException();
 
+            public bool SupportsColor => throw new NotImplementedException();
+
             public void LoadBatterySave(byte[] data)
             {
                 LoadedSaveData = data;
@@ -88,6 +90,8 @@ namespace Atem.Test.Saving
             public byte Read(ushort address, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public IEnumerable<(ushort Start, ushort End)> GetAddressRanges() => throw new NotImplementedException();
+            public void ResetMapper() => throw new NotImplementedException();
+            public bool Load(byte[] data) => throw new NotImplementedException();
         }
 
         private class TestEmulator : IEmulator

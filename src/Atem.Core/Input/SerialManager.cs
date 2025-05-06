@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Atem.Core.Processing;
+using Atem.Core.State;
 
 namespace Atem.Core.Input
 {
@@ -69,6 +70,21 @@ namespace Atem.Core.Input
         public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF01, 0xFF02); // registers
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    SB = 0x00;
+                    SC = 0x7F;
+                    break;
+                case BootMode.DMG:
+                    SB = 0x00;
+                    SC = 0x7E;
+                    break;
+            }
         }
 
         public void GetState(BinaryWriter writer)

@@ -18,7 +18,7 @@ namespace Atem.Core.Input
         Start
     }
 
-    public class Joypad : IAddressable, IStateful
+    public class Joypad : IAddressable, IBootable, IStateful
     {
         private byte _joypad;
         private byte _joyp;
@@ -89,6 +89,19 @@ namespace Atem.Core.Input
         public IEnumerable<(ushort Start, ushort End)> GetAddressRanges()
         {
             yield return (0xFF00, 0xFF00); // P1 register
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    P1 = 0xC7;
+                    break;
+                case BootMode.DMG:
+                    P1 = 0xCF;
+                    break;
+            }
         }
 
         public void GetState(BinaryWriter writer)

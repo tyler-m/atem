@@ -4,7 +4,7 @@ using Atem.Core.State;
 
 namespace Atem.Core.Input
 {
-    public interface ISerialManager : IAddressable, IStateful
+    public interface ISerialManager : IAddressable, IBootable, IStateful
     {
         byte SC { get; set; }
         byte SB { get; set; }

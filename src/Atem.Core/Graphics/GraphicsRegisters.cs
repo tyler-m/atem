@@ -1,8 +1,9 @@
 ﻿using Atem.Core.Graphics.Palettes;
+using Atem.Core.State;
 
 namespace Atem.Core.Graphics
 {
-    public class GraphicsRegisters
+    public class GraphicsRegisters : IBootable
     {
         private GraphicsManager _manager;
 
@@ -299,6 +300,36 @@ namespace Atem.Core.Graphics
             set
             {
                 _manager.HDMA.StartTransfer(value);
+            }
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    LCDC = 0x91;
+                    SCY = 0x00;
+                    SCX = 0x00;
+                    LYC = 0x00;
+                    BGP = 0xFC;
+                    OBP0 = 0x00;
+                    OBP1 = 0x00;
+                    WY = 0x00;
+                    WX = 0x00;
+                    break;
+                case BootMode.DMG:
+                    LCDC = 0x91;
+                    SCY = 0x00;
+                    SCX = 0x00;
+                    LY = 0x00;
+                    LYC = 0x00;
+                    BGP = 0xFC;
+                    OBP0 = 0x00;
+                    OBP1 = 0x00;
+                    WY = 0x00;
+                    WX = 0x00;
+                    break;
             }
         }
     }

@@ -7,5 +7,8 @@ namespace Atem.Core.Memory
         public bool Loaded { get; }
         public void LoadBatterySave(byte[] data);
         public byte[] GetBatterySave();
+        void ResetMapper();
+        bool Load(byte[] data);
+        bool SupportsColor { get; }
     }
 }

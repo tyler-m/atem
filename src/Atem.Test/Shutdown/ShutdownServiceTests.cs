@@ -58,6 +58,9 @@ namespace Atem.Test.Shutdown
         private class FakeCartridge : ICartridge
         {
             public bool Loaded { get; set; }
+
+            public bool SupportsColor => throw new NotImplementedException();
+
             public void LoadBatterySave(byte[] data) => throw new System.NotImplementedException();
             public byte[] GetBatterySave() => throw new System.NotImplementedException();
             public void GetState(BinaryWriter writer) => throw new NotImplementedException();
@@ -65,6 +68,8 @@ namespace Atem.Test.Shutdown
             public byte Read(ushort address, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public void Write(ushort address, byte value, bool ignoreAccessRestrictions = false) => throw new NotImplementedException();
             public IEnumerable<(ushort Start, ushort End)> GetAddressRanges() => throw new NotImplementedException();
+            public void ResetMapper() => throw new NotImplementedException();
+            public bool Load(byte[] data) => throw new NotImplementedException();
         }
 
         private class FakeCartridgeContext : ICartridgeContext

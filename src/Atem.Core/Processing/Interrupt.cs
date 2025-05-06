@@ -14,7 +14,7 @@ namespace Atem.Core.Processing
         Joypad
     }
 
-    public class Interrupt : IAddressable, IStateful
+    public class Interrupt : IAddressable, IBootable, IStateful
     {
         public byte IE { get; set; }
         public byte IF { get; set; }
@@ -51,6 +51,21 @@ namespace Atem.Core.Processing
         {
             yield return (0xFF0F, 0xFF0F); // IF register
             yield return (0xFFFF, 0xFFFF); // IE register
+        }
+
+        public void Boot(BootMode mode)
+        {
+            switch (mode)
+            {
+                case BootMode.CGB:
+                    IF = 0xE1;
+                    IE = 0x00;
+                    break;
+                case BootMode.DMG:
+                    IF = 0xE1;
+                    IE = 0x00;
+                    break;
+            }
         }
 
         public void GetState(BinaryWriter writer)
