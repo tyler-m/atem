@@ -20,7 +20,7 @@ namespace Atem.Input.Command
 
         public void Execute(bool pressed)
         {
-            _emulator.OnJoypadChange(_joypadButton, pressed);
+            _emulator.Joypad.OnJoypadChange(_joypadButton, pressed);
         }
     }
 }

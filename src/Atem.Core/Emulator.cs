@@ -36,6 +36,7 @@ namespace Atem.Core
         public Bus Bus => _bus;
         public Processor Processor => _processor;
         public AudioManager Audio => _audio;
+        public Joypad Joypad => _joypad;
         public ICartridge Cartridge => _cartridge;
         public ISerialManager Serial => _serial;
         public bool Paused { get => _paused; set => _paused = value; }
@@ -261,11 +262,6 @@ namespace Atem.Core
             _graphics.Clock();
             _audio.Clock();
             return opFinished;
-        }
-
-        public void OnJoypadChange(JoypadButton button, bool down)
-        {
-            _joypad.OnJoypadChange(button, down);
         }
 
         public void GetState(BinaryWriter writer)
