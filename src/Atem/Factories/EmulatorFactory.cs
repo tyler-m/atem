@@ -21,8 +21,8 @@ namespace Atem.Factories
             AudioManager audio = new();
             Cartridge cartridge = new();
             GraphicsManager graphics = GraphicsManagerFactory.Create(bus, interrupt, cartridge);
-            bus.ProvideDependencies(processor, interrupt, joypad, timer, serial, graphics, audio, cartridge);
-            return new Emulator(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics);
+            SystemMemory systemMemory = new();
+            return new Emulator(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics, systemMemory);
         }
     }
 }

@@ -35,10 +35,9 @@ namespace Atem.Core.Test.Integration
             ObjectManager objectManager = new(bus, renderModeScheduler, tileManager, paletteProvider, cartridge);
             ScreenRenderer screenRenderer = new(renderModeScheduler, tileManager, objectManager, cartridge);
             GraphicsManager graphics = new(interrupt, renderModeScheduler, paletteProvider, hdma, statInterruptDispatcher, tileManager, objectManager, screenRenderer);
+            SystemMemory systemMemory = new();
 
-            bus.ProvideDependencies(processor, interrupt, joypad, timer, serial, graphics, audio, cartridge);
-
-            Emulator emulator = new(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics);
+            Emulator emulator = new(bus, processor, interrupt, joypad, timer, serial, audio, cartridge, graphics, systemMemory);
 
             return (emulator, screenRenderer);
         }

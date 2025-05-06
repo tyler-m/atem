@@ -21,6 +21,7 @@ namespace Atem.Core
         private readonly Timer _timer;
         private readonly ISerialManager _serial;
         private readonly GraphicsManager _graphics;
+        private readonly SystemMemory _systemMemory;
         private readonly AudioManager _audio;
         private readonly Cartridge _cartridge;
         private readonly Debugger _debugger;
@@ -45,7 +46,7 @@ namespace Atem.Core
             remove => _graphics.OnVerticalBlank -= value;
         }
 
-        public Emulator(Bus bus, Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, AudioManager audio, Cartridge cartridge, GraphicsManager graphics)
+        public Emulator(Bus bus, Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, AudioManager audio, Cartridge cartridge, GraphicsManager graphics, SystemMemory systemMemory)
         {
             _bus = bus;
             _processor = processor;
@@ -56,6 +57,9 @@ namespace Atem.Core
             _audio = audio;
             _cartridge = cartridge;
             _graphics = graphics;
+            _systemMemory = systemMemory;
+
+            _bus.AddAddressables([processor, interrupt, joypad, timer, serial, audio, cartridge, graphics, systemMemory]);
 
             _debugger = new Debugger();
 
@@ -267,13 +271,29 @@ namespace Atem.Core
         public void GetState(BinaryWriter writer)
         {
             writer.Write(_leftoverClocks);
-            _bus.GetState(writer);
+            _processor.GetState(writer);
+            _timer.GetState(writer);
+            _interrupt.GetState(writer);
+            _joypad.GetState(writer);
+            _serial.GetState(writer);
+            _graphics.GetState(writer);
+            _audio.GetState(writer);
+            _cartridge.GetState(writer);
+            _systemMemory.GetState(writer);
         }
 
         public void SetState(BinaryReader reader)
         {
             _leftoverClocks = reader.ReadDouble();
-            _bus.SetState(reader);
+            _processor.SetState(reader);
+            _timer.SetState(reader);
+            _interrupt.SetState(reader);
+            _joypad.SetState(reader);
+            _serial.SetState(reader);
+            _graphics.SetState(reader);
+            _audio.SetState(reader);
+            _cartridge.SetState(reader);
+            _systemMemory.SetState(reader);
         }
     }
 }
