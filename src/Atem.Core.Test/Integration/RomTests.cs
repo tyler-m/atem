@@ -19,8 +19,8 @@ namespace Atem.Core.Test.Integration
         {
             Bus bus = new();
 
-            Processor processor = new(bus);
             Interrupt interrupt = new();
+            Processor processor = new(bus, interrupt);
             Joypad joypad = new(interrupt);
             Core.Processing.Timer timer = new(interrupt);
             SerialManager serial = new(interrupt);

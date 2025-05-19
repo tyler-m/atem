@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using Atem.Core.Memory;
 using Atem.Core.State;
 
@@ -11,7 +12,8 @@ namespace Atem.Core.Processing
         STAT,
         Timer,
         Serial,
-        Joypad
+        Joypad,
+        None
     }
 
     public class Interrupt : IAddressable, IBootable, IStateful
@@ -22,6 +24,28 @@ namespace Atem.Core.Processing
         public void SetInterrupt(InterruptType interruptType)
         {
             IF = IF.SetBit((int)interruptType);
+        }
+
+        public void ClearInterrupt(InterruptType interruptType)
+        {
+            IF = IF.ClearBit((int)interruptType);
+        }
+
+        public bool IsPending()
+        {
+            return (IE & IF) != 0;
+        }
+
+        public InterruptType GetNextInterrupt()
+        {
+            int i = BitOperations.TrailingZeroCount(IE & IF);
+
+            if (i >= 5)
+            {
+                return InterruptType.None;
+            }
+
+            return (InterruptType)i;
         }
 
         public byte Read(ushort address, bool ignoreAccessRestrictions = false)

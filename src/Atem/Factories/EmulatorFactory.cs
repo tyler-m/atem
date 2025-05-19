@@ -13,8 +13,8 @@ namespace Atem.Factories
         public static Emulator Create()
         {
             Bus bus = new();
-            Processor processor = new(bus);
             Interrupt interrupt = new();
+            Processor processor = new(bus, interrupt);
             Joypad joypad = new(interrupt);
             Timer timer = new(interrupt);
             SerialManager serial = new(interrupt);

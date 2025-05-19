@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Numerics;
 
 namespace Atem.Core.Processing
 {
+    /// <summary>
+    /// Represents the central processing unit of the emulator, responsible for
+    /// fetching, decoding, and executing instructions according to the SHARP
+    /// LR35902 instruction set architecture.
+    /// </summary>
     public class Processor : IProcessor
     {
         public const int FREQUENCY = 4194304;
 
         private readonly ProcessorRegisters _registers;
         private readonly IBus _bus;
+        private readonly Interrupt _interrupt;
         private byte _instruction;
         private int _length;
         private bool _halted;
         private bool _instructionFinished = true;
         private int _tick;
         private readonly ushort[] _interruptJumps = [0x0040, 0x0048, 0x0050, 0x0058, 0x0060];
-        private int _interruptType;
+        private InterruptType _interruptType;
 
         private readonly Dictionary<byte, Func<IProcessor, int>> _instructions = [];
         private readonly Dictionary<byte, Func<IProcessor, int>> _instructionsCB = [];
@@ -41,9 +46,10 @@ namespace Atem.Core.Processing
             }
         }
 
-        public Processor(IBus bus)
+        public Processor(IBus bus, Interrupt interrupt)
         {
             _bus = bus;
+            _interrupt = interrupt;
             _registers = new ProcessorRegisters();
             PopulateInstructionsLists();
         }
@@ -105,9 +111,7 @@ namespace Atem.Core.Processing
         {
             if (_halted)
             {
-                byte IE = _bus.Read(0xFFFF);
-                byte IF = _bus.Read(0xFF0F);
-                if ((IE & IF) != 0)
+                if (_interrupt.IsPending())
                 {
                     _halted = false;
                     _instructionFinished = true;
@@ -125,19 +129,16 @@ namespace Atem.Core.Processing
 
                 if (IME)
                 {
-                    byte IE = _bus.Read(0xFFFF);
-                    byte IF = _bus.Read(0xFF0F);
-                    int i = BitOperations.TrailingZeroCount(IE & IF);
+                    InterruptType interruptType = _interrupt.GetNextInterrupt();
 
-                    if (i < 5)
+                    if (interruptType != InterruptType.None)
                     {
                         IME = false;
-                        _bus.Write(0xFF0F, IF.ClearBit(i));
-                        _instructionFinished = false;
-                        _interruptType = i;
+                        _interrupt.ClearInterrupt(interruptType);
+                        _interruptType = interruptType;
                         _length = 5;
                         PushWord(Registers.PC);
-                        Registers.PC = _interruptJumps[_interruptType];
+                        Registers.PC = _interruptJumps[(int)_interruptType];
                         _tick++;
                         return false;
                     }
@@ -202,7 +203,7 @@ namespace Atem.Core.Processing
             writer.Write(_halted);
             writer.Write(_instructionFinished);
             writer.Write(_tick);
-            writer.Write(_interruptType);
+            writer.Write((int)_interruptType);
         }
 
         public void SetState(BinaryReader reader)
@@ -217,7 +218,7 @@ namespace Atem.Core.Processing
             _halted = reader.ReadBoolean();
             _instructionFinished = reader.ReadBoolean();
             _tick = reader.ReadInt32();
-            _interruptType = reader.ReadInt32();
+            _interruptType = (InterruptType)reader.ReadInt32();
         }
     }
 }
