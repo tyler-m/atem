@@ -3,7 +3,7 @@
 PROJECT_PATH="./src/Atem/Atem.csproj"
 OUTPUT_DIR="./dist"
 LICENSE_FILE="./LICENSE"
-NOTICE_FILE="./THIRD-PARTY-LICENSES"
+NOTICE_FILE="./THIRD-PARTY-NOTICES"
 
 declare -A RUNTIMES
 RUNTIMES["win-x64"]="cimgui.dll soft_oal.dll SDL2.dll"
@@ -44,15 +44,15 @@ move_runtime_files() {
   done
 }
 
-copy_license_files() {
+copy_notice_files() {
   local output_path=$1
 
-  local license_path="$output_path/licenses"
-  mkdir -p "$license_path"
-  if cp "$LICENSE_FILE" "$license_path" && cp "$NOTICE_FILE" "$license_path"; then
-    echo "Copied license and third-party licenses"
+  local notices_path="$output_path/notices"
+  mkdir -p "$notices_path"
+  if cp "$LICENSE_FILE" "$notices_path" && cp "$NOTICE_FILE" "$notices_path"; then
+    echo "Copied license and third-party notices"
   else
-    echo "Error copying license files"
+    echo "Error copying notice files"
     exit 1
   fi
 }
@@ -78,14 +78,14 @@ for RUNTIME in "${!RUNTIMES[@]}"; do
   RUNTIME_OUTPUT_PATH="$OUTPUT_PATH/runtimes/$RUNTIME/native"
   publish "$RUNTIME" false "$OUTPUT_PATH"
   move_runtime_files "$RUNTIMES_LIST" "$OUTPUT_PATH" "$RUNTIME_OUTPUT_PATH"
-  copy_license_files "$OUTPUT_PATH"
+  copy_notice_files "$OUTPUT_PATH"
 
   # self-contained
   OUTPUT_PATH="$OUTPUT_PATH_PREFIX-$RUNTIME-sc"
   RUNTIME_OUTPUT_PATH="$OUTPUT_PATH/runtimes/$RUNTIME/native"
   publish "$RUNTIME" true "$OUTPUT_PATH"
   move_runtime_files "$RUNTIMES_LIST" "$OUTPUT_PATH" "$RUNTIME_OUTPUT_PATH"
-  copy_license_files "$OUTPUT_PATH"
+  copy_notice_files "$OUTPUT_PATH"
 done
 
 echo "Published to $OUTPUT_DIR"

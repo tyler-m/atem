@@ -1,5 +1,5 @@
 ﻿// This file contains modified sample code from the ImGui.NET project,
-// please see THIRD-PARTY-LICENSES for the relevant copyright notice.
+// please see THIRD-PARTY-NOTICES for the relevant copyright notice.
 
 using System;
 using System.Collections.Generic;
