@@ -9,6 +9,12 @@ using Atem.Core.State;
 
 namespace Atem.Core
 {
+    /// <summary>
+    /// Represents the Game Boy emulator, holding all major subsystems
+    /// including CPU, memory, graphics, audio, input, timers, and serial I/O.
+    /// This class drives the emulation loop and faciliates state serialization,
+    /// cartridge loading, and system reset behavior.
+    /// </summary>
     public class Emulator : IEmulator
     {
         private const float ClocksPerFrame = Processor.FREQUENCY / GraphicsManager.FrameRate;
@@ -37,7 +43,17 @@ namespace Atem.Core
             remove => Graphics.OnVerticalBlank -= value;
         }
 
-        public Emulator(Bus bus, Processor processor, Interrupt interrupt, Joypad joypad, Timer timer, ISerialManager serial, AudioManager audio, Cartridge cartridge, GraphicsManager graphics, SystemMemory systemMemory)
+        public Emulator(
+            Bus bus,
+            Processor processor,
+            Interrupt interrupt,
+            Joypad joypad,
+            Timer timer,
+            ISerialManager serial,
+            AudioManager audio,
+            Cartridge cartridge,
+            GraphicsManager graphics,
+            SystemMemory systemMemory)
         {
             Bus = bus;
             Processor = processor;
