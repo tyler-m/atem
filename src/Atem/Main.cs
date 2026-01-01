@@ -1,5 +1,5 @@
-﻿using Atem.Core;
-using Atem.Factories;
+﻿using Atem.App.Factories;
+using Atem.Core;
 using Atem.Views.MonoGame;
 
 namespace Atem

@@ -1,10 +1,10 @@
-﻿using Atem.Config;
+﻿using Atem.App.Config;
+using Atem.App.Graphics;
+using Atem.App.Input;
+using Atem.App.Input.Command;
+using Atem.App.IO;
 using Atem.Core.Audio;
 using Atem.Core.Audio.Channel;
-using Atem.Graphics;
-using Atem.Input;
-using Atem.Input.Command;
-using Atem.IO;
 using Atem.Views.MonoGame.Input;
 
 namespace Atem.Test.Config

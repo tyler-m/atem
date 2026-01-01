@@ -1,4 +1,4 @@
-﻿using Atem.Config;
+﻿using Atem.App.Config;
 
 namespace Atem.Test.Config
 {

@@ -1,5 +1,5 @@
-﻿using Atem.Input;
-using Atem.Input.Command;
+﻿using Atem.App.Input;
+using Atem.App.Input.Command;
 
 namespace Atem.Test.Input
 {

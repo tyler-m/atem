@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Atem.App.Graphics;
+using Atem.App.Input;
+using Atem.App.Input.Command;
+using Atem.App.IO;
 using ImGuiNET;
 using Atem.Core.Audio;
-using Atem.Graphics;
-using Atem.Input.Command;
-using Atem.Input;
-using Atem.IO;
 
 namespace Atem.Views.MonoGame.UI.Window
 {

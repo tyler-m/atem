@@ -1,13 +1,18 @@
-﻿using Atem.Core.Graphics.Palettes;
+﻿using System;
+using System.Collections.Generic;
+using Atem.Core.Graphics.Palettes;
 using Atem.Core.State;
 
 namespace Atem.Core.Graphics.Screen
 {
     public interface IScreenRenderer : IStateful
     {
-        public bool WindowEnabled { get; set; }
+	    public IReadOnlyList<uint> ArgbFrameBuffer { get; }
+		public bool WindowEnabled { get; set; }
         public bool BackgroundAndWindowEnabledOrPriority { get; set; }
         public GBColor[] Screen { get; }
         public void Clock();
-    }
+        
+        public event Action OnFrameReady;
+	}
 }

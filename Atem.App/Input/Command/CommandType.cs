@@ -1,0 +1,37 @@
+﻿namespace Atem.App.Input.Command
+{
+    public enum CommandType
+    {
+        Up,
+        Down,
+        Left,
+        Right,
+        B,
+        A,
+        Select,
+        Start,
+        Pause,
+        Continue,
+        LoadState0,
+        LoadState1,
+        LoadState2,
+        LoadState3,
+        LoadState4,
+        LoadState5,
+        LoadState6,
+        LoadState7,
+        LoadState8,
+        LoadState9,
+        SaveState0,
+        SaveState1,
+        SaveState2,
+        SaveState3,
+        SaveState4,
+        SaveState5,
+        SaveState6,
+        SaveState7,
+        SaveState8,
+        SaveState9,
+        Exit
+    }
+}
