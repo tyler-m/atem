@@ -79,9 +79,15 @@ namespace Atem.Core.Graphics.Objects
 
         public void CollectObjectsForScanline()
         {
-            // process 2 sprites per tick to spread OAM search across scanline,
-            // emulating real hardware behavior
-            for (int i = 0; i < 2; i++)
+	        // If this is the first call for a new line, clear old data
+	        if (_objectIndex == 0)
+	        {
+		        _spriteBuffer.Clear();
+	        }
+
+			// process 2 sprites per tick to spread OAM search across scanline,
+			// emulating real hardware behavior
+			for (int i = 0; i < 2; i++)
             {
                 // find object to add to the object buffer for the current line
                 if (_spriteBuffer.Count < SPRITE_BUFFER_LIMIT)
@@ -104,7 +110,13 @@ namespace Atem.Core.Graphics.Objects
             int offsetY = pixelY - (sprite.Y - 16);
             byte spriteTile = sprite.Tile;
 
-            if (LargeObjects)
+            // Safety: if sprite is not actually on this scanline, return transparent
+            if (offsetY < 0 || offsetY >= (LargeObjects ? 16 : 8))
+            {
+	            return 0;
+            }
+
+			if (LargeObjects)
             {
                 spriteTile &= 0b11111110;
 
