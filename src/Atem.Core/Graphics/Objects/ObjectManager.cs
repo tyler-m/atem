@@ -18,7 +18,8 @@ namespace Atem.Core.Graphics.Objects
         private readonly IPaletteProvider _paletteProvider;
         private readonly Cartridge _cartridge;
         private readonly Sprite[] _objects = new Sprite[MAX_SPRITES];
-        private readonly List<Sprite> _spriteBuffer = [];
+        private readonly Sprite[] _latchedObjects = new Sprite[MAX_SPRITES];
+        private readonly List<(Sprite, int)> _spriteBuffer = [];
         private int _objectIndex;
         private byte _odma;
 
@@ -49,6 +50,7 @@ namespace Atem.Core.Graphics.Objects
             for (int i = 0; i < MAX_SPRITES; i++)
             {
                 _objects[i] = new Sprite();
+                _latchedObjects[i] = new Sprite();
             }
 
             _renderModeScheduler.RenderModeChanged += RenderModeChanged;
@@ -86,13 +88,16 @@ namespace Atem.Core.Graphics.Objects
                 // find object to add to the object buffer for the current line
                 if (_spriteBuffer.Count < SPRITE_BUFFER_LIMIT)
                 {
-                    Sprite sprite = _objects[_objectIndex++];
+                    Sprite sprite = _objects[_objectIndex];
 
                     int spriteHeight = LargeObjects ? 16 : 8;
                     if (sprite.X > 0 && _renderModeScheduler.CurrentLine + 16 >= sprite.Y && _renderModeScheduler.CurrentLine + 16 < sprite.Y + spriteHeight)
                     {
-                        _spriteBuffer.Add(sprite);
+                        _latchedObjects[_objectIndex].Populate(sprite.Y, sprite.X, sprite.Tile, sprite.Flags);
+                        _spriteBuffer.Add((_latchedObjects[_objectIndex], _objectIndex));
                     }
+
+                    _objectIndex++;
                 }
             }
         }
@@ -140,7 +145,7 @@ namespace Atem.Core.Graphics.Objects
 
             for (int j = 0; j < _spriteBuffer.Count; j++)
             {
-                Sprite tempSprite = _spriteBuffer[j];
+                (Sprite tempSprite, _) = _spriteBuffer[j];
 
                 if (tempSprite.X > x && tempSprite.X <= x + 8)
                 {
@@ -247,11 +252,20 @@ namespace Atem.Core.Graphics.Objects
 
         public void GetState(BinaryWriter writer)
         {
-            writer.Write(_spriteBuffer.Count);
-            foreach (Sprite sprite in _objects)
+            for (int i = 0; i < MAX_SPRITES; i++)
             {
-                sprite.GetState(writer);
-                writer.Write(_spriteBuffer.IndexOf(sprite));
+                _objects[i].GetState(writer);
+            }
+
+            for (int i = 0; i < MAX_SPRITES; i++)
+            {
+                _latchedObjects[i].GetState(writer);
+            }
+
+            writer.Write(_spriteBuffer.Count);
+            foreach ((_, int spriteIndex) in _spriteBuffer)
+            {
+                writer.Write(spriteIndex);
             }
 
             writer.Write(ObjectsEnabled);
@@ -262,24 +276,23 @@ namespace Atem.Core.Graphics.Objects
 
         public void SetState(BinaryReader reader)
         {
-            // GraphicsManager alters the sprites in _objects as requested by
-            // the game. _spriteBuffer is always a list constructed of
-            // references to Sprites in the _objects list. _spriteBuffer must
-            // therefore be references to Sprites in the _objects list when
-            // the state of the emulator gets reassembled
-            int spriteBufferCount = reader.ReadInt32();
-            Sprite[] spriteBufferArray = new Sprite[spriteBufferCount];
-            foreach (Sprite sprite in _objects)
+            for (int i = 0; i < MAX_SPRITES; i++)
             {
-                sprite.SetState(reader);
-                int spriteBufferIndex = reader.ReadInt32();
-                if (spriteBufferIndex >= 0)
-                {
-                    spriteBufferArray[spriteBufferIndex] = sprite;
-                }
+                _objects[i].SetState(reader);
             }
+
+            for (int i = 0; i < MAX_SPRITES; i++)
+            {
+                _latchedObjects[i].SetState(reader);
+            }
+
             _spriteBuffer.Clear();
-            _spriteBuffer.AddRange(spriteBufferArray);
+            int spriteBufferCount = reader.ReadInt32();
+            for (int i = 0; i < spriteBufferCount; i++)
+            {
+                int spriteIndex = reader.ReadInt32();
+                _spriteBuffer.Add((_latchedObjects[spriteIndex], spriteIndex));
+            }
 
             ObjectsEnabled = reader.ReadBoolean();
             _objectIndex = reader.ReadInt32();
