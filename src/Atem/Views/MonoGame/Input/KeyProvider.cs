@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Atem.App.Input;
 using Microsoft.Xna.Framework.Input;
-using Atem.Input;
 
 namespace Atem.Views.MonoGame.Input
 {
@@ -39,10 +39,14 @@ namespace Atem.Views.MonoGame.Input
             return _currentState.IsKeyDown((Keys)keyCode) != _previousState.IsKeyDown((Keys)keyCode);
         }
 
-        public void Update()
+        public void PreUpdate()
         {
             _previousState = _currentState;
             _currentState = Keyboard.GetState();
+        }
+
+        public void PostUpdate()
+        {
         }
 
         public bool IsActive(Keybind keybind)

@@ -1,13 +1,14 @@
 ﻿using System;
+using Atem.App.Audio;
+using Atem.App.Graphics;
+using Atem.App.Input;
+using Atem.App.Shutdown;
+using Atem.App.View;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Atem.Audio;
 using Atem.Core;
 using Atem.Core.Graphics;
 using Atem.Core.Graphics.Screen;
-using Atem.Graphics;
-using Atem.Input;
-using Atem.Shutdown;
 using Atem.Views.MonoGame.UI;
 using Atem.Views.MonoGame.Graphics;
 

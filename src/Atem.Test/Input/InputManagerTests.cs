@@ -1,5 +1,5 @@
-﻿using Atem.Input;
-using Atem.Input.Command;
+﻿using Atem.App.Input;
+using Atem.App.Input.Command;
 
 namespace Atem.Test.Input
 {
@@ -111,7 +111,8 @@ namespace Atem.Test.Input
             public bool Control { get; set; }
             public bool Alt { get; set; }
 
-            public void Update() { }
+            public void PreUpdate() { }
+            public void PostUpdate() { }
             public bool IsActive(Keybind keybind) => ActiveKeys.Contains(keybind.Key);
             public bool IsKeyDown(int key) => KeysDown.Contains(key);
             public bool IsModifier(int key) => key == 16 || key == 17 || key == 18; // Shift, Ctrl, Alt

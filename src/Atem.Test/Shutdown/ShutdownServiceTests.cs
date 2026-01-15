@@ -1,8 +1,8 @@
-﻿using Atem.Config;
+﻿using Atem.App.Config;
+using Atem.App.Saving;
+using Atem.App.Shutdown;
 using Atem.Core;
 using Atem.Core.Memory;
-using Atem.Saving;
-using Atem.Shutdown;
 
 namespace Atem.Test.Shutdown
 {

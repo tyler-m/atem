@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Atem.App.Config;
+using Atem.App.Input;
+using Atem.App.Input.Command;
 using Microsoft.Xna.Framework.Input;
-using Atem.Config;
-using Atem.Input;
-using Atem.Input.Command;
 
 namespace Atem.Views.MonoGame.Config
 {
