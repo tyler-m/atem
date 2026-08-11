@@ -33,7 +33,7 @@ namespace Atem.Core.Graphics.Interrupts
         public void UpdateLineYCompare()
         {
             bool wasMatching = _currentlyOnLineY;
-            _currentlyOnLineY = _lineYToCompare == _scheduler.CurrentLine;
+            _currentlyOnLineY = _lineYToCompare == _scheduler.LineY;
 
             if (_interruptOnLineY && _currentlyOnLineY && !wasMatching)
             {

@@ -7,6 +7,7 @@ namespace Atem.Core.Graphics.Timing
     {
         public event EventHandler<RenderModeChangedEventArgs> RenderModeChanged;
         public byte CurrentLine { get; }
+        public byte LineY { get; }
         public RenderMode Mode { get; }
         public void Clock();
         public void Stop();

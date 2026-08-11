@@ -85,7 +85,7 @@ namespace Atem.Core.Graphics
 
         public byte LY
         {
-            get => _manager.RenderModeScheduler.CurrentLine;
+            get => _manager.RenderModeScheduler.LineY;
             set {  }
         }
 

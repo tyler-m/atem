@@ -34,6 +34,12 @@ namespace Atem.Core.Graphics.Timing
         private const byte FirstVerticalBlankLine = 144;
         private const byte LastVerticalBlankLine = 153;
 
+        /// <summary>
+        /// How long into line 153 the hardware still reports that line in LY. Past this point LY
+        /// reads 0 even though the PPU is still working through line 153.
+        /// </summary>
+        private const int LineYWrapDot = 4;
+
         private RenderMode _mode = RenderMode.OAM;
         private byte _currentLine;
         private int _lineDotCount;
@@ -41,6 +47,9 @@ namespace Atem.Core.Graphics.Timing
         public event EventHandler<RenderModeChangedEventArgs> RenderModeChanged;
 
         public byte CurrentLine => _currentLine;
+
+        public byte LineY => _currentLine == LastVerticalBlankLine && _lineDotCount >= LineYWrapDot ? (byte)0 : _currentLine;
+
         public RenderMode Mode => _mode;
 
         public void Clock()
