@@ -796,7 +796,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 0, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -839,7 +838,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 1, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -882,7 +880,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 2, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -925,7 +922,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 3, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -968,7 +964,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 4, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -1011,7 +1006,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 5, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -1054,7 +1048,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 6, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
@@ -1097,7 +1090,6 @@ namespace Atem.Core.Processing.Instructions
         {
             byte value = cpu.ReadBus(cpu.Registers.HL);
             FlipBit(cpu, 7, ref value);
-            cpu.WriteBus(cpu.Registers.HL, value);
             return 3;
         }
 
